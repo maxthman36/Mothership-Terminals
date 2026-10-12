@@ -428,6 +428,7 @@ renderer.domElement.addEventListener('pointerup', e => {
 /* ---------- ui buttons ---------- */
 const btnL = document.getElementById('btnLabels');
 const btnR = document.getElementById('btnRotate');
+let rotateOn = true;
 btnL.onclick = () => {
   const on = !labels[0].visible;
   labels.forEach(l => l.visible = on);
@@ -435,9 +436,10 @@ btnL.onclick = () => {
   btnL.classList.toggle('off', !on);
 };
 btnR.onclick = () => {
-  controls.autoRotate = !controls.autoRotate;
-  btnR.textContent = 'ROTATE: ' + (controls.autoRotate ? 'ON' : 'OFF');
-  btnR.classList.toggle('off', !controls.autoRotate);
+  rotateOn = !rotateOn;
+  controls.autoRotate = rotateOn;
+  btnR.textContent = 'ROTATE: ' + (rotateOn ? 'ON' : 'OFF');
+  btnR.classList.toggle('off', !rotateOn);
 };
 document.getElementById('btnReset').onclick = () => {
   camera.position.copy(CAM_HOME);
@@ -461,7 +463,7 @@ const clock = new THREE.Clock();
     const s = 1 + 0.35 * Math.sin(t * 3 + i * 1.7);
     b.scale.set(s, s, s);
   });
-  station.rotation.y += 0.0004;
+  station.rotation.y += rotateOn ? 0.0004 : 0;
   controls.update();
   renderer.render(scene, camera);
 })();

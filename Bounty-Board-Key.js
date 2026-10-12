@@ -13,7 +13,8 @@
    - travel.jumps: bus jumps from Prospero's Dream. 0 = in-system (no bus).
      null travel = sealed posting, no travel block shown.
    - travel.localKcr: null = cost unknown / paid at destination. A number =
-     estimated kcr for the local leg.
+     estimated kcr for the local leg, ONE WAY — the terminal doubles it
+     for the round-trip display.
    - PLAYER-FACING RULE: this terminal shows only what public feeds would
      know. No Warden spoilers, no active-warrant hints, no rumors framed as
      news. Encyclopedia, not newspaper.
@@ -24,7 +25,7 @@ const BOARD_KEY = {
 /* ---------- travel math (applies to every bounty) ---------- */
 travelConfig: {
   busKcrPerJumpPerPerson: 1,   // MPT Bus fare, per jump, per hunter
-  crewSize: 4,                 // hunters traveling — update after session 0
+  crewSize: 4,                 // hunters traveling — confirmed session 0 (4 players)
   // Book rates (Ship Breaker's Handbook, interplanetary table) for the local leg:
   linerSteerageKcr: 1,         // JOC-III liner, steerage, per person
   linerDistantX: 2,            // x2 to a distant planet
@@ -92,7 +93,7 @@ bounties: [
     reward: "[SEALED]", status: "CLOSED",
     client: "[SEALED]", fee: "—",
     lastKnown: "[SEALED]",
-    terms: "This warrant is closed to general licensees. Inquiries: Handler Venn, RAC Annex.",
+    terms: "This warrant is closed to general licensees. Aspirational posting — build your rank. Inquiries: Handler Venn, RAC Annex.",
     travel: null }
 ],
 

@@ -247,25 +247,27 @@ function renderBoard(){
   });
 }
 /* Travel estimate: bus to the system, local transport to the target.
-   Bus = jumps × fare × crew. Local leg comes from the key file. */
+   Bus = jumps × fare × crew × 2. Local leg comes from the key file (one-way),
+   doubled here. All figures are ROUND TRIP. */
 function travelHtml(b){
   const t=b.travel;
   if(!t) return "";
   let rows="";
   if(t.jumps>0){
-    const bus=t.jumps*TRAVEL.busKcrPerJumpPerPerson*TRAVEL.crewSize;
-    rows+=`<div><span class="dim">BUS</span> ${t.busRoute} — ${t.jumps} jump × ${TRAVEL.crewSize} hunters × ${TRAVEL.busKcrPerJumpPerPerson}kcr = <b class="amber">${bus}kcr</b></div>`;
+    const bus=t.jumps*TRAVEL.busKcrPerJumpPerPerson*TRAVEL.crewSize*2;
+    rows+=`<div><span class="dim">BUS</span> ${t.busRoute} — ${t.jumps} jump × ${TRAVEL.crewSize} hunters × ${TRAVEL.busKcrPerJumpPerPerson}kcr × 2 = <b class="amber">${bus}kcr</b> <span class="dim">round trip</span></div>`;
+    const local=t.localKcr==null?null:t.localKcr*2;
     rows+=`<div><span class="dim">LOCAL</span> ${t.local}`+
-      (t.localKcr==null?` <span class="dim">(cost at destination)</span>`:` = <b class="amber">${t.localKcr}kcr</b>`)+`</div>`;
-    rows+=`<div><span class="dim">TOTAL</span> ≈ <b class="amber">${bus+(t.localKcr||0)}kcr</b>`+
-      (t.localKcr==null?` <span class="dim">+ local</span>`:"")+`</div>`;
+      (local==null?` <span class="dim">(cost at destination)</span>`:` = <b class="amber">${local}kcr</b> <span class="dim">round trip</span>`)+`</div>`;
+    rows+=`<div><span class="dim">TOTAL</span> ≈ <b class="amber">${bus+(local||0)}kcr</b> <span class="dim">round trip</span>`+
+      (local==null?` <span class="dim">+ local</span>`:"")+`</div>`;
     rows+=`<div class="dim" style="margin-top:6px">${TRAVEL.busNote}</div>`;
   }else{
     rows+=`<div><span class="dim">LOCAL</span> ${t.local}</div>`;
-    rows+=`<div><span class="dim">TOTAL</span> ≈ <b class="amber">${t.localKcr||0}kcr</b> <span class="dim">out of pocket</span></div>`;
+    rows+=`<div><span class="dim">TOTAL</span> ≈ <b class="amber">${(t.localKcr||0)*2}kcr</b> <span class="dim">out of pocket, round trip</span></div>`;
     rows+=`<div class="dim" style="margin-top:6px">${TRAVEL.cutterNote}</div>`;
   }
-  return `<div style="margin-top:12px"><b class="amber">TRAVEL ESTIMATE</b><br>${rows}</div>`;
+  return `<div style="margin-top:12px"><b class="amber">TRAVEL ESTIMATE — ROUND TRIP</b><br>${rows}</div>`;
 }
 function selectBounty(i){
   const b=BOUNTIES[i];
