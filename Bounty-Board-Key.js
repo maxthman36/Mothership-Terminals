@@ -69,11 +69,11 @@ bounties: [
               localKcr: 1 } },
 
   { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
-    reward: "10 Kcr (+350 Kcr bonus for proof of death)", status: "OPEN",
+    reward: "10 Kcr (+100 Kcr bonus for proof of death)", status: "OPEN",
     client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",
-    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, 350 Kcr bonus for proof of death. Last trace: a closed-down arcade on the Dream still paying utilities on the company ledger. The arcade's machine is not what it seems. Report anything unusual. Anything.",
+    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, 100 Kcr bonus for proof of death. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
     travel: { jumps: 0,
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
