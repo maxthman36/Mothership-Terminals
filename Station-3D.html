@@ -69,7 +69,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const PINK = 0xff2d78;
-const DECK_TOP = 0.75;   // top face of the ring band
+const DECK_TOP = 0.75;   // deck plane modules sit on
 
 /* ---------- district data (in-universe; no page refs) ----------
    a = plan angle in degrees (0 = +X, CCW from above), r = plan radius.
@@ -229,31 +229,19 @@ function arcTorus(radius, tube, a0, a1, y, mat, tubSeg, radSeg) {
   return m;
 }
 {
-  // main band: annular sector from 18deg to 315deg
-  const a0 = D2R(18), a1 = D2R(315);
-  const shape = new THREE.Shape();
-  shape.absarc(0, 0, 32, a0, a1, false);   // outer arc
-  shape.absarc(0, 0, 20, a1, a0, true);    // inner arc back (auto-caps the cut ends)
-  shape.closePath();
-  const bandGeo = new THREE.ExtrudeGeometry(shape, { depth: 1.5, bevelEnabled: false, curveSegments: 72 });
-  const band = new THREE.Mesh(bandGeo, darkMat);
-  band.rotation.x = -Math.PI / 2;
-  band.position.y = -DECK_TOP;
-  station.add(band);
-  // concentric track lines on the deck
-  [22.5, 25.5, 28.5, 31].forEach(r => arcTorus(r, 0.12, 18, 315, DECK_TOP + 0.03, trackMat));
-  arcTorus(32, 0.35, 18, 315, 0, trackMat);   // outer rim
-  arcTorus(20, 0.3, 18, 315, 0, trackMat);    // inner rim
-  // ribs across the band: the original ribbed ring sections
-  for (let k = 0; k <= 25; k++) {
-    const a = D2R(18 + k * (297 / 25));
-    const rib = boxAt(12.8, 2.2, 0.7, 26 * Math.cos(a), 0, -26 * Math.sin(a), darkMat);
-    rib.rotation.y = a;
+  // main ring: exactly a 3/4 circle (270deg) of ribbed cylindrical tube.
+  // Gap between nodes 1 and 6; the ring is completely broken there.
+  const ringTube = arcTorus(26, 2.5, 45, 315, 0, hullMat, 100, 14);
+  for (let k = 0; k <= 23; k++) {
+    const t = (k / 23) * D2R(270);
+    const rib = new THREE.Mesh(new THREE.TorusGeometry(2.62, 0.18, 6, 18), trackMat);
+    rib.position.set(26 * Math.cos(t), 0, 26 * Math.sin(t));
+    rib.rotation.y = -t;
+    ringTube.add(rib);
   }
   // rebuilt extension: smooth tube across the gap to nodes 3 & 6.
-  // It starts clear of node 1's band end, so the ring stays completely
-  // broken between nodes 6 and 1.
-  arcTorus(30, 1.6, -5, 62, 0.9, hullMat, 60, 10);
+  // It starts clear of node 1's ring end, so the break stays complete.
+  arcTorus(30, 1.6, -5, 50, 0.9, hullMat, 60, 10);
   // stub from the extension down to node 3's module
   beamBetween(30 * Math.cos(D2R(45)), -30 * Math.sin(D2R(45)),
               21 * Math.cos(D2R(45)), -21 * Math.sin(D2R(45)), 0.8);
@@ -389,7 +377,7 @@ DISTRICTS.forEach(d => {
 
 /* ---------- beacons ---------- */
 const beacons = [];
-[[0, 25.5, 0], [32, 2.2, 0], [-32, 2.2, 0], [0, -36.5, 0]].forEach(p => {
+[[0, 25.5, 0], [0, 3.4, -26], [0, 3.4, 26], [0, -36.5, 0]].forEach(p => {
   const b = new THREE.Mesh(new THREE.SphereGeometry(0.7, 12, 12),
                            new THREE.MeshBasicMaterial({ color:PINK }));
   b.position.set(p[0], p[1], p[2]); station.add(b); beacons.push(b);
