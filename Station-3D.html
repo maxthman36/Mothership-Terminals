@@ -69,23 +69,26 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const PINK = 0xff2d78;
+const DECK_TOP = 0.75;   // top face of the ring band
 
-/* ---------- district data (in-universe; no page refs) ---------- */
+/* ---------- district data (in-universe; no page refs) ----------
+   a = plan angle in degrees (0 = +X, CCW from above), r = plan radius.
+   s = [x=radial, y=up, z=tangential] box size. Group rotated so +X is radial. */
 const DISTRICTS = [
   { n:"01", name:"DRY DOCK",           desc:"Docking and repairs. 1kcr docking fee + 100cr/day. O2 tax: 10cr/day/person.",
-    a:315, r:26, y:-2,  s:[10,7,10], tank:true, seed:11 },
+    a:315, r:26, s:[12,6,8], tank:true, docks:true, seed:11 },
   { n:"02", name:"STELLAR BURN",       desc:"Rumors, drinks, and R&R. Ask for Sem.",
-    a:225, r:26, y:4,   s:[7,5,7], seed:22 },
+    a:225, r:26, s:[10,6,10], seed:22 },
   { n:"03", name:"CHOP SHOP",          desc:"Cybermod installation and repair.",
-    a:45,  r:26, y:2,   s:[7,6,9], bentPipe:true, seed:33 },
+    a:45,  r:26, s:[10,6,8], bentPipe:true, seed:33 },
   { n:"04", name:"THE ICE BOX",        desc:"Slickware installation and re-sleeving.",
-    a:270, r:26, y:-3,  s:[9,7,8], seed:44 },
+    a:270, r:26, s:[6,5,10], seed:44 },
   { n:"05", name:"THE FARM",           desc:"The Dream's food supply, run by the Solarian Church.",
-    a:180, r:22, y:10,  s:[7,10,7], pylon:true, seed:55 },
+    a:180, r:26, s:[8,6,12], tower:[4,12,4], seed:55 },
   { n:"06", name:"CANYONHEAVY.MARKET", desc:"Information market run by an elite hacking crew.",
-    a:0,   r:26, y:1,   s:[7,5,8], seed:66 },
+    a:18,  r:33, s:[6,5,6], seed:66 },
   { n:"08", name:"TEMPEST CO. HQ",     desc:"Powerful mercenary company. They run station security.",
-    a:90,  r:20, y:16,  s:[5,22,5], pylon:true, seed:88 },
+    a:90,  r:26, s:[8,6,12], tower:[5,24,5], seed:88 },
   { n:"09", name:"DOPTOWN",            desc:"Debtor's town. For those who can't pay the O2 tax.",
     a:-15, r:8,  y:-16, s:[7,6,7], col:true, seed:99 },
   { n:"10", name:"THE CHOKE",          desc:"Abandoned, quarantined wasteland.",
@@ -144,6 +147,7 @@ const station = new THREE.Group(); scene.add(station);
 const hullMat  = new THREE.MeshStandardMaterial({ color:0x14141b, roughness:0.5, metalness:0.7 });
 const darkMat  = new THREE.MeshStandardMaterial({ color:0x0a0a0f, roughness:0.7, metalness:0.5 });
 const edgeMat  = new THREE.LineBasicMaterial({ color:PINK, transparent:true, opacity:0.8 });
+const trackMat = new THREE.MeshBasicMaterial({ color:PINK });
 const pickables = [];
 const labels = [];
 
@@ -168,15 +172,16 @@ function boxAt(w, h, d, x, y, z, mat) {
   g.position.set(x, y, z); station.add(g); return g;
 }
 
-/* ---------- central disc (The Court platform) ---------- */
+/* ---------- central hub disc (The Court platform) ---------- */
 const courtGroup = new THREE.Group();
 courtGroup.userData.district = COURT;
 {
   const disc = edged(new THREE.CylinderGeometry(11, 11, 3, 24), hullMat);
   courtGroup.add(disc);
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(11, 0.45, 8, 48),
-                             new THREE.MeshBasicMaterial({ color:PINK }));
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(11, 0.45, 8, 48), trackMat);
   rim.rotation.x = Math.PI / 2; rim.position.y = 1.5; courtGroup.add(rim);
+  const hubRing = new THREE.Mesh(new THREE.TorusGeometry(7, 0.22, 8, 40), trackMat);
+  hubRing.rotation.x = Math.PI / 2; hubRing.position.y = 1.55; courtGroup.add(hubRing);
   const hall = edged(new THREE.BoxGeometry(8.5, 4.5, 8.5), hullMat);
   hall.position.y = 3.75; courtGroup.add(hall);
   const tier = edged(new THREE.BoxGeometry(5.5, 3, 5.5), darkMat);
@@ -186,7 +191,7 @@ courtGroup.userData.district = COURT;
   COURT._group = courtGroup;
 }
 
-/* ---------- tapered column below + fins ---------- */
+/* ---------- tapered column below + fins (houses 09/10) ---------- */
 {
   const col = edged(new THREE.CylinderGeometry(4.5, 2.2, 34, 8), darkMat);
   col.position.y = -18.5; station.add(col);
@@ -202,20 +207,28 @@ boxAt(3, 22, 3, 0, 13, 0, darkMat);   // spans y 2..24
 boxAt(8, 1.2, 1.2, 0, 18, 0, darkMat);
 boxAt(1.2, 1.2, 6, 0, 21.5, 0, darkMat);
 
-/* ---------- ring + spokes ---------- */
+/* ---------- ring band: flat annulus with concentric track lines ---------- */
 {
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(26, 1.8, 10, 80), hullMat);
-  ring.rotation.x = Math.PI / 2; station.add(ring);
-  const ringEdge = new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.TorusGeometry(26, 1.8, 6, 40)), edgeMat);
-  ringEdge.rotation.x = Math.PI / 2; station.add(ringEdge);
-  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(26, 0.8, 8, 80), darkMat);
-  ring2.rotation.x = Math.PI / 2; ring2.position.y = -3.4; station.add(ring2);
-  for (let i = 0; i < 8; i++) {
-    const a = i * Math.PI / 4;
-    const sp = boxAt(15, 1, 1, 18.5 * Math.cos(a), 0, -18.5 * Math.sin(a), darkMat);
-    sp.rotation.y = a;
-  }
+  const shape = new THREE.Shape();
+  shape.absarc(0, 0, 32, 0, Math.PI * 2, false);
+  const hole = new THREE.Path();
+  hole.absarc(0, 0, 20, 0, Math.PI * 2, true);
+  shape.holes.push(hole);
+  const bandGeo = new THREE.ExtrudeGeometry(shape, { depth: 1.5, bevelEnabled: false, curveSegments: 72 });
+  const band = new THREE.Mesh(bandGeo, darkMat);
+  band.rotation.x = -Math.PI / 2;
+  band.position.y = -DECK_TOP;
+  station.add(band);
+  // concentric track lines on the deck, like the plan's multi-line ring
+  [22.5, 25.5, 28.5, 31].forEach(r => {
+    const t = new THREE.Mesh(new THREE.TorusGeometry(r, 0.12, 6, 90), trackMat);
+    t.rotation.x = Math.PI / 2; t.position.y = DECK_TOP + 0.03;
+    station.add(t);
+  });
+  const rimOut = new THREE.Mesh(new THREE.TorusGeometry(32, 0.35, 8, 90), trackMat);
+  rimOut.rotation.x = Math.PI / 2; rimOut.position.y = 0; station.add(rimOut);
+  const rimIn = new THREE.Mesh(new THREE.TorusGeometry(20, 0.3, 8, 72), trackMat);
+  rimIn.rotation.x = Math.PI / 2; rimIn.position.y = 0; station.add(rimIn);
 }
 
 /* ---------- district label sprites ---------- */
@@ -237,7 +250,7 @@ function makeLabel(num, name) {
   return sp;
 }
 
-/* ---------- district clusters ---------- */
+/* ---------- district modules on the band ---------- */
 DISTRICTS.forEach(d => {
   const rad = d.a * Math.PI / 180;
   const px = d.r * Math.cos(rad), pz = -d.r * Math.sin(rad);
@@ -246,24 +259,47 @@ DISTRICTS.forEach(d => {
   grp.userData.district = d;
   grp.rotation.y = rad;   // local +X points radially outward
 
+  const deckY = d.col ? d.y : DECK_TOP + d.s[1] / 2;
+
   const main = edged(new THREE.BoxGeometry(d.s[0], d.s[1], d.s[2]), hullMat);
   grp.add(main); pickables.push(main.children[0]);
 
-  // greebles: small boxes on top and sides
+  // roof greebles
   const n = 4 + Math.floor(rnd() * 3);
   for (let i = 0; i < n; i++) {
     const w = 1 + rnd() * d.s[0] * 0.35, h = 1 + rnd() * 3, dep = 1 + rnd() * d.s[2] * 0.35;
     const g = edged(new THREE.BoxGeometry(w, h, dep), darkMat);
     if (rnd() < 0.35) {
       const side = rnd() < 0.5 ? 1 : -1;
-      g.position.set(side * (d.s[0]/2 + w/2 - 0.3), (rnd()-0.5) * d.s[1] * 0.6, (rnd()-0.5) * d.s[2] * 0.8);
+      g.position.set(side * (d.s[0]/2 + w/2 - 0.5), (rnd()-0.5) * d.s[1] * 0.5, (rnd()-0.5) * d.s[2] * 0.8);
     } else {
-      g.position.set((rnd()-0.5) * d.s[0] * 0.9, d.s[1]/2 + h/2 - 0.3, (rnd()-0.5) * d.s[2] * 0.9);
+      g.position.set((rnd()-0.5) * d.s[0] * 0.9, d.s[1]/2 + h/2 - 0.5, (rnd()-0.5) * d.s[2] * 0.9);
     }
     grp.add(g); pickables.push(g.children[0]);
   }
 
-  // ribbed horizontal tank (Dry Dock)
+  // docking arms at the outer end (Dry Dock)
+  if (d.docks) {
+    [-1, 1].forEach(sgn => {
+      const da = edged(new THREE.BoxGeometry(3, 2, 1.5), darkMat);
+      da.position.set(d.s[0]/2 + 1.2, -d.s[1]/2 + 1, sgn * d.s[2] / 4);
+      grp.add(da); pickables.push(da.children[0]);
+    });
+  }
+
+  // tower rising from the module (Farm, Tempest HQ)
+  let topY = d.s[1] / 2;
+  if (d.tower) {
+    const tw = edged(new THREE.BoxGeometry(d.tower[0], d.tower[1], d.tower[2]), hullMat);
+    tw.position.set(0, d.s[1]/2 + d.tower[1]/2 - 0.5, 0);
+    grp.add(tw); pickables.push(tw.children[0]);
+    const cap = edged(new THREE.BoxGeometry(d.tower[0]*0.6, 2, d.tower[2]*0.6), darkMat);
+    cap.position.set(0, d.s[1]/2 + d.tower[1] - 0.5 + 1, 0);
+    grp.add(cap); pickables.push(cap.children[0]);
+    topY = d.s[1]/2 + d.tower[1] + 1.5;
+  }
+
+  // ribbed horizontal tank (Dry Dock), resting on the deck
   if (d.tank) {
     const tank = new THREE.Group();
     const bodyGeo = new THREE.CylinderGeometry(2.2, 2.2, 12, 12);
@@ -272,18 +308,16 @@ DISTRICTS.forEach(d => {
     const bodyEdge = new THREE.LineSegments(new THREE.EdgesGeometry(bodyGeo), edgeMat);
     bodyEdge.rotation.z = Math.PI / 2; tank.add(bodyEdge);
     for (let i = 0; i < 6; i++) {
-      const rib = new THREE.Mesh(new THREE.TorusGeometry(2.25, 0.16, 8, 20),
-                                 new THREE.MeshBasicMaterial({ color:PINK }));
+      const rib = new THREE.Mesh(new THREE.TorusGeometry(2.25, 0.16, 8, 20), trackMat);
       rib.rotation.y = Math.PI / 2;
       rib.position.x = -5 + i * 2;
       tank.add(rib);
     }
-    tank.position.set(d.s[0]/2 + 5.5, -d.s[1]/2 + 2.4, 2);
+    tank.position.set(d.s[0]/2 + 5.5, -d.s[1]/2 + 2.2, 2);
     grp.add(tank); pickables.push(body);
   }
 
-  // bent pipe (Chop Shop): candy-cane exhaust stack rising out of the roof,
-  // curving outward. Lower end is buried inside the module so it reads attached.
+  // bent pipe (Chop Shop): candy-cane exhaust stack, lower end buried in the roof
   if (d.bentPipe) {
     const PR = 7, arc = Math.PI * 0.5;
     const pipeGeo = new THREE.TorusGeometry(PR, 1.4, 10, 28, arc);
@@ -295,27 +329,22 @@ DISTRICTS.forEach(d => {
     grp.add(pipe); grp.add(pe); pickables.push(pipe);
   }
 
-  // support pylon up from the ring plane (towers)
-  if (d.pylon) {
-    const bottom = d.y - d.s[1] / 2;
-    if (bottom > 0.5) boxAt(2.5, bottom, 2.5, px, bottom / 2, pz, darkMat);
-  }
-
-  // horizontal arm: disc rim (or column) out to the module
+  // spoke: hub disc rim (or column) out to the module
   const inner = d.col ? 3 : 11;
   const reach = d.r - inner + d.s[0] / 2 + 1;
   if (reach > 2) {
+    const armY = d.col ? d.y : 0;
     const arm = boxAt(reach, 1.1, 1.1, 0, 0, 0, darkMat);
     const mid = inner + reach / 2;
-    arm.position.set(mid * Math.cos(rad), d.y, -mid * Math.sin(rad));
+    arm.position.set(mid * Math.cos(rad), armY, -mid * Math.sin(rad));
     arm.rotation.y = rad;
   }
 
   const label = makeLabel(d.n, d.name);
-  label.position.set(px, d.y + d.s[1]/2 + 5, pz);
+  label.position.set(px, deckY + topY + 5, pz);
   station.add(label); labels.push(label);
 
-  grp.position.set(px, d.y, pz);
+  grp.position.set(px, deckY, pz);
   station.add(grp);
   d._group = grp;
 });
@@ -329,7 +358,7 @@ DISTRICTS.forEach(d => {
 
 /* ---------- beacons ---------- */
 const beacons = [];
-[[0, 25.5, 0], [26, 4.2, 0], [-26, 4.2, 0], [0, -36.5, 0]].forEach(p => {
+[[0, 25.5, 0], [32, 2.2, 0], [-32, 2.2, 0], [0, -36.5, 0]].forEach(p => {
   const b = new THREE.Mesh(new THREE.SphereGeometry(0.7, 12, 12),
                            new THREE.MeshBasicMaterial({ color:PINK }));
   b.position.set(p[0], p[1], p[2]); station.add(b); beacons.push(b);
@@ -343,8 +372,7 @@ let selected = null;
 let downAt = null;
 
 function setHighlight(d, on) {
-  const grp = d._group;
-  grp.traverse(o => {
+  d._group.traverse(o => {
     if (o.isMesh && o.material && o.material.emissive !== undefined) {
       if (on) { o.userData._mat = o.material; o.material = o.material.clone();
                 o.material.emissive = new THREE.Color(PINK); o.material.emissiveIntensity = 0.35; }
