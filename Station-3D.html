@@ -76,11 +76,11 @@ const DECK_TOP = 0.75;   // top face of the ring band
    s = [x=radial, y=up, z=tangential] box size. Group rotated so +X is radial. */
 const DISTRICTS = [
   { n:"01", name:"DRY DOCK",           desc:"Docking and repairs. 1kcr docking fee + 100cr/day. O2 tax: 10cr/day/person.",
-    a:315, r:26, s:[12,6,8], tank:true, docks:true, seed:11 },
+    a:315, r:26, s:[12,6,8], docks:true, seed:11 },
   { n:"02", name:"STELLAR BURN",       desc:"Rumors, drinks, and R&R. Ask for Sem.",
     a:225, r:26, s:[10,6,10], seed:22 },
   { n:"03", name:"CHOP SHOP",          desc:"Cybermod installation and repair.",
-    a:45,  r:26, s:[10,6,8], bentPipe:true, seed:33 },
+    a:45,  r:26, s:[10,6,8], seed:33 },
   { n:"04", name:"THE ICE BOX",        desc:"Slickware installation and re-sleeving.",
     a:270, r:26, s:[6,5,10], seed:44 },
   { n:"05", name:"THE FARM",           desc:"The Dream's food supply, run by the Solarian Church.",
@@ -88,7 +88,7 @@ const DISTRICTS = [
   { n:"06", name:"CANYONHEAVY.MARKET", desc:"Information market run by an elite hacking crew.",
     a:18,  r:33, s:[6,5,6], seed:66 },
   { n:"08", name:"TEMPEST CO. HQ",     desc:"Powerful mercenary company. They run station security.",
-    a:90,  r:26, s:[8,6,12], tower:[5,24,5], seed:88 },
+    a:90,  r:26, s:[8,6,12], tower:[5,24,5], keel:[4,16,4], seed:88 },
   { n:"09", name:"DOPTOWN",            desc:"Debtor's town. For those who can't pay the O2 tax.",
     a:-15, r:8,  y:-16, s:[7,6,7], col:true, seed:99 },
   { n:"10", name:"THE CHOKE",          desc:"Abandoned, quarantined wasteland.",
@@ -171,6 +171,12 @@ function boxAt(w, h, d, x, y, z, mat) {
   const g = edged(new THREE.BoxGeometry(w, h, d), mat || hullMat);
   g.position.set(x, y, z); station.add(g); return g;
 }
+function beamBetween(x1, z1, x2, z2, y, h) {
+  const dx = x2 - x1, dz = z2 - z1;
+  const b = boxAt(Math.hypot(dx, dz), h || 1.1, h || 1.1, (x1+x2)/2, y, (z1+z2)/2, darkMat);
+  b.rotation.y = Math.atan2(-dz, dx);
+  return b;
+}
 
 /* ---------- central hub disc (The Court platform) ---------- */
 const courtGroup = new THREE.Group();
@@ -207,29 +213,62 @@ boxAt(3, 22, 3, 0, 13, 0, darkMat);   // spans y 2..24
 boxAt(8, 1.2, 1.2, 0, 18, 0, darkMat);
 boxAt(1.2, 1.2, 6, 0, 21.5, 0, darkMat);
 
-/* ---------- ring band: flat annulus with concentric track lines ---------- */
+/* ---------- ring: 3/4 annular sector, ribbed, plus a rebuilt extension ----------
+   The ring was built as a 3/4 circle of ribbed ring sections (gap between
+   nodes 1 and 6), then rebuilt with a curved extension out to nodes 3 and 6. */
+const D2R = THREE.MathUtils.degToRad;
+function arcTorus(radius, tube, a0, a1, y, mat, tubSeg, radSeg) {
+  // torus arc spanning plan-angles [a0, a1] (0 = +X, CCW from above)
+  const g = new THREE.TorusGeometry(radius, tube, radSeg || 8, tubSeg || 90, D2R(a1 - a0));
+  g.rotateX(Math.PI / 2);
+  const m = new THREE.Mesh(g, mat);
+  m.rotation.y = D2R(a1);
+  m.position.y = y;
+  station.add(m);
+  return m;
+}
 {
+  // main band: annular sector from 18deg to 315deg
+  const a0 = D2R(18), a1 = D2R(315);
   const shape = new THREE.Shape();
-  shape.absarc(0, 0, 32, 0, Math.PI * 2, false);
-  const hole = new THREE.Path();
-  hole.absarc(0, 0, 20, 0, Math.PI * 2, true);
-  shape.holes.push(hole);
+  shape.absarc(0, 0, 32, a0, a1, false);   // outer arc
+  shape.absarc(0, 0, 20, a1, a0, true);    // inner arc back (auto-caps the cut ends)
+  shape.closePath();
   const bandGeo = new THREE.ExtrudeGeometry(shape, { depth: 1.5, bevelEnabled: false, curveSegments: 72 });
   const band = new THREE.Mesh(bandGeo, darkMat);
   band.rotation.x = -Math.PI / 2;
   band.position.y = -DECK_TOP;
   station.add(band);
-  // concentric track lines on the deck, like the plan's multi-line ring
-  [22.5, 25.5, 28.5, 31].forEach(r => {
-    const t = new THREE.Mesh(new THREE.TorusGeometry(r, 0.12, 6, 90), trackMat);
-    t.rotation.x = Math.PI / 2; t.position.y = DECK_TOP + 0.03;
-    station.add(t);
-  });
-  const rimOut = new THREE.Mesh(new THREE.TorusGeometry(32, 0.35, 8, 90), trackMat);
-  rimOut.rotation.x = Math.PI / 2; rimOut.position.y = 0; station.add(rimOut);
-  const rimIn = new THREE.Mesh(new THREE.TorusGeometry(20, 0.3, 8, 72), trackMat);
-  rimIn.rotation.x = Math.PI / 2; rimIn.position.y = 0; station.add(rimIn);
+  // concentric track lines on the deck
+  [22.5, 25.5, 28.5, 31].forEach(r => arcTorus(r, 0.12, 18, 315, DECK_TOP + 0.03, trackMat));
+  arcTorus(32, 0.35, 18, 315, 0, trackMat);   // outer rim
+  arcTorus(20, 0.3, 18, 315, 0, trackMat);    // inner rim
+  // ribs across the band: the original ribbed ring sections
+  for (let k = 0; k <= 25; k++) {
+    const a = D2R(18 + k * (297 / 25));
+    const rib = boxAt(12.8, 2.2, 0.7, 26 * Math.cos(a), 0, -26 * Math.sin(a), darkMat);
+    rib.rotation.y = a;
+  }
+  // rebuilt extension: ribbed tube from the band's 315deg end, across the gap to nodes 3 & 6
+  const ext = arcTorus(30, 1.6, -45, 55, 0, hullMat, 60, 10);
+  for (let i = 0; i <= 7; i++) {
+    const t = (i / 7) * D2R(100);
+    const rib = new THREE.Mesh(new THREE.TorusGeometry(1.72, 0.15, 6, 18), trackMat);
+    rib.position.set(30 * Math.cos(t), 0, 30 * Math.sin(t));
+    rib.rotation.y = -t;
+    ext.add(rib);
+  }
+  // stub from the extension to node 3's module
+  beamBetween(30 * Math.cos(D2R(45)), -30 * Math.sin(D2R(45)),
+              21 * Math.cos(D2R(45)), -21 * Math.sin(D2R(45)), 0);
 }
+
+/* ---------- 5 spokes: between 1&4, at 2, near 5, on 8, on 3 ---------- */
+[292.5, 225, 172, 90, 45].forEach(deg => {
+  const a = D2R(deg), inner = 11, len = 16;
+  const sp = boxAt(len, 1.3, 1.3, (inner + len/2) * Math.cos(a), 0, -(inner + len/2) * Math.sin(a), darkMat);
+  sp.rotation.y = a;
+});
 
 /* ---------- district label sprites ---------- */
 function makeLabel(num, name) {
@@ -299,45 +338,41 @@ DISTRICTS.forEach(d => {
     topY = d.s[1]/2 + d.tower[1] + 1.5;
   }
 
-  // ribbed horizontal tank (Dry Dock), resting on the deck
-  if (d.tank) {
-    const tank = new THREE.Group();
-    const bodyGeo = new THREE.CylinderGeometry(2.2, 2.2, 12, 12);
-    const body = new THREE.Mesh(bodyGeo, hullMat);
-    body.rotation.z = Math.PI / 2; tank.add(body);
-    const bodyEdge = new THREE.LineSegments(new THREE.EdgesGeometry(bodyGeo), edgeMat);
-    bodyEdge.rotation.z = Math.PI / 2; tank.add(bodyEdge);
-    for (let i = 0; i < 6; i++) {
-      const rib = new THREE.Mesh(new THREE.TorusGeometry(2.25, 0.16, 8, 20), trackMat);
-      rib.rotation.y = Math.PI / 2;
-      rib.position.x = -5 + i * 2;
-      tank.add(rib);
-    }
-    tank.position.set(d.s[0]/2 + 5.5, -d.s[1]/2 + 2.2, 2);
-    grp.add(tank); pickables.push(body);
+  // open docking boxes (Dry Dock): hollow cradles, mouths facing outward
+  if (d.docks) {
+    const bay = (w, h, dpt, lx, lz) => {
+      const g = new THREE.Group();
+      const t = 0.5;
+      const panel = (bw, bh, bd, x, y, z) => {
+        const p = edged(new THREE.BoxGeometry(bw, bh, bd), darkMat);
+        p.position.set(x, y, z); g.add(p); pickables.push(p.children[0]);
+      };
+      panel(t, h, dpt, -w/2, 0, 0);   // back wall
+      panel(w, t, dpt, 0, h/2, 0);    // roof
+      panel(w, t, dpt, 0, -h/2, 0);   // floor
+      panel(w, h, t, 0, 0, dpt/2);    // side wall
+      panel(w, h, t, 0, 0, -dpt/2);   // side wall
+      g.position.set(lx, -d.s[1]/2 + h/2 + 0.6, lz);
+      grp.add(g);
+    };
+    bay(7, 5.5, 6, d.s[0]/2 + 3.5, -4);
+    bay(6, 4.5, 5, d.s[0]/2 + 3, 3.5);
+    bay(5, 4, 5, d.s[0]/2 + 9, -1);
   }
 
-  // bent pipe (Chop Shop): candy-cane exhaust stack, lower end buried in the roof
-  if (d.bentPipe) {
-    const PR = 7, arc = Math.PI * 0.5;
-    const pipeGeo = new THREE.TorusGeometry(PR, 1.4, 10, 28, arc);
-    const pipe = new THREE.Mesh(pipeGeo, hullMat);
-    pipe.rotation.z = Math.PI * 1.5;   // spans 270deg -> 360deg
-    pipe.position.set(d.s[0]/2 - PR + 2, d.s[1]/2 + PR - 1, 0);
-    const pe = new THREE.LineSegments(new THREE.EdgesGeometry(pipeGeo), edgeMat);
-    pe.position.copy(pipe.position); pe.rotation.copy(pipe.rotation);
-    grp.add(pipe); grp.add(pe); pickables.push(pipe);
-  }
-
-  // spoke: hub disc rim (or column) out to the module
-  const inner = d.col ? 3 : 11;
-  const reach = d.r - inner + d.s[0] / 2 + 1;
-  if (reach > 2) {
-    const armY = d.col ? d.y : 0;
+  // spoke for the below-deck districts (09/10 ride the column)
+  if (d.col) {
+    const reach = d.r - 3 + d.s[0] / 2 + 1;
     const arm = boxAt(reach, 1.1, 1.1, 0, 0, 0, darkMat);
-    const mid = inner + reach / 2;
-    arm.position.set(mid * Math.cos(rad), armY, -mid * Math.sin(rad));
+    const mid = 3 + reach / 2;
+    arm.position.set(mid * Math.cos(rad), d.y, -mid * Math.sin(rad));
     arm.rotation.y = rad;
+  }
+  // keel below the deck (Tempest HQ extends below the ring plane)
+  if (d.keel) {
+    const kl = edged(new THREE.BoxGeometry(d.keel[0], d.keel[1], d.keel[2]), hullMat);
+    kl.position.set(0, -(d.s[1]/2 + d.keel[1]/2 - 0.5), 0);
+    grp.add(kl); pickables.push(kl.children[0]);
   }
 
   const label = makeLabel(d.n, d.name);
