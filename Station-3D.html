@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROSPERO'S DREAM // STATION MODEL</title>
+<style>
+  :root{ --pink:#ff2d78; --bg:#030304; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; overflow:hidden; background:var(--bg);
+    font-family:"Courier New",Courier,monospace; color:#ffd7e6; }
+  #c{ position:fixed; inset:0; width:100%; height:100%; display:block; }
+  header{ position:fixed; top:0; left:0; right:0; padding:12px 18px;
+    display:flex; justify-content:space-between; align-items:center;
+    pointer-events:none; z-index:5; }
+  header .ttl{ font-weight:bold; letter-spacing:.12em; font-size:15px; color:var(--pink);
+    text-shadow:0 0 12px rgba(255,45,120,.8); }
+  header .sub{ font-size:11px; color:#8a6a78; letter-spacing:.08em; }
+  #panel{ position:fixed; top:64px; right:16px; width:300px; max-width:calc(100vw - 32px);
+    background:rgba(8,4,8,.88); border:1px solid var(--pink); border-radius:6px;
+    padding:14px 16px; z-index:5; display:none;
+    box-shadow:0 0 24px rgba(255,45,120,.25); }
+  #panel.on{ display:block; }
+  #panel .num{ font-size:12px; color:var(--pink); letter-spacing:.2em; }
+  #panel h2{ font-size:18px; letter-spacing:.06em; margin:4px 0 8px; color:#fff; }
+  #panel p{ font-size:13px; line-height:1.6; color:#e8b8c8; }
+  #panel .x{ position:absolute; top:8px; right:10px; cursor:pointer; color:#8a6a78;
+    font-size:16px; background:none; border:none; font-family:inherit; }
+  #panel .x:hover{ color:var(--pink); }
+  #bar{ position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+    display:flex; gap:10px; z-index:5; }
+  #bar button{ font-family:inherit; font-size:12px; letter-spacing:.1em; cursor:pointer;
+    background:rgba(8,4,8,.85); color:var(--pink); border:1px solid var(--pink);
+    padding:9px 16px; border-radius:4px; text-shadow:0 0 8px rgba(255,45,120,.6); }
+  #bar button:hover{ background:rgba(255,45,120,.15); }
+  #bar button.off{ color:#5a3a48; border-color:#5a3a48; text-shadow:none; }
+  #hint{ position:fixed; bottom:18px; left:18px; font-size:11px; color:#6a4a58;
+    letter-spacing:.06em; z-index:5; pointer-events:none; }
+  @media (max-width:640px){ #hint{ display:none; } #panel{ top:auto; bottom:70px; } }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<header>
+  <div class="ttl">PROSPERO'S DREAM // STATION MODEL</div>
+  <div class="sub">RAC NAVCOM &middot; 10 DISTRICTS</div>
+</header>
+<div id="panel">
+  <button class="x" id="closePanel">&times;</button>
+  <div class="num" id="pNum"></div>
+  <h2 id="pName"></h2>
+  <p id="pDesc"></p>
+</div>
+<div id="bar">
+  <button id="btnLabels">LABELS: ON</button>
+  <button id="btnRotate">ROTATE: ON</button>
+  <button id="btnReset">RESET VIEW</button>
+</div>
+<div id="hint">drag to orbit &middot; scroll to zoom &middot; click a district</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const PINK = 0xff2d78;
+
+/* ---------- district data (in-universe; no page refs) ---------- */
+const DISTRICTS = [
+  { n:"01", name:"DRY DOCK",          desc:"Docking and repairs. 1kcr docking fee + 100cr/day. O2 tax: 10cr/day/person.",
+    a:315, r:26, y:-8,  s:[9,6,9] },
+  { n:"02", name:"STELLAR BURN",      desc:"Rumors, drinks, and R&R. Ask for Sem.",
+    a:225, r:26, y:8,   s:[7,5,7] },
+  { n:"03", name:"CHOP SHOP",         desc:"Cybermod installation and repair.",
+    a:45,  r:26, y:5,   s:[6,5,9] },
+  { n:"04", name:"THE ICE BOX",       desc:"Slickware installation and re-sleeving.",
+    a:270, r:26, y:3,   s:[9,7,7] },
+  { n:"05", name:"THE FARM",          desc:"The Dream's food supply, run by the Solarian Church.",
+    a:180, r:26, y:12,  s:[7,6,7] },
+  { n:"06", name:"CANYONHEAVY.MARKET",desc:"Information market run by an elite hacking crew.",
+    a:0,   r:26, y:0,   s:[6,4,8] },
+  { n:"07", name:"THE COURT",         desc:"Disputes settled by arena combat. Where the station's power brokers gather.",
+    a:0,   r:0,  y:9,   s:[13,8,13] },
+  { n:"08", name:"TEMPEST CO. HQ",    desc:"Powerful mercenary company. They run station security.",
+    a:90,  r:26, y:22,  s:[5,18,5] },
+  { n:"09", name:"DOPTOWN",           desc:"Debtor's town. For those who can't pay the O2 tax.",
+    a:-15, r:14, y:-14, s:[6,5,6] },
+  { n:"10", name:"THE CHOKE",         desc:"Abandoned, quarantined wasteland.",
+    a:-32, r:14, y:-21, s:[7,5,7] },
+];
+
+/* ---------- renderer / scene ---------- */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x030304);
+scene.fog = new THREE.FogExp2(0x030304, 0.0028);
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 1200);
+const CAM_HOME = new THREE.Vector3(58, 40, 74);
+camera.position.copy(CAM_HOME);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 28;
+controls.maxDistance = 260;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.6;
+
+/* ---------- lights ---------- */
+scene.add(new THREE.AmbientLight(0x887788, 0.85));
+const key = new THREE.DirectionalLight(0xffffff, 1.4);
+key.position.set(50, 80, 40); scene.add(key);
+const pl1 = new THREE.PointLight(PINK, 2600, 260, 1.8);
+pl1.position.set(-35, 25, -25); scene.add(pl1);
+const pl2 = new THREE.PointLight(PINK, 2000, 260, 1.8);
+pl2.position.set(35, -18, 30); scene.add(pl2);
+
+/* ---------- starfield ---------- */
+{
+  const N = 1600, pos = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const R = 380 + Math.random() * 320, t = Math.random() * Math.PI * 2,
+          p = Math.acos(2 * Math.random() - 1);
+    pos[i*3]   = R * Math.sin(p) * Math.cos(t);
+    pos[i*3+1] = R * Math.cos(p);
+    pos[i*3+2] = R * Math.sin(p) * Math.sin(t);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color:0x8899bb, size:1.1, sizeAttenuation:false })));
+}
+
+/* ---------- materials / helpers ---------- */
+const station = new THREE.Group(); scene.add(station);
+const hullMat  = new THREE.MeshStandardMaterial({ color:0x14141b, roughness:0.5, metalness:0.7 });
+const darkMat  = new THREE.MeshStandardMaterial({ color:0x0a0a0f, roughness:0.7, metalness:0.5 });
+const edgeMat  = new THREE.LineBasicMaterial({ color:PINK, transparent:true, opacity:0.8 });
+const pickables = [];
+const labels = [];
+
+function edged(geo, mat) {
+  const grp = new THREE.Group();
+  grp.add(new THREE.Mesh(geo, mat));
+  grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), edgeMat));
+  return grp;
+}
+function boxAt(w, h, d, x, y, z, mat) {
+  const g = edged(new THREE.BoxGeometry(w, h, d), mat || hullMat);
+  g.position.set(x, y, z); station.add(g); return g;
+}
+
+/* ---------- spine, hub, ring, spokes ---------- */
+{
+  const spine = edged(new THREE.CylinderGeometry(2.6, 3.6, 82, 6), darkMat);
+  spine.position.y = 2; station.add(spine);
+  // glowing accent bands on the spine
+  [-28, -6, 16, 34].forEach(y => {
+    const band = new THREE.Mesh(new THREE.TorusGeometry(3.1, 0.22, 8, 6),
+                                new THREE.MeshBasicMaterial({ color:PINK }));
+    band.rotation.x = Math.PI / 2; band.position.y = y; station.add(band);
+  });
+  // top antenna
+  boxAt(0.7, 10, 0.7, 0, 48, 0, darkMat);
+
+  const hub = edged(new THREE.CylinderGeometry(5.5, 5.5, 7, 6), hullMat);
+  hub.position.y = 0; station.add(hub);
+
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(26, 1.5, 10, 80), hullMat);
+  ring.rotation.x = Math.PI / 2; station.add(ring);
+  const ringEdge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.TorusGeometry(26, 1.5, 6, 40)), edgeMat);
+  ringEdge.rotation.x = Math.PI / 2; station.add(ringEdge);
+
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    const sp = boxAt(21, 0.8, 0.8, 15.5 * Math.cos(a), 0, -15.5 * Math.sin(a), darkMat);
+    sp.rotation.y = a;
+  }
+}
+
+/* ---------- district label sprites ---------- */
+function makeLabel(num, name) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 128;
+  const x = c.getContext('2d');
+  x.strokeStyle = '#ff2d78'; x.lineWidth = 6;
+  x.beginPath(); x.arc(62, 64, 42, 0, Math.PI * 2); x.stroke();
+  x.fillStyle = '#ff2d78'; x.textBaseline = 'middle';
+  x.font = 'bold 50px "Courier New", monospace'; x.textAlign = 'center';
+  x.fillText(num, 62, 66);
+  x.font = 'bold 32px "Courier New", monospace'; x.textAlign = 'left';
+  const label = (num + ' ' + name).length > 18 ? name : (num + ' ' + name);
+  x.fillText(label, 118, 66);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map:tex, transparent:true, depthTest:false }));
+  sp.scale.set(17, 4.25, 1);
+  return sp;
+}
+
+/* ---------- districts ---------- */
+DISTRICTS.forEach(d => {
+  const rad = d.a * Math.PI / 180;
+  const px = d.r * Math.cos(rad), pz = -d.r * Math.sin(rad);
+  const grp = new THREE.Group();
+  const main = edged(new THREE.BoxGeometry(d.s[0], d.s[1], d.s[2]), hullMat);
+  main.userData.district = d;
+  grp.add(main); pickables.push(main.children[0]);
+
+  // greebles: 2-3 small detail boxes on top
+  const g1 = edged(new THREE.BoxGeometry(d.s[0]*0.4, d.s[1]*0.35, d.s[2]*0.4), darkMat);
+  g1.position.set(d.s[0]*0.2, d.s[1]*0.65, -d.s[2]*0.15); grp.add(g1);
+  const g2 = edged(new THREE.BoxGeometry(d.s[0]*0.25, d.s[1]*0.5, d.s[2]*0.25), darkMat);
+  g2.position.set(-d.s[0]*0.25, d.s[1]*0.7, d.s[2]*0.2); grp.add(g2);
+  pickables.push(g1.children[0], g2.children[0]);
+  grp.userData.district = d;
+
+  // connector arm from the spine out to the module (skip for central Court)
+  if (d.r > 0) {
+    const inner = 2.5;                            // spine surface
+    const reach = d.r - inner + d.s[0] / 2 + 1;    // bites into the module
+    const arm = boxAt(reach, 0.9, 0.9, 0, 0, 0, darkMat);
+    const mid = inner + reach / 2;
+    arm.position.set(mid * Math.cos(rad), d.y, -mid * Math.sin(rad));
+    arm.rotation.y = rad;
+  }
+
+  const label = makeLabel(d.n, d.name);
+  label.position.set(px, d.y + d.s[1]/2 + 4.5, pz);
+  station.add(label); labels.push(label);
+
+  grp.position.set(px, d.y, pz);
+  station.add(grp);
+  d._group = grp;
+});
+
+/* ---------- beacons ---------- */
+const beacons = [];
+[[0, 54, 0], [26, 3, 0], [-26, 3, 0], [0, -30, 0]].forEach(p => {
+  const b = new THREE.Mesh(new THREE.SphereGeometry(0.7, 12, 12),
+                           new THREE.MeshBasicMaterial({ color:PINK }));
+  b.position.set(p[0], p[1], p[2]); station.add(b); beacons.push(b);
+});
+
+/* ---------- interaction ---------- */
+const ray = new THREE.Raycaster();
+const ptr = new THREE.Vector2();
+const panel = document.getElementById('panel');
+let selected = null;
+let downAt = null;
+
+function select(d) {
+  if (selected) selected._group.children[0].children[0].material = hullMat;
+  selected = d;
+  if (!d) { panel.classList.remove('on'); return; }
+  d._group.children[0].children[0].material =
+    new THREE.MeshStandardMaterial({ color:0x3a1220, roughness:0.4, metalness:0.6,
+                                     emissive:PINK, emissiveIntensity:0.35 });
+  document.getElementById('pNum').textContent = 'DISTRICT ' + d.n;
+  document.getElementById('pName').textContent = d.name;
+  document.getElementById('pDesc').textContent = d.desc;
+  panel.classList.add('on');
+}
+document.getElementById('closePanel').onclick = () => select(null);
+renderer.domElement.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!downAt) return;
+  const dx = e.clientX - downAt[0], dy = e.clientY - downAt[1];
+  downAt = null;
+  if (dx * dx + dy * dy > 25) return; // it was a drag
+  ptr.x = (e.clientX / window.innerWidth) * 2 - 1;
+  ptr.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  ray.setFromCamera(ptr, camera);
+  const hit = ray.intersectObjects(pickables, false)[0];
+  let target = null;
+  if (hit) { let o = hit.object; while (o && !o.userData.district) o = o.parent; target = o ? o.userData.district : null; }
+  select(target);
+});
+
+/* ---------- ui buttons ---------- */
+const btnL = document.getElementById('btnLabels');
+const btnR = document.getElementById('btnRotate');
+btnL.onclick = () => {
+  const on = !labels[0].visible;
+  labels.forEach(l => l.visible = on);
+  btnL.textContent = 'LABELS: ' + (on ? 'ON' : 'OFF');
+  btnL.classList.toggle('off', !on);
+};
+btnR.onclick = () => {
+  controls.autoRotate = !controls.autoRotate;
+  btnR.textContent = 'ROTATE: ' + (controls.autoRotate ? 'ON' : 'OFF');
+  btnR.classList.toggle('off', !controls.autoRotate);
+};
+document.getElementById('btnReset').onclick = () => {
+  camera.position.copy(CAM_HOME);
+  controls.target.set(0, 0, 0);
+  select(null);
+};
+
+/* ---------- loop / resize ---------- */
+function resize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+window.addEventListener('resize', resize); resize();
+
+const clock = new THREE.Clock();
+(function tick() {
+  requestAnimationFrame(tick);
+  const t = clock.getElapsedTime();
+  beacons.forEach((b, i) => {
+    const s = 1 + 0.35 * Math.sin(t * 3 + i * 1.7);
+    b.scale.set(s, s, s);
+  });
+  station.rotation.y += 0.0004;
+  controls.update();
+  renderer.render(scene, camera);
+})();
+</script>
+</body>
+</html>
