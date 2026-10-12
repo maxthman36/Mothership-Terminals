@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>STELLAR BURN // NIGHTLIFE TERMINAL</title>
+<style>
+:root{ --pk:#ff2d95; --pu:#b537f2; --rd:#ff3b3b; --bl:#0a0208; --pn:#1c0714; --wt:#ffe9f4; }
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{background:var(--bl); color:var(--wt); font-family:"Courier New",Courier,monospace;
+  text-shadow:0 0 10px rgba(255,45,149,.55); padding:12px; overflow-x:hidden;}
+/* marquee dots */
+#marquee{position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.35;
+  background-image:radial-gradient(circle, var(--pk) 2px, transparent 2.5px);
+  background-size:34px 34px; animation:chase 1.2s steps(2) infinite;}
+@keyframes chase{0%{background-position:0 0}100%{background-position:34px 0}}
+#term{position:relative; z-index:2; max-width:900px; margin:0 auto; background:rgba(10,2,8,.94);
+  border:2px solid var(--pk); box-shadow:0 0 34px rgba(255,45,149,.35), inset 0 0 60px rgba(181,55,242,.12);
+  border-radius:6px;}
+header.bar{padding:18px 20px; text-align:center; border-bottom:2px solid var(--pk);
+  background:linear-gradient(180deg, rgba(255,45,149,.14), transparent);}
+header.bar .ttl{font-size:clamp(22px,5vw,38px); letter-spacing:.28em; color:#fff;
+  text-shadow:0 0 18px var(--pk), 0 0 46px var(--pu); font-weight:bold;}
+header.bar .sub{font-size:clamp(10px,2vw,13px); letter-spacing:.34em; color:var(--pk); margin-top:6px;}
+#ball{cursor:pointer; font-size:30px; display:inline-block; margin-top:8px; user-select:none;
+  filter:drop-shadow(0 0 10px var(--pu)); animation:spin 7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+nav.tabs{display:flex; gap:10px; padding:16px 20px 0; flex-wrap:wrap; justify-content:center;}
+button.neon{font-family:inherit; font-weight:bold; letter-spacing:.2em; text-transform:uppercase;
+  font-size:clamp(11px,2.2vw,14px); color:var(--pk); background:rgba(255,45,149,.07);
+  border:1px solid var(--pk); border-radius:999px; padding:12px 22px; cursor:pointer; min-height:48px;
+  text-shadow:0 0 8px rgba(255,45,149,.6); box-shadow:0 0 12px rgba(255,45,149,.25);}
+button.neon:active{transform:scale(.96);}
+button.neon.on{background:var(--pk); color:#160309; text-shadow:none; box-shadow:0 0 22px rgba(255,45,149,.8);}
+#searchRow{display:flex; gap:10px; padding:14px 20px 0; flex-wrap:wrap;}
+#search{flex:1; min-width:200px; font-family:inherit; font-size:14px; letter-spacing:.08em;
+  background:#160309; color:var(--wt); border:1px solid var(--pu); border-radius:999px; padding:11px 18px;}
+#search::placeholder{color:#7a4a63;}
+#search:focus{outline:none; border-color:var(--pk);}
+main{padding:18px 20px;}
+h2.sttl{font-size:clamp(13px,2.8vw,17px); letter-spacing:.32em; color:#fff;
+  text-shadow:0 0 12px var(--pk); border-bottom:1px solid var(--pu); padding-bottom:10px; margin:4px 0 16px;}
+.dim{color:#8a5a72; text-shadow:none;}
+.panel{border:1px solid var(--pu); background:rgba(181,55,242,.06); border-radius:10px;
+  margin:0 0 12px; padding:14px 16px; display:flex; justify-content:space-between; gap:12px; align-items:center;}
+.panel .tx{flex:1;}
+.panel .nm{font-size:15px; letter-spacing:.1em; color:#fff; text-shadow:0 0 10px var(--pk);}
+.panel .pr{color:var(--pk); font-weight:bold; white-space:nowrap;}
+.panel .ds{font-size:12.5px; margin-top:6px; color:var(--wt); line-height:1.6;}
+.panel .st{font-size:11px; margin-top:6px; color:var(--pu); letter-spacing:.08em;}
+button.add{font-family:inherit; font-weight:bold; font-size:13px; letter-spacing:.14em; flex-shrink:0;
+  color:#160309; background:var(--pk); border:none; border-radius:999px; padding:12px 18px; cursor:pointer;
+  min-height:48px; box-shadow:0 0 14px rgba(255,45,149,.6);}
+button.add:active{transform:scale(.94);}
+#tabbar{margin:0 20px 6px; border:1px solid var(--pk); border-radius:10px; padding:12px 16px;
+  background:rgba(255,45,149,.07); font-size:13px; line-height:1.8;}
+#tabbar .th{letter-spacing:.3em; color:var(--pk); font-size:11px;}
+#tabItems{max-height:120px; overflow-y:auto;}
+#tabbar .tot{font-size:16px; color:#fff; letter-spacing:.1em;}
+#drunk{margin:0 20px 6px; border:1px dashed var(--pu); border-radius:10px; padding:10px 16px; font-size:12px; line-height:1.9;}
+#drunk .dh{letter-spacing:.3em; color:var(--pu); font-size:11px;}
+footer.bar{border-top:2px solid var(--pk); padding:12px 20px; display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between; font-size:11px; color:#8a5a72; letter-spacing:.1em;}
+#boot{padding:30px 24px; font-size:15px; line-height:2.1; letter-spacing:.08em; text-align:center;}
+.overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  background:rgba(10,2,8,.94); padding:18px;}
+.overlay.on{display:flex;}
+.overlay .box{max-width:540px; background:var(--pn); border:2px solid var(--pk); border-radius:12px; padding:26px;
+  box-shadow:0 0 30px rgba(255,45,149,.4); font-size:14px; line-height:1.8; letter-spacing:.06em; text-align:center;}
+#idle{position:fixed; inset:0; z-index:95; display:none; align-items:center; justify-content:center;
+  background:#050104; text-align:center; pointer-events:auto;}
+#idle.on{display:flex;}
+#idle .big{font-size:clamp(28px,7vw,64px); letter-spacing:.3em; color:#fff;
+  text-shadow:0 0 24px var(--pk),0 0 60px var(--pu); animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:.65}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div id="marquee"></div>
+<div id="idle" onclick="wake()"><div class="big">THE BURN<br>NEVER CLOSES</div></div>
+<div id="term">
+  <header class="bar">
+    <div class="ttl">STELLAR BURN</div>
+    <div class="sub">NIGHTLIFE TERMINAL // DRINKS UP, STRESS DOWN</div>
+    <div><span id="ball" onclick="ballClick()" title="">🪩</span></div>
+    <div style="margin-top:8px"><button class="neon" id="muteBtn" onclick="toggleMute()">AUDIO: ON</button></div>
+  </header>
+
+  <div id="boot"></div>
+
+  <div id="app" style="display:none">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="searchRow">
+      <input id="search" placeholder="SEARCH THE MENU... (try 'sem')" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="neon" onclick="doSearch()">FIND</button>
+    </div>
+    <main id="list"></main>
+    <div id="drunk">
+      <div class="dh">INTOXICATION MONITOR</div>
+      <div id="drunkState">DRINKS: 0 — SOBER. <span class="dim">For now.</span></div>
+    </div>
+    <div id="tabbar">
+      <div class="th">YOUR TAB</div>
+      <div id="tabItems"><span class="dim">// nothing yet. The night is young.</span></div>
+      <div class="tot" id="tabTotal">TOTAL: 0cr</div>
+      <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap">
+        <button class="neon" onclick="closeTab()">CLOSE TAB</button>
+        <button class="neon" onclick="soberUp()">SOBER UP (1d10 HRS)</button>
+      </div>
+    </div>
+    <footer class="bar">
+      <span>LET YOUR INDULGENCE SET ME FREE. NO REFUNDS ON MEMORIES.</span>
+    </footer>
+  </div>
+</div>
+<div class="overlay" id="ovl"><div class="box" id="ovlBox"></div></div>
+
+<script>
+/* ================= AUDIO: club ================= */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function tone(f,d,g,type){ if(muted) return; const a=ac(); if(!a) return;
+  const o=a.createOscillator(), gn=a.createGain(); o.type=type||"sine"; o.frequency.value=f;
+  const t=a.currentTime; gn.gain.setValueAtTime(g||0.05,t); gn.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(gn); gn.connect(a.destination); o.start(t); o.stop(t+d+0.05); }
+const sClick=()=>tone(660,.1,.05,"square");
+const sTab=()=>{tone(440,.12,.05,"square"); setTimeout(()=>tone(660,.12,.05,"square"),90);};
+const sAdd=()=>{tone(55,.35,.12,"sine"); setTimeout(()=>tone(880,.15,.04,"triangle"),120);}; /* bass + cha-ching */
+const sErr=()=>tone(160,.35,.07,"sawtooth");
+function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="AUDIO: "+(muted?"OFF":"ON"); if(!muted) sClick(); }
+
+/* ================= DATA (APoF p.13, verified) ================= */
+const CATS=["SEM'S BAR","HEAVEN","THE ECSTACY"];
+const ITEMS=[
+{c:0,n:"01. CHATTER",p:"15cr",d:"Adzuki beans. Chat grubs. Corn.",drink:true},
+{c:0,n:"02. MOLOKO+",p:"25cr",d:"Milk. Synthemesc. Hallucinogen. Body Save or hallucinate (all rolls at [-] for 1d10 hours).",drink:true},
+{c:0,n:"03. AMBROSIA",p:"20cr",d:"Midori. Blue curacao. Lime juice.",drink:true},
+{c:0,n:"04. VICTORY GIN",p:"12cr",d:"Sickly. Oily smell. Acidic.",drink:true},
+{c:0,n:"05. VESPER",p:"30cr",d:"Three measures gin to one measure vodka, half measure Lillet. Shaken. Lemon peel.",drink:true},
+{c:0,n:"06. CADRE COLA",p:"1cr",d:"Caffeinated cola beverage.",drink:false},
+{c:0,n:"07. SMOKEY",p:"15cr",d:"Mescal margarita. Dry.",drink:true},
+{c:0,n:"08. WELL DRINK",p:"10cr",d:"Blood Mary, Gin & Tonic, Long Island Iced Tea, Margarita, Rum & Coke, etc.",drink:true},
+{c:0,n:"09. CALL DRINK",p:"20-75cr",d:"Mixed drink with a particular brand of liquor requested.",drink:true},
+{c:0,n:"10. BEER",p:"5cr",d:"Can or bottle.",drink:true},
+{c:1,n:"SYCORAX",p:"750cr/pill",d:"Neon pink pill. Strong sense of euphoria for cybermod users.",st:"The house specialty. Ask your Warden about side effects."},
+{c:1,n:"PRIVATE VIP BOOTH",p:"250cr",d:"Complete sonic muting and dynamic privacy tinting."},
+{c:1,n:"BALCONY ACCESS",p:"50cr",d:"Semi-private booths with a balcony view of the dance floor."},
+{c:2,n:"COVER CHARGE",p:"100cr",d:"Required payment to gain access."},
+{c:2,n:"PRIVATE DANCE",p:"20cr",d:"A dance in a private soundproof booth. Reduce 1d5 Stress [-].",st:"Stress relief: 1d5, roll at [-]."},
+{c:2,n:"HOURLY RATE",p:"100cr",d:"An hour alone in a private room. Reduce 1d5 Stress [+].",st:"Stress relief: 1d5, roll at [+]."},
+{c:2,n:"OVERNIGHT",p:"1,500cr",d:"Companionship for an evening out or in. Reduce 1d10 Stress.",st:"Stress relief: 1d10."},
+{c:2,n:"XP SLICK",p:"40cr/hr yours · 5kcr/hr theirs",d:"Recording of time with a companion.",st:"Yours: 40cr/hr. Someone else's: 5kcr/hr."}
+];
+function priceCr(p){ const m=String(p).match(/([\d,]+)/); return m?parseInt(m[1].replace(/,/g,""),10):0; }
+
+/* ================= BOOT ================= */
+const bootLines=[
+"STELLAR BURN // NIGHTLIFE TERMINAL",
+"WARMING UP THE BASS... <span style='color:#ff2d95'>THUMP THUMP</span>",
+"DIMMING THE LIGHTS... <span class='dim'>there are no lights. There is only the Burn.</span>",
+"",
+"WELCOME TO THE BURN.",
+"FIRST DRINK'S ON THE HOUSE. <span class='dim'>Kidding. Nothing's on the house.</span>"
+];
+let bi=0;
+function bootStep(){
+  const b=document.getElementById("boot");
+  if(bi<bootLines.length){ b.innerHTML+=bootLines[bi]+"<br>"; bi++; tone(55+bi*8,.3,.1,"sine"); setTimeout(bootStep,430); }
+  else setTimeout(()=>{ b.style.display="none"; document.getElementById("app").style.display="block"; sTab(); buildTabs(); },600);
+}
+
+/* ================= TABS + LIST ================= */
+let curCat=0;
+function buildTabs(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  CATS.forEach((c,i)=>{ const b=document.createElement("button");
+    b.className="neon"+(i===curCat?" on":""); b.textContent=c;
+    b.onclick=()=>{curCat=i; sTab(); buildTabs();}; t.appendChild(b); });
+  renderList();
+}
+function card(m){
+  return `<div class="panel"><div class="tx">
+    <div class="nm">${m.n}</div><div class="ds">${m.d}</div>
+    ${m.st?`<div class="st">${m.st}</div>`:""}</div>
+    <div style="text-align:right"><div class="pr">${m.p}</div><br>
+    <button class="add" onclick='addToTab(${JSON.stringify(m.n)},${JSON.stringify(m.p)},${m.drink?1:0})'>ORDER</button></div></div>`;
+}
+function renderList(filter){
+  const L=document.getElementById("list");
+  const items=ITEMS.filter(m=>filter?(m.n+m.d).toLowerCase().includes(filter):m.c===curCat);
+  let h=`<h2 class="sttl">${filter?"SEARCH RESULTS":CATS[curCat]} <span class="dim">[${items.length}]</span></h2>`;
+  h+=items.length?items.map(card).join(""):`<p class="dim">// NOT ON THE MENU. ASK SEM. EVERYTHING HAS A PRICE.</p>`;
+  L.innerHTML=h;
+}
+
+/* ================= TAB + DRUNKENNESS ================= */
+let tab=[], drinks=0;
+function addToTab(n,p,isDrink){
+  tab.push({n,p}); sAdd();
+  if(isDrink){ drinks++; updateDrunk(); }
+  renderTab();
+}
+function renderTab(){
+  const el=document.getElementById("tabItems");
+  el.innerHTML=tab.length?tab.map(t=>`<div>▸ ${t.n} <span class="dim">— ${t.p}</span></div>`).join(""):`<span class="dim">// nothing yet. The night is young.</span>`;
+  document.getElementById("tabTotal").textContent="TOTAL: "+tab.reduce((s,t)=>s+priceCr(t.p),0).toLocaleString()+"cr";
+}
+function updateDrunk(){
+  const el=document.getElementById("drunkState");
+  if(drinks===0) el.innerHTML=`DRINKS: 0 — SOBER. <span class="dim">For now.</span>`;
+  else if(drinks<=2) el.innerHTML=`DRINKS: ${drinks} — BUZZED. <span class="dim">Body Save [+] after a few. You're fine. Probably.</span>`;
+  else if(drinks<=4) el.innerHTML=`DRINKS: ${drinks} — <span style="color:#ff2d95">DRUNK. [-] TO ALL ROLLS. Lasts 1d10 hours.</span>`;
+  else el.innerHTML=`DRINKS: ${drinks} — <span style="color:#ff3b3b">WASTED. Body Save [-]. The floor is dancing without you.</span>`;
+}
+function soberUp(){ drinks=0; tab=[]; renderTab(); updateDrunk(); sClick();
+  ovl(`<div style="color:var(--pk)">1d10 HOURS LATER.</div><br>You feel like a Slickbay accident.<br>The Burn never noticed you left.<br><br><button class="neon" onclick="closeOvl()">BACK TO THE FLOOR</button>`); }
+function closeTab(){
+  if(!tab.length){ sErr(); return; }
+  const total=tab.reduce((s,t)=>s+priceCr(t.p),0).toLocaleString();
+  tab=[]; renderTab(); sClick();
+  ovl(`<div style="color:var(--pk)">TAB CLOSED: ${total}cr</div><br>Sem nods. Somewhere, a rumor changes hands.<br><span class="dim">You don't remember paying. You paid.</span><br><br><button class="neon" onclick="closeOvl()">STUMBLE ON</button>`);
+}
+
+/* ================= SEARCH ================= */
+function doSearch(){
+  const q=document.getElementById("search").value.trim().toLowerCase(); sClick();
+  if(q==="sem"){ semSpeaks(); return; }
+  if(q==="indulgence"){ ovl(`<div style="color:var(--pk); letter-spacing:.2em">"LET YOUR INDULGENCE SET ME FREE."</div><br><span class="dim">— the house motto, carved over the door in neon.</span><br><br><button class="neon" onclick="closeOvl()">AMEN</button>`); return; }
+  if(!q){ renderList(); return; }
+  renderList(q);
+}
+function semSpeaks(){
+  tone(220,.3,.06,"triangle");
+  ovl(`<div style="color:var(--pk); letter-spacing:.2em">SEM</div><br>
+  Rumor-for-a-drink. That's the table. That's the whole table.<br><br>
+  Buy something with alcohol in it, sit down, and ask.<br>
+  Ask about anything. The Burn hears everything.<br><br>
+  <span class="dim">Sem polishes a glass that was already clean.</span><br><br>
+  <button class="neon" onclick="closeOvl()">BUY A DRINK</button>`);
+}
+
+/* ================= BALL (x5) ================= */
+let ballN=0;
+function ballClick(){
+  ballN++; tone(1200,.1,.04,"triangle");
+  if(ballN>=5){ ballN=0; sErr();
+    ovl(`<div style="color:var(--pk)">VIP LIST CHECK...</div><br>YOU ARE NOT ON IT.<br><span class="dim">Nobody is on it. The list is decorative.</span><br><br><button class="neon" onclick="closeOvl()">FINE</button>`);
+  }
+}
+
+/* ================= OVERLAY + IDLE ================= */
+function ovl(html){ document.getElementById("ovlBox").innerHTML=html; document.getElementById("ovl").classList.add("on"); }
+function closeOvl(){ sClick(); document.getElementById("ovl").classList.remove("on"); }
+document.getElementById("ovl").addEventListener("click",e=>{ if(e.target.id==="ovl") closeOvl(); });
+let idleT=null;
+function idleReset(){ document.getElementById("idle").classList.remove("on"); clearTimeout(idleT);
+  idleT=setTimeout(()=>document.getElementById("idle").classList.add("on"),60000); }
+function wake(){ sClick(); idleReset(); }
+["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
+idleReset();
+
+bootStep();
+</script>
+</body>
+</html>

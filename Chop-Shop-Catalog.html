@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ZHENYA'S BODY CATALOG!!</title>
+<style>
+:root{
+  --pink:#ff6ec7; --yellow:#ffe45e; --cyan:#5ef2ff; --purple:#2a1650;
+  --bg:#160a2e; --panel:#1f1038; --red:#ff4d5e;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{background:var(--bg); color:#fff;
+  font-family:"Comic Sans MS","Chalkboard SE","Segoe Print",cursive;
+  overflow-x:hidden; padding:12px;}
+#term{max-width:880px; margin:0 auto; border:6px solid var(--pink); background:var(--panel);
+  border-radius:34px; overflow:hidden;
+  box-shadow:0 0 34px rgba(255,110,199,.35), inset 0 0 60px rgba(0,0,0,.45);
+  animation:bob 5s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:rotate(-.2deg)}50%{transform:rotate(.2deg)}}
+header.bar{padding:16px; text-align:center; border-bottom:4px dashed var(--pink);}
+header.bar .ttl{font-size:clamp(22px,5vw,34px); color:var(--yellow);
+  text-shadow:2px 2px 0 var(--pink), 0 0 18px rgba(255,228,94,.5); letter-spacing:.04em;}
+header.bar .sub{color:var(--cyan); font-size:clamp(12px,2.6vw,16px); margin-top:6px;}
+#mama-takeover{display:none; background:#3d0a12; border-bottom:4px solid var(--red); padding:14px; text-align:center;}
+#mama-takeover.on{display:block; animation:shake .4s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#mama-takeover .mv{color:var(--red); font-size:15px;}
+nav.tabs{display:flex; gap:8px; padding:14px 14px 0; flex-wrap:wrap; justify-content:center;}
+button.bub{font-family:inherit; font-weight:bold; font-size:clamp(12px,2.4vw,15px);
+  background:var(--purple); color:var(--cyan); border:4px solid var(--cyan);
+  border-radius:22px; padding:10px 16px; cursor:pointer; min-height:48px;
+  box-shadow:3px 3px 0 rgba(0,0,0,.5); transition:transform .1s;}
+button.bub:active{transform:scale(.94);}
+button.bub.on{background:var(--cyan); color:var(--purple);}
+button.bub.lock{border-color:var(--pink); color:var(--pink);}
+button.bub.lock.on{background:var(--pink); color:var(--purple);}
+#searchRow{display:flex; gap:8px; padding:12px 16px 0; justify-content:center; flex-wrap:wrap;}
+#search{font-family:inherit; font-size:15px; background:#0d0620; color:var(--yellow);
+  border:4px solid var(--pink); border-radius:18px; padding:10px 14px; width:min(320px,80vw);}
+#search::placeholder{color:#8a6fb0;}
+main{padding:16px;}
+.toy{background:#241245; border:4px solid var(--cyan); border-radius:20px;
+  padding:12px 14px; margin:0 0 12px; cursor:pointer;}
+.toy:hover{border-color:var(--yellow);}
+.toy.locked{border-color:var(--pink); border-style:dashed; cursor:pointer;}
+.toy .nm{font-size:17px; color:var(--yellow); font-weight:bold;}
+.toy .pr{color:var(--pink); font-weight:bold;}
+.toy .kid{font-size:14px; margin-top:6px; color:#ffe9f6;}
+.toy .gw{display:none; font-size:12px; margin-top:8px; color:var(--cyan);
+  border-top:2px dotted var(--cyan); padding-top:8px; font-family:"Courier New",monospace;}
+.toy.open .gw{display:block;}
+.toy .slots{font-size:11px; color:#b9a3e3;}
+.stars{text-align:center; color:var(--pink); letter-spacing:.6em; margin:14px 0; font-size:14px;}
+#pwbox{text-align:center; padding:20px;}
+#pwbox input{font-family:inherit; font-size:18px; text-align:center; background:#0d0620; color:var(--yellow);
+  border:4px solid var(--pink); border-radius:18px; padding:12px; width:min(280px,80vw);}
+#pwbox .hint{color:var(--cyan); font-size:13px; margin-top:10px; min-height:20px;}
+.svc{background:#241245; border:4px solid var(--yellow); border-radius:20px; padding:12px 14px; margin:0 0 12px;}
+.svc .nm{color:var(--yellow); font-weight:bold; font-size:16px;}
+.svc .ds{font-size:14px; margin-top:6px;}
+footer.bar{border-top:4px dashed var(--pink); padding:12px 16px; text-align:center; font-size:12px; color:#b9a3e3;}
+#boot{padding:26px 20px; font-size:16px; line-height:2; text-align:center;}
+.overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  background:rgba(22,10,46,.9); padding:18px;}
+.overlay.on{display:flex;}
+.overlay .box{max-width:520px; background:var(--panel); border:5px solid var(--pink); border-radius:26px;
+  padding:22px; font-size:15px; line-height:1.7; text-align:center;}
+pre.ascii{color:var(--pink); font-size:14px; line-height:1.2;}
+#saverHeart{display:none; text-align:center; padding:30px; color:var(--pink); font-size:15px;}
+</style>
+</head>
+<body>
+<div id="term">
+  <header class="bar">
+    <div class="ttl">★ ZHENYA'S BODY CATALOG!! ★</div>
+    <div class="sub">Mama's Chop Shop &middot; Chop Shop District &middot; appointments thru ZHENYA!!</div>
+    <div style="margin-top:8px"><button class="bub" id="muteBtn" onclick="toggleMute()" style="font-size:12px; min-height:40px;">QUIET TIME: OFF</button></div>
+  </header>
+  <div id="mama-takeover"><div class="mv"><b>MAMA:</b> Darling. Zhenya, go to your room.<br>
+    <span style="color:#ffb3ba">...To the customer: you have lovely organs. Take care of them. — B.</span></div></div>
+
+  <div id="boot"></div>
+
+  <div id="app" style="display:none">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="searchRow">
+      <input id="search" placeholder="search the toys... (try 'mama')" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="bub" onclick="doSearch()">FIND!!</button>
+    </div>
+    <main id="list"></main>
+    <div class="stars">★ ★ ★</div>
+    <footer class="bar">
+      Mama only sees people Yandee likes!! (Zhenya checks!!)<br>
+      Thank you for shopping!! Tell your friends!! Tell your ENEMIES!!
+    </footer>
+  </div>
+</div>
+<div class="overlay" id="ovl"><div class="box" id="ovlBox"></div></div>
+
+<script>
+/* ================= AUDIO: cheerful ================= */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function tone(f,d,delay){ if(muted) return; const a=ac(); if(!a) return;
+  const o=a.createOscillator(), g=a.createGain(); o.type="sine"; o.frequency.value=f;
+  const t=a.currentTime+(delay||0);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.08,t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+(d||0.12));
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+(d||0.12)+0.05); }
+const sClick=()=>tone(880,.1);
+const sTab=()=>{tone(660,.1); tone(880,.1,.09);};
+const sYay=()=>{tone(523,.12); tone(659,.12,.1); tone(784,.2,.2);};
+const sOh=()=>{tone(392,.15); tone(330,.2,.14);};
+const sMama=()=>{tone(110,.4); tone(98,.5,.3);};
+function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="QUIET TIME: "+(muted?"ON":"OFF"); if(!muted) sClick(); }
+
+/* ================= DATA ================= */
+/* kid: Zhenya's pitch. gw: grown-up words (book mechanics). r: restricted */
+const MODS=[
+{c:"ARMS & LEGS!!",n:"Prosthetic",p:"1,000cr",s:"1 slot",kid:"New hand!! New foot!! Good as new, MOSTLY!!",gw:"Artificial hand, foot, arm or leg. Replacement organs cost 10x. Mama is very good at these."},
+{c:"ARMS & LEGS!!",n:"Hotswap",p:"1,000cr",s:"0 slots",kid:"Change your toys in ONE turn!! SO FAST!!",gw:"Swap installed cyberware in a single turn."},
+{c:"ARMS & LEGS!!",n:"Subdermal Bandolier",p:"500cr",s:"1 slot",kid:"Hide bullets UNDER YOUR SKIN!! Like a squirrel!!",gw:"Internal ammo cavity, 10 full magazines per ammo type. On a Critical Hit: 5% chance it goes off (2d10 to you and everyone within 20m who fails a Body Save)."},
+{c:"ARMS & LEGS!!",n:"Handcannon",p:"55kcr+",s:"varies",kid:"Hide a GUN in your ARM!! Like a spy!!",gw:"Conceals a weapon inside a prosthetic limb. Needs: Prosthetic. Cost = weapon cost on top."},
+{c:"ARMS & LEGS!!",n:"Spinal Rig",p:"150kcr",s:"1 slot",kid:"A robot backpack that makes you SO STRONG!! One per customer!!",gw:"+10 Strength (no extra Health). May only be installed once.",r:1},
+{c:"ARMS & LEGS!!",n:"Spider Mount",p:"250kcr",s:"1 slot",kid:"TWO MORE ARMS!!! Like a spider!!!",gw:"Attach up to 2 extra Prosthetics or Hardware. Once per customer. Needs: Spinal Rig.",r:1},
+{c:"ARMS & LEGS!!",n:"Panzerfist",p:"15mcr",s:"4 slots",kid:"A SHIP GUN IN YOUR ARM!!! TWO SHOTS!!! HOLD ON TIGHT OR YOU GO FLYING!!!",gw:"2d10 mdmg, range 50/100/400m. Without a Spinal Rig: Body Save at [-] or flung 2d10m. Two rounds to fire. Needs: Prosthetic.",r:1},
+{c:"EYES & EARS!!",n:"OGRE",p:"32kcr",s:"2 slots",kid:"A computer in your EYES!! Maps!! Movies!! Don't stare at the sun!!",gw:"Occular Graphic Rendering Engine. HUD projected into your field of vision."},
+{c:"EYES & EARS!!",n:"Black Box",p:"10kcr",s:"3 slots",kid:"NEVER FORGET ANYTHING!! Your whole life, saved like a movie!!",gw:"Eidetic memory backup from installation onward. Watch via OGRE/Holoprojector. Stores uploads + Slickware. Needs: Slicksocket."},
+{c:"EYES & EARS!!",n:"Holoprojector",p:"750cr",s:"1 slot",kid:"Show movies FROM YOUR EYEBALLS!!",gw:"Projects stored data (OGRE, Black Box, Slicksocket...). Needs: OGRE."},
+{c:"EYES & EARS!!",n:"Tattletale",p:"2,000cr",s:"1 slot",kid:"A listening bug you can THROW!! Hears secrets from 100km away!!",gw:"Detachable audio bug, traceable to 100m within a 100km area. Needs: Slicksocket + OGRE."},
+{c:"EYES & EARS!!",n:"Loudmouth",p:"5,500cr",s:"1 slot",kid:"Record ANYTHING!! Play it back LOUD!! Like, flashbang loud!!",gw:"Audio record + playback, max volume = flashbang."},
+{c:"SKIN & SMILES!!",n:"Lumatat",p:"200cr+",s:"0 slots",kid:"Tattoos that MOVE and GLOW!! Get a dragon!! Get TWO dragons!!",gw:"Cosmetic animated/luminescent tattoos."},
+{c:"SKIN & SMILES!!",n:"Fangs",p:"30kcr",s:"1 slot",kid:"Vampire teeth!! Hold 3 drinks inside!! (poison! medicine! juice!)",gw:"Hollow cybernetic fangs, 2d10 dmg. Stores 3 doses of anything."},
+{c:"SKIN & SMILES!!",n:"Little Switch",p:"8kcr",s:"1 slot",kid:"Squish your face like clay!! A new you in ONE DAY!!",gw:"Smooth or roughen appearance. 1 day + mental trigger."},
+{c:"SKIN & SMILES!!",n:"Big Switch",p:"18kcr",s:"1 slot",kid:"Change EVERYTHING!! Takes a week and a really strong wish!!",gw:"Change primary sexual characteristics. 1 week + mental trigger."},
+{c:"SKIN & SMILES!!",n:"Cloakskin",p:"200kcr",s:"2 slots",kid:"INVISIBLE for five minutes, once a day!! (If you get hurt while invisible you might STAY that way. That's why we can't find Uncle — kidding!! ...mostly.)",gw:"Near-invisibility 5 min/day. Critically Hit during use: 30% chance it's permanent.",r:1},
+{c:"BRAIN & WIRES!!",n:"Slicksocket",p:"1,000cr",s:"1 slot",kid:"A plug in your head for brain-movies!! (Slickware!!)",gw:"Cranial input jack. Required for Slickware + many mods."},
+{c:"BRAIN & WIRES!!",n:"Terminal Jack",p:"750cr",s:"1 slot",kid:"Plug into ANYTHING!! Doors!! Cars!! Vending machines!! (Ask VND-3 first!!)",gw:"Interface with terminals, smartlink weapons, vehicles. Download/upload data."},
+{c:"BRAIN & WIRES!!",n:"Huntershot",p:"4,500cr",s:"1 slot",kid:"A tiny dart that fires ALL BY ITSELF!! Even if you're napping!!",gw:"1 dart, fires on command / death / unconsciousness. 1d10 dmg. Needs: OGRE."},
+{c:"BRAIN & WIRES!!",n:"Deadswitch",p:"1,000cr",s:"1 slot",kid:"Play DEAD for two whole weeks!! The BEST hiding game!! (Don't play too often.)",gw:"Feigns death 2 weeks. Each use: cumulative 5% chance it's permanent. Needs: Black Box."},
+{c:"BRAIN & WIRES!!",n:"God Mode",p:"85kcr",s:"2 slots",kid:"Be the BEST at computers!! EVER!!",gw:"[+] on Hacking Checks when jacked in. Needs: Slicksocket.",r:1},
+{c:"BRAIN & WIRES!!",n:"Remote Uplink",p:"550kcr",s:"2 slots",kid:"Send your brain-movies somewhere SAFE, once a day!! For later!! (Or for a NEW you!!)",gw:"Daily encrypted broadcast of Black Box data to a secure backup site. For future retrieval (or re-sleeving). Needs: Black Box.",r:1},
+{c:"MAMA'S SPECIAL SHELF",n:"Panic Button",p:"10kcr",s:"1 slot",kid:"Mama says this one is NOT for kids. Mama says this one is not for ANYONE. ...It goes BOOM.",gw:"On trigger (or death): 1d10 to everyone within 20m who fails a Body Save. Unconscious: 5% auto-trigger.",r:1},
+{c:"MAMA'S SPECIAL SHELF",n:"Retractable Nanoblade",p:"105kcr",s:"1 slot",kid:"A SWORD in your ARM!! Nine inches!! Cuts through ALMOST ANYTHING!!",gw:"4d10 dmg. Needs: Prosthetic.",r:1},
+{c:"MAMA'S SPECIAL SHELF",n:"Scapegoat System",p:"130kcr",s:"3 slots",kid:"Catch bullets and THROW THEM BACK!! (Give them back fast or OWIE.)",gw:"Stores up to 30 kinetic dmg; redirect within 2d10 turns by touch or take triple. 1 week recharge.",r:1},
+{c:"MAMA'S SPECIAL SHELF",n:"Revenant Protocol",p:"280kcr",s:"2 slots",kid:"Keep fighting AFTER you're dead!! 2d10 rounds!! Pick your targets!! (Mama is serious about this one.)",gw:"Trigger within 2 rounds of death: keep fighting 2d10 rounds. No enemies left: targets random. Needs: Black Box.",r:1},
+{c:"MAMA'S SPECIAL SHELF",n:"Sockpuppet",p:"1mcr+",s:"varies",kid:"A gun that shoots ALL BY ITSELF!! It helps!!",gw:"Installed weapon fires once/turn at half your Combat. Needs: Spinal Rig + OGRE.",r:1},
+{c:"MAMA'S SPECIAL SHELF",n:"Whiplash Injector",p:"10mcr",s:"2 slots",kid:"If you hit ZERO it heals you AUTOMATICALLY!! Then a one-week nap!! (Your body keeps score, Mama says.)",gw:"Auto-heals 1d10 at 0 Health. 1 week recharge. Body Save permanently -1d10 after use.",r:1},
+{c:"MAMA'S SPECIAL SHELF",n:"STEADY",p:"Mama decides",s:"0 slots",kid:"For frames that feel... staticky. Mama's special recipe. Do NOT ask Zhenya!! (Zhenya knows a little.)",gw:"Stabilizer: stops frame/sleeve decay. Off-book. Price per person, cash, no receipts.",r:1, steady:1}
+];
+const CATS=["ARMS & LEGS!!","EYES & EARS!!","SKIN & SMILES!!","BRAIN & WIRES!!","MAMA'S SPECIAL SHELF","SERVICES!!"];
+const SERVICES=[
+{n:"Installation",d:"Mama decides the price AFTER she sees you!! (It depends how much you scream. She is JOKING!! ...mostly.)"},
+{n:"Recovery Room",d:"100cr/day!! Six dingy bunks!! (One is... occupied. Don't look. Zhenya is serious. Don't look.)"},
+{n:"Reaping (taking toys OUT)",d:"Mama can take toys out of living AND willing people!! It hurts!! Ask Mama about the price!! (Reapers must use the back door. Reapers are RUDE.)"},
+{n:"WE BUY: infected corpses",d:"2kcr each!! For study!! Don't get sick!! (Mama is VERY serious about this one.)"},
+{n:"Sycorax pickup",d:"Mama pays 3kcr to fetch it from the Farm!! Talk to Ukko/Ukka ONLY!! No one else!!"}
+];
+const OVERCLOCK=`<b>TOO MANY TOYS??</b><br><br>Your body has SLOTS — that's how many toys fit!! More toys than slots = <b>OVERCLOCKED!!</b> Every extra toy = 1 MAD LEVEL, and they ADD UP!!<br><br><span style="color:var(--cyan); font-family:'Courier New',monospace; font-size:13px;">Grown-up words: Overclock Level +1 per mod beyond your slot limit. Effects are cumulative. Mama holds the full chart — it ranges from "oops" to "you are the toy now." Mutations and malfunctions can spiral. Mama says: make sure it's fun, not just hurty.</span>`;
+
+/* ================= STATE ================= */
+let curCat=0, unlocked=false;
+try{ unlocked = localStorage.getItem("zhenya_grownup")==="1"; }catch(e){}
+function setUnlocked(on){ unlocked=on; try{ localStorage.setItem("zhenya_grownup", on?"1":"0"); }catch(e){} }
+
+/* ================= BOOT ================= */
+const bootLines=[
+"HELLO!!! I'M <b>ZHENYA</b>!!!",
+"Mama says I can show you the catalog!!!",
+"Everything is REAL and SAFE!!!",
+"<span style='font-size:13px'>(Mama says I have to say 'mostly safe'.)</span>",
+"",
+"<pre class='ascii'>  ☆ ☆ ☆\n ☆ TOYS!! ☆\n  ☆ ☆ ☆</pre>",
+"Pick a section!! Have fun!!"
+];
+let bi=0;
+function bootStep(){
+  const b=document.getElementById("boot");
+  if(bi<bootLines.length){ b.innerHTML+=bootLines[bi]+"<br>"; bi++; tone(660+bi*60,.09); setTimeout(bootStep,380); }
+  else setTimeout(()=>{ b.style.display="none"; document.getElementById("app").style.display="block"; sYay(); buildTabs(); },500);
+}
+
+/* ================= TABS + LIST ================= */
+function buildTabs(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  CATS.forEach((c,i)=>{
+    const b=document.createElement("button");
+    const isLock=(c==="MAMA'S SPECIAL SHELF");
+    b.className="bub"+(i===curCat?" on":"")+(isLock?" lock":"");
+    b.textContent=(isLock&&!unlocked)?"??? (grown-ups)":c;
+    b.onclick=()=>{curCat=i; sTab(); buildTabs(); renderList();};
+    t.appendChild(b);
+  });
+  renderList();
+}
+function toyCard(m){
+  if(m.r && !unlocked){
+    return `<div class="toy locked" onclick="lockedToy()"><div class="nm">??? MYSTERY TOY!!! ???</div>
+    <div class="kid">Mama says you have to know the SECRET WORD!! (It's somebody's NAME!!)</div></div>`;
+  }
+  return `<div class="toy" onclick="this.classList.toggle('open');sClick()">
+    <div class="nm">${m.n} <span class="pr">— ${m.p}</span></div>
+    <div class="slots">${m.s}</div>
+    <div class="kid">${m.kid}</div>
+    <div class="gw"><b>GROWN-UP WORDS:</b> ${m.gw}</div></div>`;
+}
+function renderList(filter){
+  const L=document.getElementById("list");
+  const c=CATS[curCat];
+  if(c==="SERVICES!!"){
+    L.innerHTML=`<div style="text-align:center;color:var(--yellow);font-size:18px;margin-bottom:12px"><b>★ SERVICES!! ★</b></div>`+
+      SERVICES.map(s=>`<div class="svc"><div class="nm">${s.n}</div><div class="ds">${s.d}</div></div>`).join("");
+    return;
+  }
+  if(c==="MAMA'S SPECIAL SHELF" && !unlocked){ pwScreen(); return; }
+  let items=MODS.map((m,i)=>({m,i})).filter(x=> filter ? (x.m.n+x.m.kid).toLowerCase().includes(filter) : x.m.c===c);
+  if(c==="MAMA'S SPECIAL SHELF" && unlocked){
+    items.push({m:{c, n:"OVERCLOCKING?!", p:"free", s:"-", kid:"Click me for the TOO-MANY-TOYS rule!!", gw:OVERCLOCK}, i:-1});
+  }
+  let h=`<div style="text-align:center;color:var(--yellow);font-size:18px;margin-bottom:12px"><b>★ ${filter?"WHAT ZHENYA FOUND!!":c} ★</b></div>`;
+  h+=items.length? items.map(x=>toyCard(x.m)).join("") : `<p style="text-align:center">No toys found!! Try "arm"!! Or "invisible"!!</p>`;
+  L.innerHTML=h;
+}
+function lockedToy(){ sOh(); ovl(`<b>THIS TOY IS FOR GROWN-UPS!!</b><br><br><span style="color:var(--cyan)">Mama says: tell me the secret word and I'll show you EVERYTHING.</span><br><br><button class="bub" onclick="closeOvl();curCat=4;buildTabs()">TAKE ME TO THE SECRET DOOR!!</button>`); }
+
+/* ================= PASSWORD ================= */
+let pwFails=0;
+function pwScreen(){
+  const L=document.getElementById("list");
+  L.innerHTML=`<div id="pwbox">
+    <div style="font-size:20px;color:var(--pink)"><b>★ THE SECRET DOOR ★</b></div>
+    <p>These toys are for GROWN-UPS!!<br>What's the secret word??</p>
+    <input id="pw" type="text" placeholder="secret word..." onkeydown="if(event.key==='Enter')tryPw()">
+    <div><button class="bub" style="margin-top:12px" onclick="tryPw()">KNOCK KNOCK!!</button></div>
+    <div class="hint" id="pwHint">${pwFails>=2?"HINT: Mama's favorite person!! His name is in her ROOM!! It starts with S!!":""}</div>
+  </div>`;
+  const inp=document.getElementById("pw"); if(inp) inp.focus();
+}
+function tryPw(){
+  const v=(document.getElementById("pw").value||"").trim().toLowerCase();
+  if(v==="stellan"||v==="s7311@n"){ setUnlocked(true); sYay(); buildTabs();
+    ovl(`<b style="color:var(--yellow)">★ THE DOOR OPENS!!! ★</b><br><br>HOW did you know that?!! Did you see the PHOTO?!<br><br><span style="color:var(--cyan)">Mama's special shelf is open!! Be CAREFUL!! (Have fun!!)</span><br><br><button class="bub" onclick="closeOvl()">WOW!! OK!!</button>`);
+  } else { pwFails++; sOh();
+    document.getElementById("pwHint").textContent = pwFails>=2 ? "HINT: Mama's favorite person!! His name is in her ROOM!! It starts with S!!" : "Nope!! Try again!!";
+    document.getElementById("pw").value=""; document.getElementById("pw").focus();
+  }
+}
+
+/* ================= SEARCH ================= */
+function doSearch(){
+  const q=document.getElementById("search").value.trim().toLowerCase(); sClick();
+  if(q==="mama"){ mamaTakeover(); return; }
+  if(q==="stellan"){ sYay(); ovl(`<b>That's Mama's favorite person!!</b><br><br>HOW did you know that?! ...Did you see the PHOTO?<br><br><span style="color:var(--cyan)">(The photo is in Mama's room. Under the mattress. Zhenya didn't tell you that.)</span><br><br><button class="bub" onclick="closeOvl()">ZHENYA DIDN'T TELL ME ANYTHING</button>`); return; }
+  if(!q){ renderList(); return; }
+  curCat=-1; buildTabsLite();
+  const items=MODS.filter(m=>(m.n+m.kid).toLowerCase().includes(q) && (!m.r||unlocked));
+  document.getElementById("list").innerHTML=`<div style="text-align:center;color:var(--yellow);font-size:18px;margin-bottom:12px"><b>★ WHAT ZHENYA FOUND!! ★</b></div>`+
+    (items.length? items.map(toyCard).join("") : `<p style="text-align:center">No toys found!! Try "arm"!! Or "invisible"!!</p>`);
+}
+function buildTabsLite(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  CATS.forEach((c,i)=>{ const b=document.createElement("button");
+    b.className="bub"+((c==="MAMA'S SPECIAL SHELF")?" lock":"");
+    b.textContent=(c==="MAMA'S SPECIAL SHELF"&&!unlocked)?"??? (grown-ups)":c;
+    b.onclick=()=>{curCat=i; sTab(); buildTabs();}; t.appendChild(b); });
+}
+function mamaTakeover(){
+  sMama();
+  const m=document.getElementById("mama-takeover"); m.classList.add("on");
+  setTimeout(()=>m.classList.remove("on"),6000);
+  document.getElementById("search").value="";
+}
+
+/* ================= OVERLAY ================= */
+function ovl(html){ document.getElementById("ovlBox").innerHTML=html; document.getElementById("ovl").classList.add("on"); }
+function closeOvl(){ sClick(); document.getElementById("ovl").classList.remove("on"); }
+document.getElementById("ovl").addEventListener("click",e=>{ if(e.target.id==="ovl") closeOvl(); });
+
+/* ================= IDLE: Zhenya gets lonely ================= */
+let idleT=null;
+function idleReset(){ clearTimeout(idleT); idleT=setTimeout(()=>{
+  sOh();
+  ovl(`<pre class="ascii">  ♥ ♥ ♥\n ♥ ARE YOU ♥\n ♥ STILL THERE?? ♥\n  ♥ ♥ ♥</pre><br><button class="bub" onclick="closeOvl()">I'M HERE, ZHENYA!!</button>`);
+},90000); }
+["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
+idleReset();
+
+bootStep();
+</script>
+</body>
+</html>

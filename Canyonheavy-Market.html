@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>CANYONHEAVY.MARKET // PARANOIA EXCHANGE</title>
+<style>
+:root{ --lm:#b6ff00; --mg:#ff2d78; --bl:#050505; --pn:#0b0f06; --wt:#e8ffd0; --dm:#5a7038; }
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{background:var(--bl); color:var(--wt); font-family:"Courier New",Courier,monospace;
+  text-shadow:0 0 8px rgba(182,255,0,.45); padding:12px; overflow-x:hidden;}
+#noise{position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.05;
+  background-image:repeating-linear-gradient(0deg, var(--lm) 0 1px, transparent 1px 4px);}
+#term{position:relative; z-index:2; max-width:920px; margin:0 auto; background:rgba(5,5,5,.96);
+  border:1px solid var(--lm); box-shadow:0 0 26px rgba(182,255,0,.18), inset 0 0 60px rgba(182,255,0,.04);}
+header.bar{border-bottom:1px solid var(--lm); padding:16px 20px; display:flex; justify-content:space-between;
+  align-items:center; gap:10px; flex-wrap:wrap;}
+header.bar .ttl{font-size:clamp(17px,3.6vw,26px); letter-spacing:.14em; color:#fff;
+  text-shadow:0 0 14px var(--lm); cursor:pointer; user-select:none;}
+header.bar .ttl .mg{color:var(--mg); text-shadow:0 0 14px var(--mg);}
+header.bar .sub{font-size:clamp(10px,2vw,12px); color:var(--dm); letter-spacing:.2em; margin-top:4px;}
+nav.tabs{display:flex; gap:10px; padding:16px 20px 0; flex-wrap:wrap;}
+button.hx{font-family:inherit; font-weight:bold; letter-spacing:.18em; text-transform:uppercase;
+  font-size:clamp(11px,2.2vw,13px); color:var(--lm); background:transparent;
+  border:1px solid var(--lm); padding:12px 18px; cursor:pointer; min-height:48px;}
+button.hx:active{transform:scale(.96);}
+button.hx.on{background:var(--lm); color:#0a0f02; text-shadow:none; box-shadow:0 0 16px rgba(182,255,0,.6);}
+#searchRow{display:flex; gap:10px; padding:14px 20px 0; flex-wrap:wrap;}
+#search{flex:1; min-width:200px; font-family:inherit; font-size:14px; background:#0a0d05; color:var(--wt);
+  border:1px solid var(--dm); padding:11px 14px;}
+#search::placeholder{color:var(--dm);}
+#search:focus{outline:none; border-color:var(--lm);}
+main{padding:18px 20px;}
+h2.sttl{font-size:clamp(13px,2.8vw,16px); letter-spacing:.26em; color:#fff; text-shadow:0 0 12px var(--lm);
+  border-bottom:1px solid var(--dm); padding-bottom:10px; margin:4px 0 16px;}
+.dim{color:var(--dm); text-shadow:none;}
+.listing{border:1px solid var(--dm); background:rgba(182,255,0,.03); margin:0 0 12px; padding:14px 16px;}
+.listing:hover{border-color:var(--lm);}
+.listing .row1{display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap;}
+.listing .nm{font-size:15px; letter-spacing:.1em; color:#fff; text-shadow:0 0 10px var(--lm);}
+.listing .pr{color:var(--lm); font-weight:bold; white-space:nowrap;}
+.listing .ds{font-size:12.5px; margin-top:8px; line-height:1.65; color:var(--wt);}
+.listing .vn{font-size:11px; margin-top:8px; color:var(--dm); letter-spacing:.06em;}
+.listing .vn .esc{color:var(--lm); border:1px solid var(--lm); padding:1px 6px; font-size:10px;}
+.listing .warn{font-size:11px; margin-top:6px; color:var(--mg); letter-spacing:.06em;}
+.listing .foot{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;}
+button.buy{font-family:inherit; font-weight:bold; font-size:12px; letter-spacing:.14em; color:#0a0f02;
+  background:var(--lm); border:none; padding:11px 18px; cursor:pointer; min-height:44px;}
+button.buy:active{transform:scale(.94);}
+button.ghost{font-family:inherit; font-size:12px; letter-spacing:.14em; color:var(--lm);
+  background:transparent; border:1px solid var(--lm); padding:11px 18px; cursor:pointer; min-height:44px;}
+button.ghost:active{transform:scale(.94);}
+#cart{margin:0 20px 6px; border:1px solid var(--lm); padding:12px 16px; background:rgba(182,255,0,.05);
+  font-size:13px; line-height:1.8;}
+#cart .ch{letter-spacing:.28em; color:var(--lm); font-size:11px;}
+#cartItems{max-height:110px; overflow-y:auto;}
+#tipbox{margin:0 20px 6px; border:1px dashed var(--mg); padding:12px 16px; font-size:12.5px; line-height:1.8;}
+#tipbox .th{letter-spacing:.24em; color:var(--mg); font-size:11px;}
+#tipInput{width:100%; font-family:inherit; font-size:13px; background:#0a0d05; color:var(--wt);
+  border:1px solid var(--dm); padding:10px 12px; margin-top:8px;}
+#tipInput:focus{outline:none; border-color:var(--mg);}
+#tipResp{margin-top:8px; min-height:20px; color:var(--lm);}
+footer.bar{border-top:1px solid var(--lm); padding:12px 20px; display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between; font-size:11px; color:var(--dm); letter-spacing:.1em;}
+#boot{padding:30px 24px; font-size:14px; line-height:2.1; letter-spacing:.06em;}
+.overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  background:rgba(5,5,5,.95); padding:18px;}
+.overlay.on{display:flex;}
+.overlay .box{max-width:560px; background:var(--pn); border:1px solid var(--lm); padding:26px;
+  box-shadow:0 0 26px rgba(182,255,0,.3); font-size:14px; line-height:1.8; letter-spacing:.05em; text-align:center;}
+#idle{position:fixed; inset:0; z-index:95; display:none; align-items:center; justify-content:center;
+  background:#030303; text-align:center;}
+#idle.on{display:flex;}
+#idle .big{font-size:clamp(20px,4.5vw,40px); letter-spacing:.24em; color:var(--lm);
+  text-shadow:0 0 20px var(--lm); animation:blk 1.1s steps(2) infinite;}
+@keyframes blk{50%{opacity:.25}}
+.glitch{animation:gt .25s steps(2) 3;}
+@keyframes gt{25%{transform:translateX(-5px) skewX(2deg)}75%{transform:translateX(5px) skewX(-2deg)}}
+</style>
+</head>
+<body>
+<div id="noise"></div>
+<div id="idle" onclick="wake()"><div class="big">ENCRYPTING SESSION...<br><span class="dim">DO NOT LOOK AWAY</span></div></div>
+<div id="term">
+  <header class="bar">
+    <div>
+      <div class="ttl" id="logo" onclick="logoClick()">CANYONHEAVY<span class="mg">.</span>MARKET</div>
+      <div class="sub">PEER-TO-PEER PARANOIA EXCHANGE // ESCROW-PROTECTED</div>
+    </div>
+    <button class="hx" id="muteBtn" onclick="toggleMute()">AUDIO: ON</button>
+  </header>
+
+  <div id="boot"></div>
+
+  <div id="app" style="display:none">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="searchRow">
+      <input id="search" placeholder="SEARCH LISTINGS... (try 'angus')" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="hx" onclick="doSearch()">QUERY</button>
+    </div>
+    <main id="list"></main>
+    <div id="cart">
+      <div class="ch">ESCROW CART</div>
+      <div id="cartItems"><span class="dim">// empty. Paranoia is free.</span></div>
+      <div id="cartTotal" style="color:#fff">TOTAL: 0cr + 2% escrow fee (non-negotiable)</div>
+      <div style="margin-top:8px"><button class="buy" onclick="checkout()">CHECKOUT VIA ESCROW</button></div>
+    </div>
+    <div id="tipbox">
+      <div class="th">SELL A TIP TO ANGUS</div>
+      <div class="dim">Always buying. Pays 3d10 x 10kcr. No questions. Some questions. Okay, a few questions.</div>
+      <input id="tipInput" placeholder="Type what you know..." onkeydown="if(event.key==='Enter')sellTip()">
+      <div style="margin-top:8px"><button class="ghost" onclick="sellTip()">TRANSMIT TIP</button></div>
+      <div id="tipResp"></div>
+    </div>
+    <footer class="bar">
+      <span>ESCROW FEE 2%. DO NOT ASK WHO RUNS ESCROW. THIS MARKET DOES NOT EXIST.</span>
+    </footer>
+  </div>
+</div>
+<div class="overlay" id="ovl"><div class="box" id="ovlBox"></div></div>
+
+<script>
+/* ================= AUDIO: modem ================= */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function blip(f,d,g,type){ if(muted) return; const a=ac(); if(!a) return;
+  const o=a.createOscillator(), gn=a.createGain(); o.type=type||"square"; o.frequency.value=f;
+  const t=a.currentTime; gn.gain.setValueAtTime(g||0.03,t); gn.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(gn); gn.connect(a.destination); o.start(t); o.stop(t+d+0.05); }
+const sClick=()=>blip(1200,.06,.03);
+const sTab=()=>{blip(800,.07,.03); setTimeout(()=>blip(1200,.07,.03),80);};
+const sBuy=()=>{blip(300,.12,.05); setTimeout(()=>blip(1500,.1,.04),110);};
+const sErr=()=>blip(140,.3,.05,"sawtooth");
+const sModem=()=>{[400,900,1400,700,1800,500].forEach((f,i)=>setTimeout(()=>blip(f,.09,.035),i*110));};
+function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="AUDIO: "+(muted?"OFF":"ON"); if(!muted) sClick(); }
+
+/* ================= DATA ================= */
+/* Gear: book table (APoF). Jobs: Canyonheavy Missions p.25 (book). */
+const CATS=["BLACK MARKET"];
+const GEAR=[
+{n:"TrashKid",p:"5kcr",d:"Portable device preconfigured to generate believable iconography and attack patterns for a fictitious cyber-gang, leading investigators astray.",v:"0xBURNER ★★★★☆ (212)",w:"Frame someone who doesn't exist. They can't alibi."},
+{n:"Splintermask",p:"3kcr",d:"Transparent, flexible balaclava. Outer surface transmits harsh jagged noise-patterns, defeating conventional and IR cameras. Stressful to Androids/AI systems.",v:"mirrormask ★★★★★ (98)",w:"Do not wear near androids you like."},
+{n:"Racketball",p:"4.5kcr",d:"Bundle of transmitters, speakers, LEDs and suspicious cabling. Aggressively outputs noise on all spectrums, destroying delicate sensors within 30m and stunning standard sensors for 1d10min.",v:"NULL_SECTOR ★★★☆☆ (41)",w:"Loud. Illegal in 9 systems. This is one of them."},
+{n:"Office Assistant",p:"55kcr",d:"Suitcase of blank android personality storage + I/O cables. A willing android downloads a copy of their personality; connected to an unwilling android (Sanity Save to resist), it takes the new body and locks the original out.",v:"coldboot ★★★★★ (377)",w:"Sanity Save to resist. No refunds on bodies."},
+{n:"Moebius Strip",p:"3.5kcr",d:"Connects to a camera; endlessly replays 30 seconds of selected footage while advancing the timestamp.",v:"packet_rat ★★★★☆ (156)",w:"The footage is always 30 seconds ago. Forever."},
+{n:"Doorstop",p:"500cr",d:"Siphon-circuit trapping any open/close signal a door outputs. The network is never notified.",v:"DOORS_4_SALE ★★★☆☆ (23)",w:"Doors can't tell. That's the point."},
+{n:"Remote Autohacker",p:"250kcr",d:"Radio-operated, pre-programmable output device for remote input. Make a remote Hacking Check. 100m range.",v:"jackmove ★★★★★ (289)",w:"100m of deniability."},
+{n:"Slaveshot",p:"15kcr",d:"Dartgun, 20m range. Injects malicious code into a cybermod: remote access within 200m (Body Save to resist).",v:"SPLICE ★★★★☆ (174)",w:"Body Save to resist. Aim for the chrome."},
+{n:"Socketsnake",p:"750cr",d:"Inert, lifeless cable bundle with adaptors. Once connected, any further input makes it thrash wildly: 3d10 damage to the user.",v:"voltmama ★★☆☆☆ (12)",w:"The seller's rating explains itself."},
+{n:"Mommybird",p:"75kcr",d:"Heavy black cylinder, bank of capacitors. Siphons power for 60 seconds, then outputs the full charge back into the device.",v:"glitchwife ★★★★☆ (203)",w:"Sixty seconds. Then everything at once."}
+];
+function priceCr(p){ const m=String(p).match(/([\d.]+)k?cr/); if(!m) return 0;
+  return m[0].includes("kcr")?parseFloat(m[1])*1000:parseFloat(m[1]); }
+
+/* ================= BOOT ================= */
+const bootLines=[
+"CANYONHEAVY.MARKET // PEER-TO-PEER PARANOIA EXCHANGE",
+"ROUTING THROUGH 14 PROXIES... BOUNCE... BOUNCE... <span style='color:#b6ff00'>CLEAN</span>",
+"HANDSHAKE ACCEPTED. YOU ARE USER #44821. <span class='dim'>(Not really.)</span>",
+"",
+"WELCOME, ANONYMOUS.",
+"ANGUS IS WATCHING. <span class='dim'>Angus is always watching. He's friendly about it.</span>"
+];
+let bi=0;
+function bootStep(){
+  const b=document.getElementById("boot");
+  if(bi<bootLines.length){ b.innerHTML+=bootLines[bi]+"<br>"; bi++; blip(300+bi*140,.08,.03); setTimeout(bootStep,400); }
+  else setTimeout(()=>{ b.style.display="none"; document.getElementById("app").style.display="block"; sModem(); buildTabs(); },600);
+}
+
+/* ============ SEEDED DAILY DRAW (same ritual as the Dry Dock board) ============ */
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function todayKey(){ const d=new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+function pickDaily(){ const rng=mulberry32(hashStr("canyonheavy:"+todayKey()));
+  const pool=GEAR.map((g,i)=>i); const out=[];
+  for(let k=0;k<2;k++){ out.push(pool.splice(Math.floor(rng()*pool.length),1)[0]); }
+  return out.sort((a,b)=>a-b); }
+const DAILY=pickDaily();
+const isDaily=i=>DAILY.includes(i);
+
+/* ================= TABS + LIST ================= */
+let curCat=0;
+function buildTabs(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  CATS.forEach((c,i)=>{ const b=document.createElement("button");
+    b.className="hx"+(i===curCat?" on":""); b.textContent=c;
+    b.onclick=()=>{curCat=i; sTab(); buildTabs();}; t.appendChild(b); });
+  renderList();
+}
+function gearCard(g,i,badge){
+  return `<div class="listing"><div class="row1"><span class="nm">${g.n}</span><span class="pr">${g.p}</span></div>
+  ${badge?`<div style="margin-top:6px"><span class="esc" style="color:var(--lm); border:1px solid var(--lm); padding:1px 6px; font-size:10px">◉ ADVERTISED TODAY</span></div>`:""}
+  <div class="ds">${g.d}</div><div class="warn">⚠ ${g.w}</div>
+  <div class="vn">vendor: ${g.v} &nbsp;<span class="esc">ESCROW</span></div>
+  <div class="foot"><button class="buy" onclick='buy(${JSON.stringify(g.n)},${JSON.stringify(g.p)})'>BUY (ESCROW)</button></div></div>`;
+}
+function renderList(filter){
+  const L=document.getElementById("list");
+  if(filter){
+    /* search reaches the whole catalog, including yesterday's listings */
+    const items=GEAR.map((g,i)=>({g,i})).filter(x=>(x.g.n+x.g.d).toLowerCase().includes(filter));
+    let h=`<h2 class="sttl">QUERY RESULTS <span class="dim">[${items.length} of 10]</span></h2>`;
+    h+=items.length?items.map(x=>gearCard(x.g,x.i,isDaily(x.i))).join(""):`<p class="dim">// NO RESULTS. TRY FEWER WORDS. OR MORE MONEY.</p>`;
+    L.innerHTML=h; return;
+  }
+  /* default: only today's 2 advertised listings */
+  const items=DAILY.map(i=>({g:GEAR[i],i}));
+  let h=`<h2 class="sttl">TODAY'S LISTINGS <span class="dim">${todayKey()} [2 of 10]</span></h2>`;
+  h+=`<p class="dim" style="font-size:12px">// Vendors rotate daily. Saw something yesterday? Search for it — the catalog remembers.<br>// Missions? Angus hands those out in person. Ask him. Or don't. He'll find you.</p>`;
+  h+=items.map(x=>gearCard(x.g,x.i,false)).join("");
+  L.innerHTML=h;
+}
+
+/* ================= CART ================= */
+let cart=[];
+function buy(n,p){ cart.push({n,p}); sBuy(); renderCart(); }
+function renderCart(){
+  const el=document.getElementById("cartItems");
+  el.innerHTML=cart.length?cart.map(t=>`<div>▸ ${t.n} <span class="dim">— ${t.p}</span></div>`).join(""):`<span class="dim">// empty. Paranoia is free.</span>`;
+  const tot=cart.reduce((s,t)=>s+priceCr(t.p),0);
+  document.getElementById("cartTotal").textContent="TOTAL: "+tot.toLocaleString()+"cr + 2% escrow fee (non-negotiable)";
+}
+function checkout(){
+  if(!cart.length){ sErr(); return; }
+  const n=cart.length; cart=[]; renderCart(); sBuy();
+  ovl(`<div style="color:#b6ff00">ESCROW COMPLETE: ${n} ITEM(S)</div><br>
+  Funds held. Vendor notified. Dead drop coordinates incoming.<br>
+  <span class="dim">If the vendor ghosts you, escrow ghosts them back. Probably.</span><br><br>
+  <button class="hx" onclick="closeOvl()">VANISH</button>`);
+}
+/* ================= SELL A TIP ================= */
+const ANGUS_OK=["YES!! TALK TO ME! 3d10 times ten kay, CASH, no questions — okay, a few questions — SOLD!",
+"OH that's GOOD. That's very good. Sending credits NOW. Tell no one. Tell everyone. Tell me MORE.",
+"Manic typing intensifies. Credits sent. You are my favorite anonymous user. Don't tell the others.",
+"WAIT. Say that again slower. ... Got it. GOT IT. Credits sent! This changes EVERYTHING. Or nothing. Either way: paid!"];
+function sellTip(){
+  const inp=document.getElementById("tipInput");
+  const q=inp.value.trim(); if(!q){ sErr(); return; }
+  let r=0; for(let i=0;i<3;i++) r+=1+Math.floor(Math.random()*10);
+  const pay=(r*10000).toLocaleString();
+  document.getElementById("tipResp").innerHTML=
+    `<span style="color:#ff2d78">TIP RECEIVED. EVALUATING...</span><br>`+
+    `<span class="dim">Angus, chatty and manic:</span> "${ANGUS_OK[Math.floor(Math.random()*ANGUS_OK.length)]}"<br>`+
+    `<span style="color:#b6ff00">PAYOUT: ${pay}cr (rolled ${r} on 3d10 × 10kcr)</span>`;
+  blip(500,.1,.04); setTimeout(()=>blip(1500,.12,.04),130);
+  inp.value="";
+}
+
+/* ================= SEARCH ================= */
+function doSearch(){
+  const q=document.getElementById("search").value.trim().toLowerCase(); sClick();
+  if(q==="angus"){ angusSpeaks(); return; }
+  if(q==="outbreak"){ sErr();
+    ovl(`<div style="color:#ff2d78">SERVICE NOTICE</div><br>All services currently at <span style="color:#b6ff00">2× normal cost</span>.<br><span class="dim">Do not ask why. The hackers are handling it.</span><br><br><button class="hx" onclick="closeOvl()">UNDERSTOOD</button>`); return; }
+  if(!q){ renderList(); return; }
+  renderList(q);
+}
+function angusSpeaks(){
+  sModem();
+  ovl(`<div style="color:#b6ff00; letter-spacing:.2em">ANGUS</div>
+  <div class="dim">sysadmin of canyonheavy.market // chatty, manic voice</div><br>
+  YOU'RE LOOKING AT HIM! Well, at his terminal. He's three rooms away. Or fourteen proxies away. BOTH!<br><br>
+  Tips! I buy tips! 3d10 × 10kcr, CASH! Finder's fee 2d10cr just for showing up with work!<br>
+  Loyal to Yandee, loyal to the market, loyal to YOU, anonymous user #44821!<br><br>
+  <span class="dim">He has already opened seventeen tabs about you. All of them say "friend".</span><br><br>
+  <button class="hx" onclick="closeOvl()">BACK TO THE MARKET</button>`);
+}
+
+/* ================= LOGO (x5) ================= */
+let logoN=0;
+function logoClick(){
+  logoN++; blip(900,.06,.03);
+  document.getElementById("term").classList.remove("glitch"); void document.getElementById("term").offsetWidth;
+  document.getElementById("term").classList.add("glitch");
+  if(logoN>=5){ logoN=0; sErr();
+    ovl(`<div style="color:#ff2d78">THIS MARKET DOES NOT EXIST.</div><br>YOU WERE NEVER HERE.<br><span class="dim">This message will not self-destruct. It will simply be denied.</span><br><br><button class="hx" onclick="closeOvl()">DENY EVERYTHING</button>`);
+  }
+}
+
+/* ================= OVERLAY + IDLE ================= */
+function ovl(html){ document.getElementById("ovlBox").innerHTML=html; document.getElementById("ovl").classList.add("on"); }
+function closeOvl(){ sClick(); document.getElementById("ovl").classList.remove("on"); }
+document.getElementById("ovl").addEventListener("click",e=>{ if(e.target.id==="ovl") closeOvl(); });
+let idleT=null;
+function idleReset(){ document.getElementById("idle").classList.remove("on"); clearTimeout(idleT);
+  idleT=setTimeout(()=>document.getElementById("idle").classList.add("on"),60000); }
+function wake(){ sClick(); idleReset(); }
+["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
+idleReset();
+
+bootStep();
+</script>
+</body>
+</html>
