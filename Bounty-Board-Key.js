@@ -92,7 +92,7 @@ bounties: [
     reward: "[SEALED]", status: "CLOSED",
     client: "[SEALED]", fee: "—",
     lastKnown: "[SEALED]",
-    terms: "This warrant is closed to general licensees. Aspirational posting — build your rank. Inquiries: Handler Venn, RAC Annex.",
+    terms: "This warrant is closed to general licensees. Inquiries: Handler Venn, RAC Annex.",
     travel: null }
 ],
 
