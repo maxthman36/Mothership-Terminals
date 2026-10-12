@@ -114,9 +114,11 @@ controls.autoRotate = true;
 controls.autoRotateSpeed = 0.6;
 
 /* ---------- lights ---------- */
-scene.add(new THREE.AmbientLight(0x887788, 0.85));
+scene.add(new THREE.AmbientLight(0x887788, 1.0));
 const key = new THREE.DirectionalLight(0xffffff, 1.4);
 key.position.set(50, 80, 40); scene.add(key);
+const fill = new THREE.DirectionalLight(0x6688cc, 0.5);
+fill.position.set(-40, -30, 60); scene.add(fill);
 const pl1 = new THREE.PointLight(PINK, 2600, 260, 1.8);
 pl1.position.set(-35, 25, -25); scene.add(pl1);
 const pl2 = new THREE.PointLight(PINK, 2000, 260, 1.8);
@@ -197,6 +199,8 @@ courtGroup.userData.district = COURT;
 
 /* ---------- upper mast ---------- */
 boxAt(3, 22, 3, 0, 13, 0, darkMat);   // spans y 2..24
+boxAt(8, 1.2, 1.2, 0, 18, 0, darkMat);
+boxAt(1.2, 1.2, 6, 0, 21.5, 0, darkMat);
 
 /* ---------- ring + spokes ---------- */
 {
@@ -205,6 +209,8 @@ boxAt(3, 22, 3, 0, 13, 0, darkMat);   // spans y 2..24
   const ringEdge = new THREE.LineSegments(
     new THREE.EdgesGeometry(new THREE.TorusGeometry(26, 1.8, 6, 40)), edgeMat);
   ringEdge.rotation.x = Math.PI / 2; station.add(ringEdge);
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(26, 0.8, 8, 80), darkMat);
+  ring2.rotation.x = Math.PI / 2; ring2.position.y = -3.4; station.add(ring2);
   for (let i = 0; i < 8; i++) {
     const a = i * Math.PI / 4;
     const sp = boxAt(15, 1, 1, 18.5 * Math.cos(a), 0, -18.5 * Math.sin(a), darkMat);
@@ -238,6 +244,7 @@ DISTRICTS.forEach(d => {
   const rnd = mulberry32(d.seed);
   const grp = new THREE.Group();
   grp.userData.district = d;
+  grp.rotation.y = rad;   // local +X points radially outward
 
   const main = edged(new THREE.BoxGeometry(d.s[0], d.s[1], d.s[2]), hullMat);
   grp.add(main); pickables.push(main.children[0]);
@@ -271,17 +278,18 @@ DISTRICTS.forEach(d => {
       rib.position.x = -5 + i * 2;
       tank.add(rib);
     }
-    tank.position.set(d.s[0]/2 + 6.5, -d.s[1]/2 + 2.4, 2);
+    tank.position.set(d.s[0]/2 + 5.5, -d.s[1]/2 + 2.4, 2);
     grp.add(tank); pickables.push(body);
   }
 
-  // bent ribbed pipe (Chop Shop)
+  // bent pipe (Chop Shop): candy-cane exhaust stack rising out of the roof,
+  // curving outward. Lower end is buried inside the module so it reads attached.
   if (d.bentPipe) {
-    const arc = Math.PI * 0.55;
-    const pipeGeo = new THREE.TorusGeometry(6, 1.3, 10, 24, arc);
+    const PR = 7, arc = Math.PI * 0.5;
+    const pipeGeo = new THREE.TorusGeometry(PR, 1.4, 10, 28, arc);
     const pipe = new THREE.Mesh(pipeGeo, hullMat);
-    pipe.position.set(d.s[0]/2 + 5, d.s[1]/2 + 1, 0);
-    pipe.rotation.z = Math.PI * 0.15;
+    pipe.rotation.z = Math.PI * 1.5;   // spans 270deg -> 360deg
+    pipe.position.set(d.s[0]/2 - PR + 2, d.s[1]/2 + PR - 1, 0);
     const pe = new THREE.LineSegments(new THREE.EdgesGeometry(pipeGeo), edgeMat);
     pe.position.copy(pipe.position); pe.rotation.copy(pipe.rotation);
     grp.add(pipe); grp.add(pe); pickables.push(pipe);
