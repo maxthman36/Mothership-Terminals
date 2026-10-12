@@ -433,13 +433,11 @@ function doSearch(){
   const q=document.getElementById("search").value.trim(); sClick();
   const l=q.toLowerCase();
   if(l==="kiosk-7"||l==="kiosk7"||l==="kiosk"){ k7Speaks(); return; }
-  if(l==="slickworld"||l==="slick"){ k7Memo("SLICKWORLD",
-    "Full-sensory network environments, accessed via slicksocket. Public parlors on the Concourse rent time by the hour. Private rigs exist.<br><br>"+
-    "The Court holds you responsible for anything your body does while your mind is elsewhere. This has been tested. The body lost.<br><br>"+
-    "Lycaon's Arcade (disused, Deck 9) was the Dream's first slickworld parlor. It closed years ago. It is still drawing power on the company ledger.<br><br>"+
-    "<span class=\"dim\">This is the kind of detail KIOSK-7 notices. KIOSK-7 notices everything. It is a kiosk. This is its whole life.</span>"); return; }
-  if(l==="arcade"||l==="lycaon"||l==="lycaon's"){ k7Memo("LYCAON'S ARCADE",
+  if(l==="arcade"||l==="lycaon"||l==="lycaon's"||l==="slickworld"||l==="slick"){ k7Memo("THE SLICKWORLD ARCADE (LYCAON'S)",
     "Disused slickworld parlor, Deck 9. Forty cabinets under dust cloths. Doors sealed by Court order.<br><br>"+
+    "SLICKWORLD: full-sensory network environments, accessed via slicksocket. Public parlors on the Concourse rent time by the hour. "+
+    "The Court holds you responsible for anything your body does while your mind is elsewhere. This has been tested. The body lost.<br><br>"+
+    "Lycaon's was the Dream's first slickworld parlor. It closed years ago. It is still drawing power on the company ledger.<br><br>"+
     "Urban explorers: the trespass fine is 500cr, and the tetanus is free.<br><br>"+
     "<span class=\"dim\">VNR-3 adds: I have never been. I am a vending machine. I go nowhere. The flap is my whole world.</span>"); return; }
   if(l==="observatory"||l==="moroi"){ k7Memo("MOROI OBSERVATORY",
