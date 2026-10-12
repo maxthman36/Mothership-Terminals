@@ -108,7 +108,7 @@ footer.bar{border-top:1px solid var(--cy); padding:12px 20px; display:flex; gap:
   <div id="app" style="display:none">
     <nav class="tabs" id="tabs"></nav>
     <div id="searchRow">
-      <input id="search" placeholder="QUERY THE COLD... (try 'cold')" onkeydown="if(event.key==='Enter')doSearch()">
+      <input id="search" placeholder="QUERY THE COLD... (try 'slickworld')" onkeydown="if(event.key==='Enter')doSearch()">
       <button class="hex" onclick="doSearch()">SCAN</button>
     </div>
     <main id="list"></main>
@@ -210,6 +210,7 @@ function renderList(filter){
 function doSearch(){
   const q=document.getElementById("search").value.trim().toLowerCase(); sClick();
   if(q==="cold"||q==="dr cold"||q==="doctor"){ coldSpeaks(); return; }
+  if(q==="slickworld"||q==="slick"){ slickSpeaks(); return; }
   if(!q){ renderList(); return; }
   renderList(q);
   if(!document.querySelector(".panel")) sErr();
@@ -223,6 +224,17 @@ function coldSpeaks(){
   Yours is adequate. It could be better.<br>
   Everything here can make it better.<br><br>
   <span class="dim">The grille goes quiet. The conversation is over.</span><br><br>
+  <button class="hex" onclick="closeOvl()">RETURN TO SELECTION</button>`);
+}
+
+function slickSpeaks(){
+  ping(110,.6,.07);
+  ovl(`<div style="color:var(--cy); letter-spacing:.2em">❄ DR. COLD ❄</div><br>
+  SLICKWORLD, EXPLAINED. SINCE YOU ASKED.<br><br>
+  Full-sensory network environments, accessed via slicksocket. Your mind goes. Your body stays. Try not to think about the arrangement.<br><br>
+  DIY or join a Clan Server — 100cr a month, this terminal, right now. Slickbays by the hour, 50cr. Your body waits in the cold. The cold is honest.<br><br>
+  The Court holds you responsible for anything your body does while your mind is elsewhere. Bodies have been known to wander. If yours wanders, we sell storage.<br><br>
+  <span class="dim">Users report vivid dreams. This is normal. Probably.</span><br><br>
   <button class="hex" onclick="closeOvl()">RETURN TO SELECTION</button>`);
 }
 
