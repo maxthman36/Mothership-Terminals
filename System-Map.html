@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAC NAVCOM // MIRANDA SYSTEM CHART</title>
+<style>
+:root{
+  --grn:#33ff66;
+  --grn-dim:#1e8f43;
+  --grn-faint:#0d3a1c;
+  --amb:#ffb000;
+  --red:#ff5544;
+  --bg:#020a04;
+  --panel:#03130a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#010603}
+body{
+  color:var(--grn);
+  font-family:"Courier New",Courier,monospace;
+  font-size:14px;
+  line-height:1.45;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* ---------- CRT LAYERS ---------- */
+#crt{position:relative;min-height:100vh;padding:10px 14px 0;z-index:1}
+#crt::before{ /* scanlines */
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px);
+}
+#crt::after{ /* vignette + glass */
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
+  background:radial-gradient(ellipse at center, transparent 52%, rgba(0,0,0,.62) 100%);
+}
+#screen{position:relative;z-index:2;max-width:1180px;margin:0 auto}
+.flicker-on #screen{animation:crtFlicker 5s infinite}
+@keyframes crtFlicker{
+  0%,100%{opacity:1}
+  91%{opacity:1} 92%{opacity:.84} 93%{opacity:1}
+  96%{opacity:.93} 96.6%{opacity:1}
+}
+.surge{animation:surgeA .18s steps(2,end) 1 !important}
+@keyframes surgeA{
+  0%{opacity:1;transform:translateX(0)}
+  40%{opacity:.55;transform:translateX(3px)}
+  70%{opacity:.85;transform:translateX(-2px)}
+  100%{opacity:1;transform:translateX(0)}
+}
+.glow{text-shadow:0 0 6px rgba(51,255,102,.75),0 0 22px rgba(51,255,102,.28)}
+.amb{color:var(--amb);text-shadow:0 0 6px rgba(255,176,0,.75),0 0 22px rgba(255,176,0,.3)}
+.red{color:var(--red);text-shadow:0 0 6px rgba(255,85,68,.8)}
+.dim{color:var(--grn-dim)}
+/* ---------- STARFIELD ---------- */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#stars span{position:absolute;color:var(--grn-dim);opacity:.5;user-select:none}
+.tw{animation:tw 3.4s infinite ease-in-out}
+@keyframes tw{0%,100%{opacity:.18}50%{opacity:.7}}
+/* ---------- HEADER ---------- */
+header.pre{white-space:pre;font-size:clamp(6px,1.35vw,11px);line-height:1.15;color:var(--grn);
+  text-shadow:0 0 8px rgba(51,255,102,.8);margin:6px 0 2px;overflow-x:auto}
+.subhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--grn-dim);border-bottom:1px solid var(--grn-dim);padding:6px 2px;margin-bottom:8px}
+/* ---------- CONTROLS ---------- */
+.controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+button{
+  font-family:inherit;font-size:13px;color:var(--grn);background:var(--panel);
+  border:1px solid var(--grn-dim);padding:6px 12px;cursor:pointer;letter-spacing:1px;
+}
+button:hover{background:#0a2c16;color:#d6ffe2}
+button.active{background:var(--grn);color:#02120a;font-weight:bold;
+  box-shadow:0 0 12px rgba(51,255,102,.6)}
+button.warn{border-color:var(--amb);color:var(--amb)}
+button:focus-visible{outline:2px solid var(--amb);outline-offset:2px}
+.hint{font-size:12px;color:var(--grn-dim)}
+/* ---------- LAYOUT ---------- */
+#main{display:grid;grid-template-columns:1fr 320px;gap:10px;align-items:start}
+@media (max-width:900px){#main{grid-template-columns:1fr}}
+.panel{border:1px solid var(--grn-dim);background:rgba(3,19,10,.88);padding:8px;position:relative}
+.panel h3{margin:0 0 6px;font-size:13px;letter-spacing:2px;border-bottom:1px dashed var(--grn-dim);padding-bottom:4px}
+svg.chart{width:100%;height:auto;display:block;background:radial-gradient(ellipse at 40% 45%, #04170c 0%, #020a04 70%);
+  border:1px solid #0a2f18;cursor:crosshair}
+svg text{font-family:"Courier New",Courier,monospace;fill:var(--grn);user-select:none}
+.slabel{font-size:12px;letter-spacing:1px;text-shadow:0 0 6px rgba(51,255,102,.7)}
+.slabel-sm{font-size:10.5px;fill:var(--grn-dim);letter-spacing:1px}
+.jtitle{font-size:34px;letter-spacing:8px;text-shadow:0 0 10px rgba(51,255,102,.8)}
+.orbit{fill:none;stroke:#14532a;stroke-width:1;stroke-dasharray:5 7;opacity:.8}
+.body{stroke:var(--grn);stroke-width:1.6}
+.hit{fill:transparent;stroke:none;cursor:pointer}
+g.node{cursor:pointer}
+g.node:hover .halo{opacity:.9}
+.halo{opacity:0;transition:opacity .12s}
+/* ---------- DOSSIER ---------- */
+#dossier{min-height:420px;font-size:13px}
+#dossier .dname{font-size:16px;letter-spacing:2px;margin:2px 0 6px}
+#dossier .row{margin:5px 0}
+#dossier .k{color:var(--grn-dim)}
+#dossier ul{margin:6px 0;padding-left:18px}
+#dossier li{margin:3px 0}
+.cursorblink{display:inline-block;width:9px;height:15px;background:var(--grn);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+/* ---------- TICKER ---------- */
+#ticker{border-top:1px solid var(--grn-dim);margin-top:10px;overflow:hidden;white-space:nowrap;padding:6px 0 14px}
+#ticker div{display:inline-block;padding-left:100%;animation:tick 46s linear infinite}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+/* ---------- BOOT ---------- */
+#boot{position:fixed;inset:0;background:#010603;z-index:100;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#boot pre{font-size:14px;line-height:1.7}
+/* ---------- MISC ---------- */
+a{color:var(--amb)}
+.legend{font-size:12px;color:var(--grn-dim);margin-top:6px;line-height:1.7}
+.legend b{color:var(--grn);font-weight:normal}
+.hidden{display:none !important}
+@media (prefers-reduced-motion:reduce){
+  .flicker-on #screen{animation:none}
+  .tw{animation:none}
+  #ticker div{animation-duration:200s}
+}
+</style>
+</head>
+<body id="crt" class="flicker-on">
+<div id="stars"></div>
+<div id="boot"><pre id="boottext"></pre></div>
+<div id="screen">
+<header class="pre glow" aria-label="Miranda system title"> ███╗   ███╗██╗██████╗  █████╗ ███╗   ██╗██████╗   █████╗
+ ████╗ ████║██║██╔══██╗██╔══██╗████╗  ██║██╔══██╗ ██╔══██╗
+ ██╔████╔██║██║██████╔╝███████║██╔██╗ ██║██║  ██║ ███████║
+ ██║╚██╔╝██║██║██╔══██╗██╔══██║██║╚██╗██║██║  ██║ ██╔══██║
+ ██║ ╚═╝ ██║██║██║  ██║██║  ██║██║ ╚████║██████╔╝ ██║  ██║
+ ╚═╝     ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═╝  ╚═╝</header>
+<div class="subhead">
+  <span class="glow">RAC NAVCOM // SYSTEM + JUMP CHART // PUBLIC FEED // EPHEMERIS 2186.10</span>
+  <span class="dim">OPERATOR: LICENSED TEAM // <a href="RAC-Terminal.html">OPEN RAC TERMINAL</a></span>
+</div>
+
+<div class="controls">
+  <button id="btnSys" class="active">[1] SYSTEM CHART</button>
+  <button id="btnJump">[2] JUMP CHART</button>
+  <button id="btnMotion">MOTION: ON</button>
+  <button id="btnFlicker">FLICKER: ON</button>
+  <button id="btnSound">SOUND: ON</button>
+  <span class="hint">CLICK A BODY FOR DOSSIER // KEYS 1 2 M F S</span>
+</div>
+
+<div id="main">
+  <div>
+    <div class="panel">
+      <h3 class="glow" id="chartTitle">&gt; MIRANDA SYSTEM — CUTTER RANGE</h3>
+      <svg id="sysSvg" class="chart" viewBox="0 0 1000 640" role="img" aria-label="Miranda system chart"></svg>
+      <svg id="jumpSvg" class="chart hidden" viewBox="0 0 1000 640" role="img" aria-label="Jump chart"></svg>
+      <div class="legend" id="legendSys">
+        <b class="amb">&#9632;</b> STAR&nbsp;&nbsp;<b>&#9679;</b> PLANET&nbsp;&nbsp;<b>&#9646;</b> STATION&nbsp;&nbsp;<b>&#9672;</b> MOON&nbsp;&nbsp;
+        <span class="dim">DASHED RINGS = ORBITS // SIZES NOT TO SCALE // ALL TRANSITS BY RAC CUTTER UNLESS NOTED</span>
+      </div>
+      <div class="legend hidden" id="legendJump">
+        <b class="amb">──</b> J1 ROUTE (~15KCR)&nbsp;&nbsp;<b class="red">──</b> J2 ROUTE (~40KCR)&nbsp;&nbsp;<b class="red">●</b> DARK SYSTEM — NO PUBLIC DATA&nbsp;&nbsp;
+        <span class="dim">MPT BUS: 1KCR/PERSON/JUMP // 132 CRYOPODS // THEY LOCK FROM THE OUTSIDE</span>
+      </div>
+    </div>
+  </div>
+  <aside class="panel" id="dossier" aria-live="polite">
+    <h3 class="glow">DOSSIER</h3>
+    <div id="dossierBody">
+      <div class="dname glow">AWAITING INPUT</div>
+      <div class="row"><span class="k">></span> SELECT A BODY ON THE CHART.</div>
+      <div class="row"><span class="k">></span> GREEN = CUTTER RANGE. AMBER = ONE JUMP. RED = TWO JUMPS.</div>
+      <div class="row"><span class="k">></span> PUBLIC FEED DATA ONLY. WARRANT BRIEFINGS CARRY THE REST.<span class="cursorblink"></span></div>
+    </div>
+  </aside>
+</div>
+
+<div id="ticker"><div class="dim" id="tickerText"></div></div>
+</div><!-- /screen -->
+<script>
+(function(){
+"use strict";
+var NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){var n=document.createElementNS(NS,tag);for(var k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n;}
+function $(id){return document.getElementById(id);}
+
+/* ================= DATA ================= */
+var DOSSIER={
+miranda:{tone:"amb",name:"MIRANDA",cls:"G-TYPE STAR // SYSTEM PRIMARY",transit:"--",
+ desc:"System primary. The old spacers call this system Tempest's wake — Caliban's shadow, Ariel's light, Sycorax green. Ask a lifer dirtside and they will talk.",
+ hooks:["Navigation hazard: none.","Ephemeris current to 2186.10."]},
+ferdinand:{tone:"amb",name:"FERDINAND",cls:"PLANET 1 // FOUNDRY WORLD",transit:"2 DAYS BY CUTTER",
+ desc:"Scorched foundry world in close orbit. Shipyards and drydocks ring the planet; the RAC cutter was built here.",
+ hooks:["Refits, repairs, upgrades — bring money.","Union halls and hiring boards; working spacer culture."]},
+doenides:{tone:"grn",name:"DOENIDES",cls:"PLANET 2 // URBAN WORLD",transit:"5 DAYS BY CUTTER",
+ desc:"City planet, ward stacked on ward. The Doenides Police Department posts municipal warrants; RAC teams in good standing may apply.",
+ hooks:["Ward stacked on ward.","Mind the local uniforms."]},
+shatter:{tone:"grn",name:"THE SHATTER",cls:"ASTEROID BELT // DOENIDES-JANUS GAP",transit:"1-3 DAYS BY CUTTER",
+ desc:"Mining claims, unregistered caches, and a thousand places to hide a ship. The claims registry is open; unregistered finds are finders-keepers.",
+ hooks:["Belt runs: 1-3 days.","Claims registry is open; unregistered finds are finders-keepers."]},
+janus:{tone:"grn",name:"JANUS",cls:"GAS GIANT // SYSTEM ANCHOR",transit:"--",
+ desc:"The gravity well everything useful hangs off. Karth rides it as a moon; the Dream rides its L4 point.",
+ hooks:["Licensed skimming runs.","Gravity assist shaves a day off outer transits."]},
+karth:{tone:"amb",name:"KARTH",cls:"MOON OF JANUS // DESERT WORLD",transit:"36 HOURS BY CUTTER",
+ desc:"Desert moon. No-fly zone enforced by relic defense satellites; total EM blackout below the Karman line. One space elevator serves Larstown — the only way down, and the only way up.",
+ hooks:["Factions dirtside: MEF security, Dawnseeker missions, Valley Ranger charters.","The Marshal's office requires a separate license interview and fee for all bounty work."]},
+dream:{tone:"grn",name:"PROSPERO'S DREAM",cls:"STATION // JANUS L4 // HOME",transit:"0 — YOU ARE HERE",
+ desc:"Prospero's Dream. 8M+ residents, 12.98km across, riding Janus's L4. Administered under Golyanovo II charter. The RAC annex sits in the Court district — warrants, licensing, intake.",
+ hooks:["Ten districts: Dry Dock, the Stellar Burn, the Chop Shop, the Ice Box, the Farm, CANYONHEAVY.market, the Court, Tempest Co. HQ, Doptown, the Choke.","Oxygen tax: 10cr/day. Pay at any kiosk.","Doria Venn runs the license desk. Brunhildh issues local warrants."]},
+cocytus:{tone:"grn",name:"COCYTUS",cls:"PLANET 4 // RINGED GIANT",transit:"--",
+ desc:"Ringed giant, cold and far. Automated ring mining; claims registered.",
+ hooks:["Nobody lives on Cocytus. Everybody it owns lives on Offit."]},
+offit:{tone:"red",name:"OFFIT",cls:"MOON OF COCYTUS // PRISON WORLD",transit:"8 DAYS BY CUTTER",
+ desc:"The ODC: for-profit prison and lumber camp. 26-hour days, the Green Hell forest, a three-day twilight every month.",
+ hooks:["Prisoner transfer contracts post regularly."]},
+transit:{tone:"amb",name:"TRANSIT DESK",cls:"INTERSTELLAR // THE CUTTER CAN'T JUMP",transit:"CHARTER OR BUS",
+ desc:"The issued cutter is jump-0: fast inside the system, useless between stars. Three ways out.",
+ hooks:["CHARTER, JUMP-1: ~15kcr per leg. JUMP-2: ~40kcr per leg plus fuel. About a week ship-time per jump.","MPT BUS: 1kcr per person per jump. 132 cryopods. They lock from the outside.","MPT BUS: scheduled routes only — the charted systems. Off-chart, the bus will not go.","RAC PRIORITY TRANSPORT: the firm covers the trip on priority warrants. The firm chooses the destination and the timetable.","RAC ADVISORY: standard warrant payouts do not cover interstellar charter. Budget accordingly.","DARK SYSTEMS: uncharted waypoints on the deep routes. No public data. Passage at your own risk."]},
+ersa:{tone:"amb",name:"ERSA",cls:"ONE JUMP // OCEAN WORLD",transit:"~15KCR CHARTER / 1KCR BUS",
+ desc:"Ocean world, 80 percent water. Three stops on the public boards.",
+ hooks:["BARIDON OUTPOST 46B — coastal research station.","THE CHEER — habitat station in high orbit. Shore leave and refit.","SPLIT LOG — rustic township on the main landmass.","Nearest city: Nadir, 110km inland. Half a day off-road."]},
+tybalt:{tone:"amb",name:"TYBALT",cls:"ONE JUMP // RESEARCH SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
+ desc:"Research system. One station, and the staging point for a Company expedition two jumps out.",
+ hooks:["TYBALT BLUE — research station. Tempest Co. contracts desk; spare parts and refits.","Support staging for the Vanir terraforming expedition (Vanaheim)."]},
+argent:{tone:"amb",name:"ARGENT",cls:"ONE JUMP // CORPORATE SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
+ desc:"G³ system. Everything here is invitation-only.",
+ hooks:["PIRAD ONE — G³ research station on the far route. Docking by corporate invitation only.","G³ SECTOR OFFICES — corporate contracts desk. Standard rates. Impeccable manners."]},
+carmentis:{tone:"amb",name:"CARMENTIS",cls:"ONE JUMP // COLONY SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
+ desc:"Colonial system under Company survey.",
+ hooks:["CARMENTIS VI — colony world. Eden settlement; teralith formations under survey.","PRAYCO PORT — port facility. Pilgrim traffic heavy; corporate security heavier."]},
+utpala:{tone:"amb",name:"UTPALA",cls:"ONE JUMP // FRINGE SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
+ desc:"Rough space. No extradition treaties, no questions at the counter.",
+ hooks:["UTPALA — hollowed asteroid, free port.","PINK ICE — older station, partial occupancy."]},
+tausigma:{tone:"amb",name:"TAU SIGMA",cls:"ONE JUMP // SURVEY SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
+ desc:"Quiet system.",
+ hooks:["YPSILON 14 — asteroid. Mining station.","TAU SIGMA 7 — deep-range research station.","VELDAT — colony world. NWH Colonial Enterprise; temperate, terraformed."]},
+bell:{tone:"red",name:"THE BELL",cls:"TWO JUMPS // RELAY STATION",transit:"~40KCR CHARTER / 2KCR BUS",
+ desc:"The Bell. Deep-range relay and dive platform.",
+ hooks:["Access restricted to contract crews.","No public berthing."]},
+brilotis:{tone:"red",name:"BRILOTIS X-1",cls:"TWO JUMPS // BLACK HOLE",transit:"~40KCR CHARTER / 2KCR BUS",
+ desc:"Brilotis X-1. Black hole with a gamma pulse pattern on record.",
+ hooks:["Science crews only."]},
+vanaheim:{tone:"red",name:"VANAHEIM",cls:"TWO JUMPS // EXPEDITION SITE",transit:"~40KCR CHARTER / 2KCR BUS",
+ desc:"Vanir terraforming expedition, Company contract. Staged via Tybalt Blue.",
+ hooks:["Details restricted to contract holders.","No public manifest at this time."]},
+ku9:{tone:"red",name:"KU-9",cls:"DARK SYSTEM // J2 ROUTE",transit:"PASS-THROUGH ONLY",
+ desc:"Uncharted waypoint on the rimward deep route. No public feed data.",
+ hooks:["Ships pass through on the Tybalt to Vanaheim run.","No port, no beacon, no manifest."]},
+longfall:{tone:"red",name:"LONG FALL",cls:"TWO JUMPS // RESTRICTED",transit:"NO PUBLIC DATA",
+ desc:"No public feed data available at your clearance.",
+ hooks:["File a query with the RAC annex for restricted destinations."]},
+ku17:{tone:"red",name:"KU-17",cls:"DARK SYSTEM // J2 ROUTE",transit:"PASS-THROUGH ONLY",
+ desc:"Uncharted waypoint on the spinward deep route. No public feed data.",
+ hooks:["Ships pass through on the Tau Sigma to Bell run.","No port, no beacon, no manifest."]},
+ku2b:{tone:"red",name:"KU-2B",cls:"DARK SYSTEM // J2 ROUTE",transit:"PASS-THROUGH ONLY",
+ desc:"Uncharted waypoint on the coreward deep route. No public feed data.",
+ hooks:["Ships pass through on the Argent to Brilotis run.","No port, no beacon, no manifest."]}
+};
+
+/* ================= AUDIO ================= */
+var audioCtx=null, soundOn=true;
+function blip(freq,dur,type,vol){
+  if(!soundOn)return;
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type||"square";o.frequency.value=freq||880;
+    var t=audioCtx.currentTime;
+    g.gain.setValueAtTime(vol||0.025,t);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.05));
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start(t);o.stop(t+(dur||0.05));
+  }catch(e){}
+}
+function blipHover(){blip(1350,0.025,"square",0.018);}
+function blipSelect(){blip(620,0.06,"square",0.03);setTimeout(function(){blip(930,0.07,"square",0.03);},70);}
+function blipView(){blip(300,0.09,"sawtooth",0.03);}
+
+/* ================= STARFIELD ================= */
+(function(){
+  var box=$("stars"),chars=["·",".","*","+","·",":","."];
+  for(var i=0;i<130;i++){
+    var s=document.createElement("span");
+    s.textContent=chars[Math.floor(Math.random()*chars.length)];
+    s.style.left=(Math.random()*100)+"%";
+    s.style.top=(Math.random()*100)+"%";
+    s.style.fontSize=(6+Math.random()*10)+"px";
+    if(Math.random()<0.4){s.className="tw";s.style.animationDelay=(Math.random()*3.4)+"s";}
+    box.appendChild(s);
+  }
+})();
+
+/* ================= TICKER ================= */
+$("tickerText").textContent=
+"O2 TAX DUE: 10CR/DAY — PAY AT ANY KIOSK /// RAC ANNEX HOURS 0600-2200 /// BOUNTY BOARD UPDATED 0600 DAILY /// "+
+"REPORT MIRROR-FACE SIGHTINGS TO STATION SECURITY /// THE CHOP SHOP: NO REFUNDS ON REAPED MODS /// "+
+"MPT BUS DEPARTS FRIDAY — CRYOPODS LOCK FROM THE OUTSIDE /// BRUNHILDH REMINDS: DELIVER THEM BREATHING /// "+
+"DOENIDES DPD: REWARD POSTED — INFORMATION LEADING TO THE ARREST OF MAGDA CUESTA /// KARTH ELEVATOR: ONLY WAY DOWN /// ";
+
+/* ================= SYSTEM CHART ================= */
+var CX=170,CY=320;
+var sysBodies=[
+ {id:"ferdinand", orbit:105, size:9,  period:64,  angle:0.7, stroke:"#ffb000"},
+ {id:"doenides",orbit:165, size:12, period:96,  angle:2.6},
+ {id:"janus",   orbit:295, size:24, period:150, angle:4.4},
+ {id:"cocytus", orbit:395, size:18, period:215, angle:5.6}
+];
+var moonState={karth:{angle:1.2,period:26,orbit:44},offit:{angle:3.4,period:34,orbit:34}};
+var janusRef=null;
+function buildSystem(){
+  var svg=$("sysSvg");
+  // orbit rings
+  [105,165,208,232,295,395].forEach(function(r){el("circle",{cx:CX,cy:CY,r:r,"class":"orbit"},svg);});
+  // shatter belt dots
+  var belt=el("g",{},svg);
+  for(var i=0;i<70;i++){
+    var a=Math.random()*Math.PI*2, r=208+Math.random()*24;
+    el("circle",{cx:CX+r*Math.cos(a),cy:CY+r*Math.sin(a),r:1+Math.random()*1.6,fill:"#1e8f43",opacity:0.5+Math.random()*0.4},belt);
+  }
+  // star
+  var sg=el("g",{id:"g-miranda"},svg);
+  el("circle",{cx:CX,cy:CY,r:52,fill:"#ffb000",opacity:0.12},sg);
+  el("circle",{cx:CX,cy:CY,r:40,fill:"none",stroke:"#ffb000","stroke-width":1,"stroke-dasharray":"4 6",opacity:0.7},sg);
+  el("circle",{cx:CX,cy:CY,r:28,fill:"#0d1a08",stroke:"#ffb000","stroke-width":2},sg);
+  var st=el("text",{x:CX,y:CY+5,"text-anchor":"middle","class":"slabel",fill:"#ffb000"},sg);
+  st.textContent="MIRANDA";
+  el("circle",{cx:CX,cy:CY,r:52,"class":"hit","data-id":"miranda"},sg);
+  wireHit(sg,"miranda");
+
+  sysBodies.forEach(function(b){
+    var g=el("g",{id:"g-"+b.id},svg);
+    b.g=g;
+    if(b.id==="janus"){
+      janusRef=b;
+      // bands
+      for(var k=-1;k<=1;k++)el("line",{x1:-b.size+3,y1:k*8,x2:b.size-3,y2:k*8,stroke:"#1e8f43","stroke-width":1.4,opacity:0.8},g);
+      el("circle",{cx:0,cy:0,r:b.size,fill:"#07130c",stroke:"#33ff66","stroke-width":1.6,"class":"body"},g);
+      el("circle",{cx:0,cy:0,r:b.size+14,"class":"hit","data-id":"janus"},g);wireHit(g,"janus");
+      // karth (amber moon)
+      var kg=el("g",{id:"g-karth"},g);b.karthG=kg;
+      el("circle",{cx:0,cy:0,r:6.5,fill:"#171106",stroke:"#ffb000","stroke-width":1.6},kg);
+      var kt=el("text",{x:0,y:-12,"text-anchor":"middle","class":"slabel-sm",fill:"#ffb000"},kg);kt.textContent="KARTH";
+      el("circle",{cx:0,cy:0,r:20,"class":"hit","data-id":"karth"},kg);wireHit(kg,"karth");
+      // dream at L4
+      var dg=el("g",{id:"g-dream"},svg);b.dreamG=dg;
+      var tri=el("polygon",{points:"0,-11 9,7 -9,7",fill:"none",stroke:"#33ff66","stroke-width":2},dg);
+      el("circle",{cx:0,cy:0,r:3,fill:"#33ff66"},dg);
+      var dt=el("text",{x:0,y:-18,"text-anchor":"middle","class":"slabel"},dg);dt.textContent="PROSPERO'S DREAM";
+      var yh=el("text",{x:0,y:24,"text-anchor":"middle","class":"slabel-sm",fill:"#ffb000"},dg);yh.textContent="\u25b2 YOU ARE HERE";
+      el("circle",{cx:0,cy:0,r:24,"class":"hit","data-id":"dream"},dg);wireHit(dg,"dream");
+    }else if(b.id==="cocytus"){
+      el("ellipse",{cx:0,cy:0,rx:38,ry:12,fill:"none",stroke:"#1e8f43","stroke-width":1.6},g);
+      el("circle",{cx:0,cy:0,r:b.size,fill:"#07130c",stroke:"#33ff66","stroke-width":1.6,"class":"body"},g);
+      var og=el("g",{id:"g-offit"},g);b.offitG=og;
+      el("circle",{cx:0,cy:0,r:5.5,fill:"#0d0a0a",stroke:"#ff5544","stroke-width":1.4},og);
+      var ot=el("text",{x:0,y:-11,"text-anchor":"middle","class":"slabel-sm"},og);ot.textContent="OFFIT";
+      el("circle",{cx:0,cy:0,r:18,"class":"hit","data-id":"offit"},og);wireHit(og,"offit");
+      var lt=el("text",{x:0,y:-b.size-16,"text-anchor":"middle","class":"slabel"},g);lt.textContent="COCYTUS";
+      el("circle",{cx:0,cy:0,r:b.size+16,"class":"hit","data-id":"cocytus"},g);wireHit(g,"cocytus");
+    }else{
+      var sc=b.stroke||"#33ff66";
+      el("circle",{cx:0,cy:0,r:b.size,fill:"#07130c",stroke:sc,"stroke-width":1.6,"class":"body"},g);
+      if(b.id==="doenides"){
+        [[-4,-3],[3,-5],[0,4]].forEach(function(p){el("circle",{cx:p[0],cy:p[1],r:1.4,fill:"#ffb000"},g);});
+      }
+      var names={ferdinand:"FERDINAND P1",doenides:"DOENIDES P2"};
+      var t=el("text",{x:0,y:-b.size-10,"text-anchor":"middle","class":"slabel",fill:sc},g);t.textContent=names[b.id];
+      el("circle",{cx:0,cy:0,r:b.size+16,"class":"hit","data-id":b.id},g);wireHit(g,b.id);
+    }
+  });
+  var sh=el("text",{x:CX+232,y:CY-8,"class":"slabel-sm"},svg);sh.textContent="THE SHATTER";
+  var shh=el("circle",{cx:CX+220,cy:CY,r:26,"class":"hit","data-id":"shatter"},svg);wireHit(shh,"shatter");
+}
+
+/* ================= JUMP CHART ================= */
+function hexPoints(cx,cy,r){var p=[];for(var i=0;i<6;i++){var a=Math.PI/3*i-Math.PI/6;p.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1));}return p.join(" ");}
+function routeLine(svg,x1,y1,x2,y2,color,tag){
+  el("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:color,"stroke-width":1.6,opacity:0.85},svg);
+  if(tag){var t=el("text",{x:((x1+x2)/2).toFixed(1),y:((y1+y2)/2-9).toFixed(1),"text-anchor":"middle","class":"slabel-sm",fill:color},svg);t.textContent=tag;}
+}
+function jumpCircle(svg,x,y,r,id,label,color){
+  var g=el("g",{"class":"node"},svg);
+  el("circle",{cx:x,cy:y,r:r+9,fill:color,opacity:0.10,"class":"halo"},g);
+  el("circle",{cx:x,cy:y,r:r,fill:"#0d1a08",stroke:color,"stroke-width":2},g);
+  var t=el("text",{x:x,y:y+4,"text-anchor":"middle","font-size":(label.length>9?10:11),fill:color},g);t.textContent=label;
+  el("circle",{cx:x,cy:y,r:r+13,"class":"hit","data-id":id},g);wireHit(g,id);
+}
+function darkDot(svg,x,y,id,label){
+  var g=el("g",{"class":"node"},svg);
+  el("circle",{cx:x,cy:y,r:7,fill:"#3a0f0c",stroke:"#ff5544","stroke-width":1.2},g);
+  var t=el("text",{x:x,y:y+25,"text-anchor":"middle","class":"slabel-sm",fill:"#ff5544"},g);t.textContent=label;
+  el("circle",{cx:x,cy:y,r:19,"class":"hit","data-id":id},g);wireHit(g,id);
+}
+function buildJump(){
+  var svg=$("jumpSvg"),cx=110,cy=320;
+  // title block, after the Alexandrian's map
+  var title=el("text",{x:36,y:76,"class":"jtitle",fill:"#33ff66"},svg);title.textContent="MIRANDA REACH";
+  var sub=el("text",{x:38,y:100,"class":"slabel-sm"},svg);sub.textContent="RAC NAVCOM SURVEY 2186 // JUMP ROUTES";
+  // home node
+  var hg=el("g",{"class":"node"},svg);
+  el("polygon",{points:hexPoints(cx,cy,34),fill:"#0d1a08",stroke:"#ffb000","stroke-width":2},hg);
+  var ht=el("text",{x:cx,y:cy+4,"text-anchor":"middle","class":"slabel",fill:"#ffb000"},hg);ht.textContent="MIRANDA";
+  var hs=el("text",{x:cx,y:cy+54,"text-anchor":"middle","class":"slabel-sm",fill:"#ffb000"},hg);hs.textContent="HOME";
+  el("circle",{cx:cx,cy:cy,r:42,"class":"hit","data-id":"transit"},hg);wireHit(hg,"transit");
+  // J1 systems, middle column
+  var jx=400;
+  var J1N=[["tausigma","TAU SIGMA",120],["tybalt","TYBALT",210],["ersa","ERSA",300],["argent","ARGENT",390],["carmentis","CARMENTIS",480],["utpala","UTPALA",570]];
+  J1N.forEach(function(n){
+    routeLine(svg,cx,cy,jx,n[2],"#8a6a00",null);
+    jumpCircle(svg,jx,n[2],26,n[0],n[1],"#ffb000");
+  });
+  var j1tag=el("text",{x:255,y:150,"text-anchor":"middle","class":"slabel-sm",fill:"#8a6a00"},svg);j1tag.textContent="J1";
+  // deep routes via dark systems
+  routeLine(svg,jx,120,640,120,"#7a2a22",null);
+  darkDot(svg,640,120,"ku17","KU-17");
+  routeLine(svg,640,120,860,120,"#7a2a22","J2");
+  jumpCircle(svg,860,120,34,"bell","THE BELL","#ff5544");
+  routeLine(svg,jx,210,640,210,"#7a2a22",null);
+  darkDot(svg,640,210,"ku9","KU-9");
+  routeLine(svg,640,210,860,210,"#7a2a22","J2");
+  jumpCircle(svg,860,210,34,"vanaheim","VANAHEIM","#ff5544");
+  routeLine(svg,jx,390,640,390,"#7a2a22",null);
+  darkDot(svg,640,390,"ku2b","KU-2B");
+  routeLine(svg,640,390,860,390,"#7a2a22","J2");
+  jumpCircle(svg,860,390,34,"brilotis","BRILOTIS X-1","#ff5544");
+  routeLine(svg,jx,570,860,570,"#7a2a22","J2");
+  jumpCircle(svg,860,570,34,"longfall","LONG FALL","#ff5544");
+}
+
+/* ================= DOSSIER ================= */
+function wireHit(node,id){
+  node.addEventListener("mouseenter",function(){blipHover();});
+  node.addEventListener("click",function(e){e.stopPropagation();showDossier(id);});
+}
+function showDossier(id){
+  var d=DOSSIER[id];if(!d)return;
+  blipSelect();
+  var toneCls=d.tone==="amb"?"amb":(d.tone==="red"?"red":"glow");
+  var hooks=d.hooks.map(function(h){return "<li>"+h+"</li>";}).join("");
+  $("dossierBody").innerHTML=
+   '<div class="dname '+toneCls+'">'+d.name+'</div>'+
+   '<div class="row"><span class="k">CLASS:</span> '+d.cls+'</div>'+
+   '<div class="row"><span class="k">TRANSIT:</span> <span class="'+toneCls+'">'+d.transit+'</span></div>'+
+   '<div class="row" style="margin-top:8px">'+d.desc+'</div>'+
+   '<ul>'+hooks+'</ul>'+
+   '<div class="row"><span class="cursorblink"></span></div>';
+}
+
+/* ================= ANIMATION LOOP ================= */
+var motionOn=true,lastT=0;
+function frame(t){
+  if(motionOn){
+    var dt=Math.min(0.05,(t-lastT)/1000||0);
+    sysBodies.forEach(function(b){
+      b.angle+=dt*(Math.PI*2)/b.period;
+      var x=CX+b.orbit*Math.cos(b.angle),y=CY+b.orbit*Math.sin(b.angle);
+      b.g.setAttribute("transform","translate("+x.toFixed(1)+","+y.toFixed(1)+")");
+      if(b.id==="janus"){
+        moonState.karth.angle+=dt*(Math.PI*2)/moonState.karth.period;
+        var kx=44*Math.cos(moonState.karth.angle),ky=44*Math.sin(moonState.karth.angle);
+        b.karthG.setAttribute("transform","translate("+kx.toFixed(1)+","+ky.toFixed(1)+")");
+        var da=b.angle+Math.PI/3;
+        b.dreamG.setAttribute("transform","translate("+(CX+295*Math.cos(da)).toFixed(1)+","+(CY+295*Math.sin(da)).toFixed(1)+")");
+      }
+      if(b.id==="cocytus"){
+        moonState.offit.angle+=dt*(Math.PI*2)/moonState.offit.period;
+        var ox=34*Math.cos(moonState.offit.angle),oy=34*Math.sin(moonState.offit.angle);
+        b.offitG.setAttribute("transform","translate("+ox.toFixed(1)+","+oy.toFixed(1)+")");
+      }
+    });
+  }
+  lastT=t;
+  requestAnimationFrame(frame);
+}
+
+/* ================= VIEWS / TOGGLES ================= */
+var flickerOn=true;
+if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches){
+  flickerOn=false;motionOn=false;
+  document.getElementById("crt").classList.remove("flicker-on");
+}
+function setView(which){
+  blipView();
+  var sys=which==="sys";
+  $("sysSvg").classList.toggle("hidden",!sys);
+  $("jumpSvg").classList.toggle("hidden",sys);
+  $("legendSys").classList.toggle("hidden",!sys);
+  $("legendJump").classList.toggle("hidden",sys);
+  $("btnSys").classList.toggle("active",sys);
+  $("btnJump").classList.toggle("active",!sys);
+  $("chartTitle").innerHTML=sys?"&gt; MIRANDA SYSTEM — CUTTER RANGE":"&gt; JUMP CHART — CHARTER &amp; BUS";
+}
+function setMotion(on){
+  motionOn=on;
+  $("btnMotion").textContent="MOTION: "+(on?"ON":"OFF");
+  $("btnMotion").classList.toggle("active",!on);
+}
+function setFlicker(on){
+  flickerOn=on;
+  $("crt").classList.toggle("flicker-on",on);
+  $("btnFlicker").textContent="FLICKER: "+(on?"ON":"OFF");
+  $("btnFlicker").classList.toggle("active",!on);
+}
+function setSound(on){
+  soundOn=on;
+  $("btnSound").textContent="SOUND: "+(on?"ON":"OFF");
+  $("btnSound").classList.toggle("active",!on);
+  if(on)blipSelect();
+}
+$("btnSys").addEventListener("click",function(){setView("sys");});
+$("btnJump").addEventListener("click",function(){setView("jump");});
+$("btnMotion").addEventListener("click",function(){setMotion(!motionOn);});
+$("btnFlicker").addEventListener("click",function(){setFlicker(!flickerOn);});
+$("btnSound").addEventListener("click",function(){setSound(!soundOn);});
+document.addEventListener("keydown",function(e){
+  var k=e.key.toLowerCase();
+  if(k==="1")setView("sys");
+  else if(k==="2")setView("jump");
+  else if(k==="m")setMotion(!motionOn);
+  else if(k==="f")setFlicker(!flickerOn);
+  else if(k==="s")setSound(!soundOn);
+});
+// random CRT surge
+setInterval(function(){
+  if(!flickerOn)return;
+  if(Math.random()<0.35){
+    var s=$("screen");s.classList.remove("surge");void s.offsetWidth;s.classList.add("surge");
+    setTimeout(function(){s.classList.remove("surge");},200);
+    blip(90+Math.random()*60,0.12,"sawtooth",0.012);
+  }
+},3800);
+
+/* ================= BOOT ================= */
+buildSystem();
+buildJump();
+setMotion(motionOn);setFlicker(flickerOn);setSound(soundOn);
+requestAnimationFrame(frame);
+var bootLines=[
+ "RAC NAVCOM v2.1 — CHART TERMINAL",
+ "> LOADING EPHEMERIS ............ OK",
+ "> LOADING JUMP TAPES ........... OK",
+ "> RENDER PHOSPHOR .............. OK",
+ "> _"
+];
+var bi=0,bootDone=false;
+function bootStep(){
+  if(bootDone)return;
+  if(bi<bootLines.length){
+    $("boottext").textContent+=bootLines[bi]+"\n";
+    blip(400+bi*160,0.05,"square",0.02);
+    bi++;setTimeout(bootStep,170);
+  }else{
+    setTimeout(finishBoot,350);
+  }
+}
+function finishBoot(){
+  if(bootDone)return;bootDone=true;
+  $("boot").style.display="none";
+}
+$("boot").addEventListener("click",finishBoot);
+setTimeout(bootStep,250);
+})();
+</script>
+</body>
+</html>

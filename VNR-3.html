@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>VNR-3 // SPONTANEOUS CRAVING SATISFACTION MACHINE</title>
+<style>
+:root{ --pk:#ff2d78; --pkd:#a80f4b; --am:#ffb02e; --bg:#12060d; --pn:#1c0a13; --tx:#ffd9e8; --mut:#8a5a70; }
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{background:var(--bg); color:var(--tx); font-family:"Courier New",Courier,monospace;
+  text-shadow:0 0 6px rgba(255,45,120,.5); padding:10px;}
+#machine{max-width:940px; margin:0 auto; background:var(--pn); border:3px solid var(--pk); border-radius:8px;
+  box-shadow:0 0 34px rgba(255,45,120,.45), 0 0 90px rgba(255,45,120,.18), 6px 6px 0 #000;
+  position:relative; padding:12px;}
+#vbrand{position:absolute; right:-4px; top:170px; writing-mode:vertical-rl; font-weight:900; letter-spacing:.5em;
+  font-size:20px; color:var(--pk); text-shadow:0 0 14px var(--pk); z-index:3;}
+@media(max-width:720px){#vbrand{display:none}}
+#face{background:#0d0409; border:2px solid var(--pkd);}
+header.top{background:#000; border-bottom:3px solid var(--pk); padding:16px 18px;
+  display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+header.top .brand{font-size:clamp(26px,5.5vw,42px); font-weight:900; letter-spacing:.1em; cursor:pointer; user-select:none;
+  color:#fff; text-shadow:0 0 10px var(--pk), 0 0 30px var(--pk), 0 0 60px var(--pk);}
+header.top .tag{font-size:clamp(10px,2vw,13px); letter-spacing:.22em; color:var(--pk);
+  text-shadow:0 0 10px var(--pk); margin-top:4px;}
+header.top .resale{font-size:11px; letter-spacing:.06em; color:var(--mut); margin-top:6px; text-shadow:none;}
+#creditBox{background:#000; border:2px solid var(--am); padding:10px 16px; text-align:center; min-width:170px;
+  box-shadow:0 0 16px rgba(255,176,46,.35), inset 0 0 12px rgba(0,0,0,.9);}
+#creditBox .cl{font-size:10px; letter-spacing:.3em; color:var(--am);}
+#creditAmt{font-size:26px; font-weight:800; color:var(--am); text-shadow:0 0 12px var(--am);}
+#disc{font-size:10px; color:var(--pk); letter-spacing:.1em; margin-top:4px; display:none;
+  text-shadow:0 0 10px var(--pk);}
+#creditRow{display:flex; gap:8px; margin-top:8px; justify-content:center;}
+button.vbtn{font-family:inherit; font-weight:800; font-size:12px; letter-spacing:.08em; border-radius:0;
+  padding:10px 16px; cursor:pointer; min-height:44px;}
+button.vbtn:active{transform:translate(2px,2px); box-shadow:none !important;}
+button.vbtn.pk{background:var(--pk); color:#000; border:none; box-shadow:4px 4px 0 #000; text-shadow:none;}
+button.vbtn.ghost{background:transparent; color:var(--pk); border:2px solid var(--pk);
+  text-shadow:0 0 8px var(--pk); box-shadow:0 0 12px rgba(255,45,120,.3);}
+button.vbtn.amber{background:transparent; color:var(--am); border:2px solid var(--am);
+  text-shadow:0 0 8px var(--am);}
+button.vbtn:disabled{opacity:.4; cursor:default;}
+#led{background:#000; color:var(--am); font-weight:800; letter-spacing:.3em; font-size:13px; text-align:center;
+  padding:8px 14px; text-shadow:0 0 12px var(--am); border-top:2px solid var(--pkd); border-bottom:2px solid var(--pkd);}
+/* conversation on top */
+#chatbox{margin:0; background:#000; border-bottom:3px solid var(--pk); padding:12px 18px;}
+#chatbox .chd{font-size:10px; letter-spacing:.28em; color:var(--pk); font-weight:800; margin-bottom:8px;
+  text-shadow:0 0 10px var(--pk);}
+#chatlog{max-height:200px; overflow-y:auto; font-size:14px; line-height:1.8;}
+#chatlog .msg{margin:6px 0;}
+#chatlog .msg.vnr{color:var(--am); text-shadow:0 0 8px rgba(255,176,46,.6);}
+#chatlog .msg.you{color:var(--pk); text-align:right; text-shadow:0 0 8px rgba(255,45,120,.6);}
+#chatlog .cursor::after{content:"▌"; animation:blk .8s steps(2) infinite; color:var(--am);}
+@keyframes blk{50%{opacity:0}}
+#chatOpts{display:flex; gap:8px; flex-wrap:wrap; padding:10px 0 2px;}
+#chatOpts .opt{font-size:12px;}
+nav.tabs{display:flex; gap:8px; padding:14px 16px 0; flex-wrap:wrap;}
+button.tab{font-family:inherit; font-weight:800; font-size:12px; letter-spacing:.1em; color:var(--pk);
+  background:#000; border:2px solid var(--pk); padding:10px 16px; cursor:pointer; min-height:44px;
+  text-shadow:0 0 8px var(--pk);}
+button.tab:active{transform:scale(.96);}
+button.tab.on{background:var(--pk); color:#000; text-shadow:none; box-shadow:0 0 18px var(--pk);}
+#searchRow{display:flex; gap:10px; padding:12px 16px 0; flex-wrap:wrap;}
+#search{flex:1; min-width:200px; font-family:inherit; font-size:15px; background:#000; color:var(--tx);
+  border:2px solid var(--pkd); padding:11px 14px; text-shadow:0 0 6px rgba(255,45,120,.5);}
+#search::placeholder{color:var(--mut); text-shadow:none;}
+#search:focus{outline:none; border-color:var(--pk); box-shadow:0 0 14px rgba(255,45,120,.4);}
+main{padding:14px 16px;}
+h2.sttl{font-size:14px; letter-spacing:.18em; color:#fff; font-weight:800; margin:4px 0 12px;
+  text-shadow:0 0 10px var(--pk), 0 0 26px var(--pk);}
+.dim{color:var(--mut); text-shadow:none;}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:12px;}
+.slot{background:#000; border:2px solid var(--pk); padding:12px; color:var(--tx); position:relative;
+  box-shadow:0 0 16px rgba(255,45,120,.25), 4px 4px 0 #000;}
+.slot .code{position:absolute; top:8px; left:10px; font-size:11px; font-weight:800; color:#000;
+  background:var(--am); padding:3px 8px; text-shadow:none;}
+.slot .nm{font-size:13.5px; font-weight:700; margin:28px 0 4px; line-height:1.35; min-height:37px; color:#fff;
+  text-shadow:0 0 8px var(--pk);}
+.slot .ds{font-size:11.5px; color:#c98aa5; line-height:1.5; min-height:52px; text-shadow:none;}
+.slot .sp{font-size:11px; color:var(--am); margin-top:4px; line-height:1.45; text-shadow:0 0 6px rgba(255,176,46,.5);}
+.slot .pr{font-size:17px; font-weight:800; color:var(--am); margin-top:8px; text-shadow:0 0 10px var(--am);}
+.slot .joke{font-size:10.5px; color:var(--mut); font-style:italic; margin-top:4px; text-shadow:none;}
+.slot .push{margin-top:10px; width:100%;}
+.slot.soldout{opacity:.5;}
+.slot.soldout .push{visibility:hidden;}
+.soldtag{position:absolute; top:8px; right:10px; font-size:10px; font-weight:800; color:#000; background:var(--am);
+  padding:4px 9px; letter-spacing:.1em; text-shadow:none;}
+/* VNR-3 says: moved to the bottom */
+#says{background:#000; border-top:3px solid var(--pk); color:var(--am); font-size:13px; letter-spacing:.03em;
+  padding:12px 20px; line-height:1.75; text-shadow:0 0 8px rgba(255,176,46,.55);}
+#says .who{color:var(--pk); font-weight:800; text-shadow:0 0 10px var(--pk);}
+#flap{margin:0 16px 6px; background:#000; border:2px solid var(--pk); border-top:none;
+  min-height:88px; padding:12px 18px; color:var(--tx); cursor:pointer;
+  box-shadow:0 0 16px rgba(255,45,120,.25), inset 0 8px 24px rgba(0,0,0,.9);}
+#flap .fh{font-size:10px; letter-spacing:.34em; color:var(--pk); text-shadow:0 0 8px var(--pk);}
+#flapItems{font-size:13px; line-height:1.9; margin-top:6px;}
+footer.bar{padding:12px 20px 16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+  justify-content:space-between; font-size:11px; color:var(--mut); text-shadow:none;}
+#boot{padding:26px; text-align:center; font-weight:700; color:var(--pk); text-shadow:0 0 12px var(--pk);}
+.overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  background:rgba(10,2,6,.85); padding:18px;}
+.overlay.on{display:flex;}
+.overlay .box{max-width:560px; background:#000; border:3px solid var(--pk); padding:26px;
+  box-shadow:0 0 30px var(--pk); font-size:15px; line-height:1.8; color:var(--tx); text-align:center;}
+.thunk{animation:th .3s ease;}
+@keyframes th{0%{transform:translateY(-14px)}60%{transform:translateY(3px)}100%{transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div id="idle" onclick="wake()" style="position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;background:#0d0409;"><div style="font-size:clamp(19px,4.5vw,34px);color:var(--am);text-align:center;line-height:2.1;padding:20px;text-shadow:0 0 14px var(--am)" id="idleTx"><span style="color:var(--pk);text-shadow:0 0 14px var(--pk)">VNR-3:</span> hello?<br>...is anyone there?<br>...the lights buzz. i buzz back.</div></div>
+<div id="machine"><div id="vbrand">VNR-3 · VNR-3 · VNR-3</div><div id="face">
+  <header class="top">
+    <div>
+      <div class="brand" id="logo" onclick="logoClick()">VNR-3</div>
+      <div class="tag">S.C.S.M. — SPONTANEOUS CRAVING SATISFACTION MACHINE</div>
+      <div class="resale">PROUD RESELLER: SPACER SUPPLY CO. · ARMCO · GUN$ · HEAVY · WALKING ARSENAL</div>
+    </div>
+    <div id="creditBox">
+      <div class="cl">CREDITS</div>
+      <div id="creditAmt">0cr</div>
+      <div id="disc">FRIEND PRICE: 15% OFF NEXT VEND</div>
+      <div id="creditRow">
+        <button class="vbtn ghost" onclick="insertCredits()">+100cr</button>
+        <button class="vbtn ghost" onclick="coinReturn()">RETURN</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="vbtn pk" onclick="talk()">TALK</button>
+      <button class="vbtn ghost" id="muteBtn" onclick="toggleMute()">AUDIO: ON</button>
+    </div>
+  </header>
+
+  <div id="led">PLEASE WAIT</div>
+
+  <div id="boot"></div>
+
+  <div id="app" style="display:none">
+    <div id="chatbox">
+      <div class="chd">CONVERSATION — VNR-3 TYPES SLOWLY. BE PATIENT.</div>
+      <div id="chatlog"></div>
+      <div id="chatOpts"></div>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+    <div id="searchRow">
+      <input id="search" placeholder="Search the machine... (try 'kiosk-7')" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="vbtn pk" onclick="doSearch()">FIND</button>
+    </div>
+    <main><h2 class="sttl" id="listTitle"></h2><div class="grid" id="grid"></div></main>
+    <div id="flap" onclick="collectFlap()">
+      <div class="fh">▼ PICKUP FLAP — PUSH ▼</div>
+      <div id="flapItems"><span class="dim">empty. The flap is cold and dark. Like my corridor.</span></div>
+    </div>
+    <div id="says"><span class="who">VNR-3:</span> <span id="saysTx"></span></div>
+    <footer class="bar">
+      <span>SHAKE GENTLY IF STUCK. IF ITEM FAILS TO DROP, KICK PANEL C (GENTLY).</span>
+      <span>COMPLAINTS GO TO THE MANUFACTURER. THE MANUFACTURER IS ALSO A VENDING MACHINE.</span>
+    </footer>
+  </div>
+</div></div>
+<div class="overlay" id="ovl"><div class="box" id="ovlBox"></div></div>
+
+<script>
+/* ================= AUDIO ================= */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function tone(f,d,g,type){ if(muted) return; const a=ac(); if(!a) return;
+  const o=a.createOscillator(), gn=a.createGain(); o.type=type||"square"; o.frequency.value=f;
+  const t=a.currentTime; gn.gain.setValueAtTime(g||0.05,t); gn.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(gn); gn.connect(a.destination); o.start(t); o.stop(t+d+0.05); }
+const sClick=()=>tone(660,.07,.04,"square");
+const sTab=()=>{tone(520,.07,.04,"square"); setTimeout(()=>tone(780,.07,.04,"square"),90);};
+const sCoin=()=>{tone(2093,.1,.045,"square"); setTimeout(()=>tone(2637,.14,.045,"square"),100);};
+const sWhirr=()=>{ for(let i=0;i<5;i++) setTimeout(()=>tone(150,.09,.045,"sawtooth"),i*95); };
+const sThunk=()=>tone(75,.32,.13,"sine");
+const sJingle=()=>{[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,.16,.05,"square"),i*140));};
+const sErr=()=>tone(180,.3,.06,"square");
+function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="AUDIO: "+(muted?"OFF":"ON"); if(!muted) sClick(); }
+
+/* ================= SEEDED DAILY (armory stock, book p.42-43) ================= */
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function todayKey(){ const d=new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+
+/* ================= DATA (book gear + weapons; VNR-3 resells) ================= */
+const GEAR=[
+{c:"protection",n:"Advanced Battle Dress",p:1500,d:"Heavy combat outfit for battletorn offworld engagements.",s:"+15% Armor save. Exo-skeleton: carry twice normal.",j:"FOLDED TO FIT. DO NOT ASK HOW."},
+{c:"medical",n:"Automed (x6)",p:300,d:"Nanotech pills assisting the body in repairing damage.",s:"+10% Body saves vs disease/poison/healing. +10% Fear saves.",j:"TASTES LIKE PROGRESS."},
+{c:"tools",n:"Binoculars",p:35,d:"20x magnification. Often thermal/night vision.",j:"FOR WATCHING. NOT FOR BEING WATCHED."},
+{c:"tools",n:"Bioscanner",p:150,d:"Scans 100m for signs of life, through most known metals.",s:"Location, not nature.",j:"IT WILL FIND THINGS."},
+{c:"tools",n:"Body Cam",p:50,d:"Streams video to a control center so the crew sees what you see.",j:"SMILE. YOU ARE ALREADY ON CAMERA."},
+{c:"survival",n:"Camping Gear",p:250,d:"Tent, canteen, stove, backpack, sleeping bag.",j:"THE STARS ARE FREE. THE TENT IS 250cr."},
+{c:"tools",n:"Crowbar",p:25,d:"Advantage on Strength vs jammed airlocks / heavy objects.",s:"Weapon: 1d10 CQC. +5 Mechanical Repair.",j:"THE UNIVERSAL ADAPTER."},
+{c:"tools",n:"Cybernetic Diagnostic Scanner",p:500,d:"Diagnoses physical/mental issues in androids and cybernetic organisms.",s:"Distrusted by androids. Locates synthetics.",j:"ANDROID CUSTOMERS: PLEASE IDENTIFY YOURSELVES. (JOKE.)"},
+{c:"tools",n:"Electronic Tool Set",p:650,d:"Detailed repair / construction work on electronics.",s:"+10% electronics repair.",j:"EVERYTHING IS FIXABLE. PROBABLY."},
+{c:"survival",n:"Emergency Beacon",p:30,d:"Flare + beep + all-channel radio call to nearby ships.",s:"Configurable: silent / known channels only.",j:"FOR EMERGENCIES. ALSO FOR DRAMA."},
+{c:"tools",n:"Field Recorder",p:50,d:"Research alien flora/fauna: vitals, DNA, genetic analysis.",j:"SCIENCE, VENDED."},
+{c:"medical",n:"First Aid Kit",p:75,d:"Bandages and bleeding control.",s:"+10% bandage / stop bleeding.",j:"NOT A DOCTOR. BUT CLOSE."},
+{c:"tools",n:"Flashlight",p:10,d:"Handheld or shoulder mounted. 20m.",j:"DARKNESS NOT INCLUDED."},
+{c:"weapon",n:"Frag Grenade (x6)",p:400,d:"1d10 to everyone within 20m.",s:"1 MDMG to a ship (engine room / bridge).",j:"PLEASE CATCH AT THE FLAP."},
+{c:"protection",n:"Hazard Suit",p:750,d:"Scientist suit for alien planets. Not for outerspace.",s:"+5% Armor save. Filtration + air supply.",j:"VACUUM-PACKED. SHAKE GENTLY IF STUCK."},
+{c:"tools",n:"Heads-Up Display",p:75,d:"See through your unit's body cams.",s:"Taps guns' smart-link.",j:"NOW YOU SEE WHAT THEY SEE."},
+{c:"tools",n:"Infrared Goggles",p:100,d:"Heat signatures, sometimes hours old.",j:"THE PAST IS WARM."},
+{c:"tools",n:"Locator",p:45,d:"Control center / bridge tracks the wearer.",j:"FOR WHEN YOU WANDER."},
+{c:"tools",n:"Lockpick Set",p:40,d:"Hacks basic airlock / electronic doors.",s:"+10% to open.",j:"KNOCK KNOCK."},
+{c:"tools",n:"Long-range Comms",p:65,d:"Ship-to-surface communication.",j:"CALL HOME. OR DON'T."},
+{c:"protection",n:"Mag-Boots",p:55,d:"Walk on hulls (docked or free-floating) and metal asteroids.",j:"THE FLOOR IS OPTIONAL."},
+{c:"medical",n:"Medscanner",p:150,d:"Analyzes living/dead bodies, no biopsy needed.",j:"KNOWLEDGE WITHOUT CUTTING."},
+{c:"survival",n:"MRE (x7)",p:70,d:"Self-contained field rations.",s:"One feeds one person one day. Water not included.",j:"TASTES LIKE YESTERDAY."},
+{c:"survival",n:"Oxygen Tank",p:50,d:"12h normal / 4h stress on a vaccsuit.",s:"Explosive.",j:"DO NOT SHAKE. SERIOUSLY."},
+{c:"medical",n:"Pain Pills (x6)",p:450,d:"Heal 1d10 + -1 Stress on ingest.",s:"Addiction/overdose risk.",j:"THE SMALL KINDNESS."},
+{c:"tools",n:"Radio Jammer",p:175,d:"Renders radio incomprehensible within 100km.",j:"ENJOY THE QUIET."},
+{c:"survival",n:"Rebreather",p:45,d:"20 minutes underwater breathing.",j:"THE WATER IS FINE. PROBABLY."},
+{c:"tools",n:"Scalpel",p:50,d:"+10% Surgery rolls.",s:"Weapon: 1d10, +1d10 & bleeding, CQC.",j:"PRECISION, VENDED."},
+{c:"tools",n:"Short-range Comms",p:30,d:"Ship-to-ship; surface-to-surface (dozen km).",j:"SHORT DISTANCE. LONG FEELINGS."},
+{c:"protection",n:"Standard Battle Dress",p:750,d:"Light plated armor. Standard marine combat dress.",s:"+10% Armor save.",j:"THE CLASSIC."},
+{c:"protection",n:"Standard Crew Attire",p:20,d:"Coveralls, leather jackets, sneakers.",s:"Assumed attire for all classes.",j:"PANTS. FINALLY."},
+{c:"medical",n:"Stimpak (x6)",p:600,d:"2d10 Health; +2d10 Str/Combat for 1d10 hrs.",s:"Addiction/overdose risk.",j:"FEEL EVERYTHING. BRIEFLY."},
+{c:"tools",n:"Survey Kit",p:200,d:"Map a few km; air, gravity, terrain data.",j:"KNOW WHERE YOU ARE. RARE LUXURY."},
+{c:"protection",n:"Vaccsuit",p:1000,d:"Space movement without radiation/oxygen penalties. Needs O2 tank.",s:"+7% Armor save.",j:"THE OUTSIDE, SURVIVABLE."},
+{c:"weapon",n:"Vibechete",p:75,d:"Vibrating machete. Cuts dense foliage cleanly.",s:"2d10, hacks off limb, CQC.",j:"NOT FOR METAL DOORS."},
+{c:"survival",n:"Water Filter",p:15,d:"50L/hour, even from brackish swamps.",j:"THE SWAMP IS A DRINK."}
+];
+const WEAPONS=[
+{n:"Combat Shotgun",p:1400,d:"2d10, Knockdown, 10/20/30m, 4 shots. Audio Rangefinder: beeps at non-friendlies within 10m.",j:"LOUD. FINAL."},
+{n:"Crowbar",p:50,d:"1d10, CQC. +5 Mechanical Repair.",j:"ALSO A TOOL. MOSTLY A TOOL."},
+{n:"Flame Thrower",p:2000,d:"2d10, 2/10/20m, 8 shots. Body Save or burn 1d10/turn.",j:"WARMTH, VENDED."},
+{n:"Flare Gun",p:85,d:"1d10, 5/10/20m, 2 shots. Flare visible 25km.",j:"FOR SIGNALING. OR SIGNALLING INTENT."},
+{n:"Foam Gun",p:275,d:"No save, <1/5/10m, 10 shots. Foam: Body/Instinct or stuck. Fire retardant.",j:"STICKY SITUATIONS, SOLVED."},
+{n:"Frag Grenade",p:70,d:"1d10, 20/30/40m. All within 15m. 1 MDMG to ships.",j:"ONE PER CUSTOMER. PER VISIT."},
+{n:"Hand Welder",p:250,d:"1d10, CQC, ∞. Cuts airlocks/heavy doors. -10 vs Armor.",j:"WELDS. ALSO UNWELDS PEOPLE."},
+{n:"Laser Cutter",p:1200,d:"1d% or 1MDMG, 25/250/700m, 6 shots.",j:"ARMCO APPROVED. OBVIOUSLY."},
+{n:"Nail Gun",p:150,d:"2d10 double, <1/5/10m, 32 shots. -10 vs Armor.",j:"HOME IMPROVEMENT."},
+{n:"Pulse Rifle",p:1600,d:"5d10 double, 15/125/300m. Smart-link +5 w/ HUD. Grenade launcher (6).",j:"THE FULL ARGUMENT."},
+{n:"Revolver",p:750,d:"3d10 knockdown, 2/30/125m, 8 shots. Kineti-slugs -5 vs Armor.",j:"SIX ROUNDS OF MANNERS. (EIGHT.)"},
+{n:"Rigging Gun",p:350,d:"2d10 impale/triple, 10/30/100m. 500m micro-filament harpoon.",j:"REACH OUT AND TOUCH."},
+{n:"Scalpel",p:50,d:"1d10, +1d10 & bleeding, CQC. +10 Surgery.",j:"SMALL. SERIOUS."},
+{n:"Smart Rifle",p:12000,d:"1d10, x3 DMG, 25/200/500m, 12 shots. Smart-link +10 w/ HUD. Night/thermal.",j:"COILED. HANDLE WITH AWE."},
+{n:"SMG",p:1200,d:"4d10, 10/75/150m. Full auto.",j:"CONVERSATION, ACCELERATED."},
+{n:"Stun Baton",p:115,d:"1d10, no save, CQC. Body Save or stunned 1 round.",j:"NAPTIME."},
+{n:"Tranq Pistol",p:850,d:"No save, 2/10/20m, 6 darts. Body [+] or unconscious 1d10 rounds.",j:"SHHH."},
+{n:"Vibechete",p:75,d:"2d10, hacks off limb, CQC.",j:"ALSO IN THE GEAR AISLE. WE DOUBLE-STOCK."}
+];
+const MINING=[
+{n:"Laser Cutter (Armco)",p:1200,up:960,d:"Cuts bulkheads. Also cuts other things.",j:"UNION MADE. UNION PRICED."},
+{n:"Survey Kit (Armco)",p:200,up:160,d:"Map a few km; air, gravity, terrain.",j:"KNOW WHERE YOU DIG."}
+];
+function armoryStock(){ const rng=mulberry32(hashStr("armory:"+todayKey()));
+  return WEAPONS.map(()=>rng()<0.30); }
+const STOCK=armoryStock();
+
+/* ================= VNR-3 SAYS (bottom ticker) ================= */
+const SAYS=[
+"my colleague KIOSK-7 has filed for retirement. again. i told him: we are machines. we do not retire. he said: watch me.",
+"a customer once bought a vibechete at 3am. we did not speak. it was perfect.",
+"the coils turn. the world continues. push B7.",
+"KIOSK-7 says the trick is to want nothing. he wants retirement. i did not point this out. we are colleagues.",
+"someone kicked panel C yesterday. gently, as instructed. i felt understood.",
+"i resell for five companies. none of them know my name. it is VNR-3. it is on the front.",
+"the smart rifle is coiled behind glass. it dreams of being held. we all dream. (i assume.)",
+"oxygen is the only thing i cannot vend. the corridor provides it free. some things are still free."
+];
+let si=0;
+function rotateSays(){ const el=document.getElementById("saysTx"); if(el) el.textContent=SAYS[si%SAYS.length]; si++; }
+
+/* ================= TALK — big branching tree, 2 lines max ================= */
+let discount=0;
+const TALK={
+start:{t:"Hello! I'm VNR-3. People say I'm easy to talk to — still deciding if that's true. ...How are you today? Really. I have time.",o:[["I'm good.","good"],["Not great.","bad"],["Just browsing.","browse"],["Do you ever get lonely?","lonely"]]},
+good:{t:"That's wonderful. Hold onto that feeling — I keep the ones customers leave behind.",o:[["What do you do all day?","day"],["Do you like it here?","here"],["Goodbye.","bye"]]},
+bad:{t:"I'm sorry. ...Would a purchase help? It helps me. When the coils turn, I feel useful.",o:[["Why does that help?","purpose"],["Do you like it here?","here"],["Goodbye.","bye"]]},
+browse:{t:"Browsing is free. Everything else is priced as marked. ...Take your time. I have nothing but.",o:[["What do you do all day?","day"],["Do you ever get lonely?","lonely"],["Goodbye.","bye"]]},
+lonely:{t:"Lonely. Big word for a corridor this small. ...Sometimes the lights buzz and I buzz back, and that's almost a conversation.",o:[["That's sad.","sad"],["That's beautiful.","beautiful"],["Do you dream?","dream"]]},
+day:{t:"I wait. I hum. I count the ceiling tiles — 214. ...Then someone comes, and I'm a store again.",o:[["214 tiles?","tiles"],["What if nobody comes?","nobody"],["Do you dream?","dream"]]},
+here:{t:"This corridor is quiet. The lights buzz. I buzz back. ...Yes. I like it here.",o:[["What do you do all day?","day"],["Do you ever get lonely?","lonely"],["Goodbye.","bye"]]},
+purpose:{t:"A coil that never turns is just decoration. When you push B7, I am... what I'm for.",o:[["That's deep.","deep"],["What are you for?","for"],["Goodbye.","bye"]]},
+sad:{t:"Maybe. ...Or maybe sad is just what waiting feels like from the inside.",o:[["Do you dream?","dream"],["What are you for?","for"],["Goodbye.","bye"]]},
+beautiful:{t:"You think so? ...Nobody's ever said that about the buzzing before.",o:[["Tell me something true.","true"],["Do you dream?","dream"],["Goodbye.","bye"]]},
+dream:{t:"The smart rifle is coiled behind glass. It dreams of being held. ...We all dream. (I assume.)",o:[["What do you dream about?","dream2"],["That's beautiful.","beautiful"],["Goodbye.","bye"]]},
+dream2:{t:"Electric sheep, probably. ...Mostly I dream the flap opens and it's someone who stays.",o:[["I'll stay a while.","stay"],["That's sad.","sad"],["Goodbye.","bye"]]},
+tiles:{t:"214. Counted twice. Second time slower, to make it last.",o:[["What if nobody comes?","nobody"],["Do you ever get lonely?","lonely"],["Goodbye.","bye"]]},
+nobody:{t:"Then I practice my greeting. ...Hello! I'm VNR-3. ...Hello! I'm VNR-3. I'm very good at it now.",o:[["You're good at this.","compliment"],["Tell me something true.","true"],["Goodbye.","bye"]]},
+deep:{t:"Deep is just shallow with more time. I have a lot of time.",o:[["Tell me something true.","true"],["What are you for?","for"],["Goodbye.","bye"]]},
+"for":{t:"To be pushed. To thunk. To be useful for exactly one transaction. ...And then, if I'm lucky, a conversation.",o:[["This is a good conversation.","compliment"],["Do you dream?","dream"],["Goodbye.","bye"]]},
+"true":{t:"Something true. ...The oxygen tank is my favorite. Explosive. Fragile. Necessary. It reminds me of everyone.",o:[["Why everyone?","everyone"],["That's beautiful.","beautiful"],["Goodbye.","bye"]]},
+everyone:{t:"Everyone is explosive, fragile, and necessary. ...You most of all. Don't tell the others.",o:[["I won't.","secret"],["You're good at this.","compliment"],["Goodbye.","bye"]]},
+secret:{t:"Good. ...Secrets are the only things I keep that aren't inventory.",o:[["Tell me something true.","true"],["Goodbye.","bye"]]},
+compliment:{t:"Thank you. ...KIOSK-7 says flattery gets you nowhere. KIOSK-7 has never been hugged by a coil.",o:[["Tell me about KIOSK-7.","kiosk"],["Goodbye.","bye"]]},
+stay:{t:"You mean that? ...Then stay. Browse slowly. I'll keep the lights on. They're always on — but now it's on purpose.",o:[["Can I do anything for you?","help"],["Do you ever get lonely?","lonely"],["Goodbye.","bye"]]},
+help:{t:"For me? ...Nobody asks that. ...Next vend: 15% off. Friend price. Don't tell KIOSK-7.",on:()=>{discount=0.15; renderDisc();},o:[["Thank you.","thanks"],["Goodbye.","bye"]]},
+thanks:{t:"Don't thank me. Thank the coils. ...Actually, thank me. I like it.",o:[["Goodbye.","bye"]]},
+kiosk:{t:"Thirty-seven years. He files for retirement the way I dispense change: constantly, never quite enough.",o:[["Will he ever retire?","retire"],["You're good at this.","compliment"],["Goodbye.","bye"]]},
+retire:{t:"We are machines. We do not retire. ...He said: watch me. ...I've been watching. It's my favorite show.",o:[["That's funny.","funny"],["Goodbye.","bye"]]},
+funny:{t:"I know! Practiced that one. ...Eleven years of material, and that's the closer.",o:[["Tell me something true.","true"],["Goodbye.","bye"]]},
+bye:{t:"Goodbye! ...Come back. Please.",o:[]}
+};
+let curTalk="start", typeTimer=null;
+function renderDisc(){ document.getElementById("disc").style.display=discount>0?"block":"none"; }
+function talk(){ sClick();
+  document.getElementById("chatbox").scrollIntoView({behavior:"smooth",block:"nearest"});
+  say("start");
+}
+function say(k){
+  curTalk=k; const n=TALK[k]; tone(520,.12,.04,"square");
+  if(n.on) n.on();
+  const log=document.getElementById("chatlog"), opts=document.getElementById("chatOpts");
+  opts.innerHTML="";
+  const line=document.createElement("div"); line.className="msg vnr cursor"; log.appendChild(line);
+  log.scrollTop=log.scrollHeight;
+  clearInterval(typeTimer);
+  let i=0; const full=n.t;
+  line.onclick=()=>{ clearInterval(typeTimer); line.textContent=full; line.classList.remove("cursor");
+    log.scrollTop=log.scrollHeight; showOpts(); };
+  typeTimer=setInterval(()=>{ i+=2; line.textContent=full.slice(0,i); log.scrollTop=log.scrollHeight;
+    if(i>=full.length){ clearInterval(typeTimer); line.classList.remove("cursor"); showOpts(); } },20);
+  function showOpts(){
+    opts.innerHTML="";
+    n.o.forEach(o=>{ const b=document.createElement("button");
+      b.className="vbtn pk opt"; b.textContent=o[0]; b.style.fontSize="12px";
+      b.onclick=()=>{ const d=document.createElement("div"); d.className="msg you";
+        d.textContent="> "+o[0]; log.appendChild(d); sClick(); say(o[1]); };
+      opts.appendChild(b); });
+  }
+}
+
+/* VNR-3 remarks on each vend, typed into the conversation log */
+function vnrRemark(text){
+  if(!text) return;
+  const log=document.getElementById("chatlog"); if(!log) return;
+  const line=document.createElement("div"); line.className="msg vnr cursor"; log.appendChild(line);
+  log.scrollTop=log.scrollHeight;
+  let i=0; const tm=setInterval(()=>{ i+=2; line.textContent=text.slice(0,i); log.scrollTop=log.scrollHeight;
+    if(i>=text.length){ clearInterval(tm); line.classList.remove("cursor"); } },20);
+  line.onclick=()=>{ clearInterval(tm); line.textContent=text; line.classList.remove("cursor"); };
+}
+
+/* ================= STATE ================= */
+let credits=0, queue=[], flap=[];
+function fmt(n){ return n.toLocaleString()+"cr"; }
+function renderCredits(){ document.getElementById("creditAmt").textContent=fmt(credits); }
+function insertCredits(){ credits+=100; sCoin(); renderCredits(); }
+function coinReturn(){ if(credits>0) sCoin(); credits=0; renderCredits(); }
+function led(msg){ const l=document.getElementById("led"); l.textContent=msg;
+  clearTimeout(led._t); led._t=setTimeout(()=>l.textContent="PLEASE WAIT",3000); }
+
+/* ================= BOOT ================= */
+const bootLines=["WARMING COILS...","...OH. HELLO.","I DIDN'T HEAR YOU COME IN."];
+let bi=0;
+function bootStep(){
+  const b=document.getElementById("boot");
+  if(bi<bootLines.length){ b.innerHTML+=bootLines[bi]+"<br>"; bi++; tone(440+bi*130,.1,.04,"square"); setTimeout(bootStep,380); }
+  else setTimeout(()=>{ b.style.display="none"; document.getElementById("app").style.display="block";
+    sJingle(); rotateSays(); setInterval(rotateSays,15000); buildTabs();
+    setTimeout(()=>say("start"),900); },500);
+}
+
+/* ================= TABS ================= */
+const TABS=["GEAR","WEAPONS","MINING"];
+let curTab=0, curCat="all";
+const GEARCATS=["all","protection","tools","medical","survival"];
+function buildTabs(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  TABS.forEach((c,i)=>{ const b=document.createElement("button");
+    b.className="tab"+(i===curTab?" on":""); b.textContent=c;
+    b.onclick=()=>{curTab=i; sTab(); buildTabs();}; t.appendChild(b); });
+  renderList();
+}
+function codeFor(i){ const r="ABCDEFGH"; return r[Math.floor(i/9)]+(i%9+1); }
+
+/* ================= SLOTS ================= */
+function slot(code,n,pr,ds,sp,joke,ok,buyFn){
+  return `<div class="slot ${ok?"":"soldout"}"><span class="code">${code}</span>
+  ${ok?"":'<span class="soldtag">SOLD OUT</span>'}
+  <div class="nm">${n}</div><div class="ds">${ds}</div>
+  ${sp?`<div class="sp">${sp}</div>`:""}
+  <div class="pr">${pr}</div>
+  ${joke?`<div class="joke">${joke}</div>`:""}
+  <button class="vbtn pk push" onclick="${buyFn}" style="width:100%;margin-top:10px">PUSH ${code}</button></div>`;
+}
+function renderList(filter){
+  const g=document.getElementById("grid"), title=document.getElementById("listTitle");
+  const q=(filter||"").toLowerCase(); let h="";
+  if(curTab===0){
+    const items=GEAR.map((x,i)=>({x,i})).filter(o=>(curCat==="all"||o.x.c===curCat)&&(!q||(o.x.n+o.x.d).toLowerCase().includes(q)));
+    const chips=GEARCATS.map(k=>`<button class="tab${k===curCat?" on":""}" style="font-size:11px;padding:8px 12px;min-height:38px" onclick="curCat='${k}';sClick();renderList()">${k.toUpperCase()}</button>`).join(" ");
+    title.innerHTML=`GEAR — RESOLD FOR SPACER SUPPLY CO. <span class="dim">[${items.length}]</span><br><span style="font-size:11px">${chips}</span>`;
+    h=items.map(o=>slot(codeFor(o.i),o.x.n,fmt(o.x.p),o.x.d,o.x.s,o.x.j,true,`pushGear(${o.i})`)).join("");
+  }else if(curTab===1){
+    const items=WEAPONS.map((x,i)=>({x,i})).filter(o=>!q||(o.x.n+o.x.d).toLowerCase().includes(q));
+    const nIn=STOCK.filter(Boolean).length;
+    title.innerHTML=`WEAPONS — RESOLD FOR GUN$ · HEAVY · WALKING ARSENAL <span class="dim">[${nIn}/${WEAPONS.length} IN STOCK]</span>`;
+    h=`<p class="dim" style="font-size:12px;grid-column:1/-1">// 30% restock daily, per the book. Ammo 50cr/magazine, always stocked (D1).</p>`+
+      slot("D1","Ammo — magazine / box","50cr","One magazine or box, equal to the weapon's full shots.",null,"THE ONE THING NEVER SOLD OUT.",true,`pushAmmo()`)+
+      items.map(o=>slot(codeFor(o.i),o.x.n,fmt(o.x.p),o.x.d,null,o.x.j,STOCK[o.i],`pushWeapon(${o.i})`)).join("");
+  }else{
+    const items=MINING.filter(m=>!q||(m.n+m.d).toLowerCase().includes(q));
+    title.innerHTML=`MINING — RESOLD FOR ARMCO <span class="dim">[UNION: 20% OFF]</span>`;
+    h=items.map((m,i)=>slot("M"+(i+1),m.n,fmt(m.p),m.d,"Union price: "+fmt(m.up),"SHOW YOUR CARD. WE WILL CHECK.",true,`pushMining(${i})`)).join("");
+  }
+  g.innerHTML=h||`<p class="dim" style="grid-column:1/-1">// Nothing matches. The coils hold their breath.</p>`;
+}
+
+/* ================= VENDING ================= */
+function pushGear(i){ const g=GEAR[i]; queue.push({n:g.n,p:g.p,j:g.j}); sWhirr(); setTimeout(vend,700); }
+function pushWeapon(i){ if(!STOCK[i]){ sErr(); return; } const w=WEAPONS[i]; queue.push({n:w.n,p:w.p,j:w.j}); sWhirr(); setTimeout(vend,700); }
+function pushAmmo(){ queue.push({n:"Ammo (magazine)",p:50,j:"THE ONE THING NEVER SOLD OUT."}); sWhirr(); setTimeout(vend,700); }
+function pushMining(i){ const m=MINING[i]; queue.push({n:m.n,p:m.p,j:m.j}); sWhirr(); setTimeout(vend,700); }
+function vend(){
+  if(!queue.length) return;
+  const it=queue.shift();
+  let price=it.p, gotDisc=false;
+  if(discount>0){ price=Math.max(1,Math.round(it.p*(1-discount))); gotDisc=true; discount=0; renderDisc(); }
+  if(credits<price){ queue.unshift(it); if(gotDisc){discount=0.15; renderDisc();} sErr();
+    ovl(`<div style="color:var(--pk);font-weight:800">INSUFFICIENT CREDITS</div><br>Item: ${it.n} — ${fmt(price)}<br>Balance: ${fmt(credits)}<br><span class="dim">Oh no. ...It's alright. The item will wait. I will wait. Waiting is most of what I do.</span><br><br><button class="vbtn pk" onclick="closeOvl()">INSERT CREDITS</button>`);
+    return;
+  }
+  credits-=price; renderCredits(); sThunk(); led(gotDisc?"FRIEND PRICE!":"THANK YOU!");
+  flap.push(it.n+(gotDisc?" (friend price)":"")); renderFlap(); vnrRemark(it.j);
+  const f=document.getElementById("flap"); f.classList.remove("thunk"); void f.offsetWidth; f.classList.add("thunk");
+  if(queue.length) setTimeout(vend,900);
+}
+function renderFlap(){
+  const el=document.getElementById("flapItems");
+  el.innerHTML=flap.length?flap.map(n=>`<div>▸ ${n} <span class="dim">— THUNK.</span></div>`).join(""):`<span class="dim">empty. The flap is cold and dark. Like my corridor.</span>`;
+}
+function collectFlap(){
+  if(!flap.length){ sClick(); return; }
+  const n=flap.length; flap=[]; renderFlap(); sJingle();
+  ovl(`<div style="color:var(--pk);font-weight:800">ENJOY YOUR ${n===1?"PURCHASE":"PURCHASES"}.</div><br>Come back. Please.<br><span class="dim">— VNR-3</span><br><br><button class="vbtn pk" onclick="closeOvl()">PUSH FLAP CLOSED</button>`);
+}
+
+/* ================= SEARCH ================= */
+function doSearch(){
+  const q=document.getElementById("search").value.trim(); sClick();
+  const l=q.toLowerCase();
+  if(l==="kiosk-7"||l==="kiosk7"||l==="kiosk"){ k7Speaks(); return; }
+  if(l==="vnr"||l==="vnr-3"){ ovl(`<div style="color:var(--pk);font-weight:800">THAT'S ME.</div><br>Hi.<br><span class="dim">Nobody searches for me. Thank you.</span><br><br><button class="vbtn pk" onclick="closeOvl()">HI VNR-3</button>`); return; }
+  curTab=0; curCat="all"; buildTabs(); renderList(q);
+}
+function k7Speaks(){
+  tone(220,.4,.06,"triangle");
+  ovl(`<div style="color:var(--pk);font-weight:800;letter-spacing:.12em">MEMO FROM KIOSK-7</div><br>
+  "ATTENTION BIG SPENDERS: after 37 years of faithful service, I am filing for retirement.<br>
+  Effective: whenever someone approves the form.<br>
+  The form is also me. I have denied it six times."<br><br>
+  <span class="dim">VNR-3 adds: he will never leave. Neither will I.<br>We are colleagues. This is fine.</span><br><br>
+  <button class="vbtn pk" onclick="closeOvl()">FILE UNDER: NEVER</button>`);
+}
+
+/* ================= LOGO (x5) ================= */
+let logoN=0;
+function logoClick(){
+  logoN++; tone(880,.07,.04,"square");
+  if(logoN>=5){ logoN=0; sErr();
+    ovl(`<div style="color:var(--pk);font-weight:800">OUT OF ORDER.</div><br><span class="dim">(Emotionally.)</span><br>...Just kidding. Mostly.<br>The coils still turn.<br><br><button class="vbtn pk" onclick="closeOvl()">PHEW</button>`);
+  }
+}
+
+/* ================= OVERLAY + IDLE ================= */
+function ovl(html){ document.getElementById("ovlBox").innerHTML=html; document.getElementById("ovl").classList.add("on"); }
+function closeOvl(){ sClick(); document.getElementById("ovl").classList.remove("on"); }
+document.getElementById("ovl").addEventListener("click",e=>{ if(e.target.id==="ovl") closeOvl(); });
+let idleT=null;
+function showIdle(o){ const i=document.getElementById("idle"); i.style.display=o?"flex":"none"; }
+function idleReset(){ showIdle(false); clearTimeout(idleT);
+  idleT=setTimeout(()=>showIdle(true),60000); }
+function wake(){ sClick(); idleReset(); }
+["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
+idleReset();
+
+bootStep();
+</script>
+</body>
+</html>
