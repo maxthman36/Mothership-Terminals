@@ -68,15 +68,18 @@ bounties: [
               local: "Shuttle from the hub down to Split Log (250cr × 4 hunters)",
               localKcr: 1 } },
 
-  { id: "B-0204", target: "THE CHOP SHOP KILLER", type: "APPREHENSION (DEAD OR ALIVE)", bl: 2,
-    reward: "10 Kcr", status: "OPEN",
-    client: "Doenides Police Department (via RAC annex)",
+  { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
+    reward: "10 Kcr (+350 Kcr bonus for proof of death)", status: "OPEN",
+    client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
-    lastKnown: "Prospero's Dream",
-    terms: "A killer is harvesting cyberware from modded victims across the station. Bodies found with mods removed, each with surgical precision. Local law is getting nowhere and the DPD wants it stopped. Six persons of interest, no arrests. The killer grows bolder with every murder.",
+    lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",
+    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, 350 Kcr bonus for proof of death. Last trace: a closed-down arcade on the Dream still paying utilities on the company ledger. The arcade's machine is not what it seems. Report anything unusual. Anything.",
     travel: { jumps: 0,
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
+  /* B-0204 THE CHOP SHOP KILLER retired to the refill queue 2026-10-12 —
+     solid job, weakest printed backing of the five. Restore when the board
+     needs a Dream body-horror slot. */
 
   { id: "B-0220", target: "BORGES, AMARUQ", type: "APPREHENSION (DEAD)", bl: 3,
     reward: "20 Kcr", status: "OPEN",
