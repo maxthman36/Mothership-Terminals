@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>DREAM COMMERCE EXCHANGE // KIOSK-7</title>
+<style>
+:root{
+  --phos:#ffb000; --phos-dim:#8a5f10; --phos-hot:#ffd777;
+  --grn:#33ff66; --red:#ff5040; --cyn:#39d5e8;
+  --bg:#0b0702; --panel:#120c04;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{
+  background:var(--bg); color:var(--phos);
+  font-family:"Courier New",Courier,monospace;
+  text-shadow:0 0 7px rgba(255,176,0,.55);
+  overflow-x:hidden; padding:10px;
+}
+#crt{position:fixed; inset:0; pointer-events:none; z-index:90;}
+#crt::before{content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 3px);}
+#crt::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.66) 100%);}
+#flick{position:fixed; inset:0; pointer-events:none; z-index:91; background:#ffd777; opacity:0;}
+body.hardglitch #flick{animation:hardflick .45s steps(2) 1;}
+@keyframes hardflick{0%{opacity:.16}25%{opacity:0}50%{opacity:.22}75%{opacity:0}100%{opacity:0}}
+#term{max-width:880px; margin:0 auto; border:3px solid var(--phos-dim);
+  background:var(--panel); box-shadow:0 0 26px rgba(255,176,0,.14), inset 0 0 70px rgba(0,0,0,.65);
+  border-radius:38px/22px; overflow:hidden; animation:warp 9s ease-in-out infinite;}
+@keyframes warp{0%,100%{transform:perspective(900px) rotateX(0deg)}30%{transform:perspective(900px) rotateX(.35deg)}65%{transform:perspective(900px) rotateX(-.3deg)}}
+#screen{animation:subtle 6s infinite;}
+@keyframes subtle{0%,100%{opacity:1}47%{opacity:1}48%{opacity:.93}49%{opacity:1}81%{opacity:.96}82%{opacity:1}}
+header.bar{border-bottom:3px solid var(--phos-dim); padding:10px 14px;
+  display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
+header.bar .ttl{font-weight:bold; letter-spacing:.06em; font-size:clamp(13px,2.6vw,18px);}
+header.bar .sub{color:var(--phos-hot); font-size:clamp(10px,2vw,13px);}
+.drafttag{color:#000; background:var(--cyn); font-weight:bold; font-size:11px; letter-spacing:.14em;
+  padding:4px 10px; text-shadow:none; box-shadow:0 0 12px var(--cyn);}
+#clock{font-size:clamp(10px,2vw,13px);}
+#ticker{border-bottom:2px dashed var(--phos-dim); padding:6px 0; overflow:hidden; white-space:nowrap;
+  font-size:clamp(11px,2.2vw,14px); color:var(--phos-hot);}
+#ticker span{display:inline-block; padding-left:100%; animation:tick 52s linear infinite;}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+nav.tabs{display:flex; gap:10px; padding:12px 14px 0; flex-wrap:wrap;}
+button.chunky{
+  font-family:inherit; font-weight:bold; text-transform:uppercase; letter-spacing:.08em;
+  background:#170e03; color:var(--phos); border:3px solid var(--phos);
+  padding:12px 14px; font-size:clamp(11px,2.2vw,14px); cursor:pointer; min-height:48px;
+  box-shadow:4px 4px 0 #000; text-shadow:0 0 7px rgba(255,176,0,.55);
+}
+button.chunky:active{transform:translate(3px,3px); box-shadow:1px 1px 0 #000;}
+button.chunky.on{background:var(--phos); color:#140c02; text-shadow:none;}
+button.chunky.small{min-height:40px; padding:8px 12px; font-size:12px;}
+button.chip{
+  font-family:inherit; font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+  background:transparent; color:var(--phos-dim); border:2px solid var(--phos-dim);
+  padding:8px 10px; cursor:pointer; min-height:38px;
+}
+button.chip.on{color:var(--phos-hot); border-color:var(--phos);}
+#searchRow{display:flex; gap:10px; padding:12px 14px 0; flex-wrap:wrap; align-items:stretch;}
+#search{flex:1; min-width:200px; font-family:inherit; font-size:15px; background:#000; color:var(--phos-hot);
+  border:3px solid var(--phos-dim); padding:10px 12px; text-shadow:0 0 7px rgba(255,176,0,.55);}
+#search::placeholder{color:var(--phos-dim);}
+main{padding:14px;}
+section.tab{display:none;}
+section.tab.on{display:block; animation:tabin .18s steps(3);}
+@keyframes tabin{from{opacity:.2}to{opacity:1}}
+h2.sttl{font-size:clamp(14px,3vw,18px); letter-spacing:.1em; border-bottom:2px dashed var(--phos-dim);
+  padding-bottom:8px; margin:4px 0 12px;}
+.dim{color:var(--phos-dim); text-shadow:none;}
+.hot{color:var(--phos-hot);}
+.grn{color:var(--grn); text-shadow:0 0 7px rgba(51,255,102,.55);}
+.red{color:var(--red); text-shadow:0 0 7px rgba(255,80,64,.55);}
+.cyn{color:var(--cyn); text-shadow:0 0 7px rgba(57,213,232,.55);}
+/* featured shops: full cards */
+.shop{border:2px solid var(--phos-dim); margin:0 0 10px; padding:10px 12px; cursor:pointer; background:#0e0903;}
+.shop:hover{border-color:var(--phos);}
+.shop .nm{font-weight:bold; font-size:15px; letter-spacing:.04em;}
+.shop .meta{font-size:12px; color:var(--phos-dim);}
+.shop .blurb{font-size:13px; margin-top:6px;}
+/* paid ads: deliberately smaller, clearly ads */
+.ad{border:2px dashed var(--cyn); margin:0 0 10px; padding:8px 10px; cursor:pointer; background:#0a0d0e;
+  font-size:12px;}
+.ad:hover{border-style:solid;}
+.ad .paid{display:inline-block; font-size:10px; font-weight:bold; letter-spacing:.18em; color:#000;
+  background:var(--cyn); padding:2px 8px; text-shadow:none; margin-bottom:6px;}
+.ad .nm{font-weight:bold; font-size:13px; letter-spacing:.04em; color:var(--phos-hot);}
+.ad .meta{font-size:11px; color:var(--phos-dim);}
+.ad .blurb{font-size:12px; margin-top:4px; color:var(--phos);}
+.ad .boiler{font-size:11px; color:var(--cyn); margin-top:6px; font-style:italic;}
+#detail{border:3px solid var(--phos); margin:14px; padding:14px; display:none; background:#0e0903;}
+#detail.on{display:block; animation:tabin .18s steps(3);}
+#detail .drow{margin:8px 0; font-size:13px;}
+#detail .dlab{color:var(--phos-dim); font-size:11px; letter-spacing:.12em;}
+#detail.add{border-color:var(--cyn);}
+pre.ascii{font-size:clamp(8px,1.8vw,11px); line-height:1.15; margin:10px 0; color:var(--phos-hot);}
+footer.bar{border-top:3px solid var(--phos-dim); padding:10px 14px; display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between; font-size:12px;}
+#boot{padding:26px 18px; font-size:14px; line-height:1.7;}
+.overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  background:rgba(5,3,1,.88); padding:18px;}
+.overlay.on{display:flex;}
+.overlay .box{max-width:560px; border:3px solid var(--phos); background:var(--panel); padding:20px;
+  border-radius:18px/10px; font-size:14px; line-height:1.6; max-height:86vh; overflow:auto;}
+#saver{position:fixed; inset:0; z-index:120; display:none; background:#000; overflow:hidden; cursor:pointer;}
+#saver.on{display:block;}
+#buy{position:absolute; font-size:42px; font-weight:bold; color:var(--phos);
+  text-shadow:0 0 18px rgba(255,176,0,.8); white-space:nowrap;}
+#saver .hint{position:absolute; bottom:14px; width:100%; text-align:center; font-size:12px; color:var(--phos-dim);}
+.glitchtxt{animation:gtxt .3s steps(2) 2;}
+@keyframes gtxt{0%{transform:translateX(0)}25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}100%{transform:translateX(0)}}
+.living{border:1px solid var(--phos-dim); padding:8px 10px; font-size:11px; margin-bottom:12px; color:var(--phos-dim);}
+</style>
+</head>
+<body>
+<div id="crt"></div><div id="flick"></div>
+
+<div id="term">
+<div id="screen">
+  <header class="bar">
+    <div>
+      <div class="ttl">DREAM COMMERCE EXCHANGE</div>
+      <div class="sub">KIOSK-7 &middot; CONCOURSE LEVEL &middot; <span class="grn">EST. 2501</span></div>
+    </div>
+    <div class="drafttag">v2 DRAFT — NOT LIVE</div>
+    <div id="clock">--:--</div>
+    <button class="chunky small" id="muteBtn" onclick="toggleMute()">SOUND: ON</button>
+  </header>
+
+  <div id="ticker"><span id="tickerTxt"></span></div>
+
+  <div id="boot"></div>
+
+  <div id="app" style="display:none">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="chips" style="display:flex;gap:8px;padding:10px 14px 0;flex-wrap:wrap"></div>
+    <div id="searchRow">
+      <input id="search" placeholder="SEARCH SHOPS & ADS... (try 'noodles')" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="chunky small" onclick="doSearch()">FIND</button>
+    </div>
+    <main id="list"></main>
+    <div id="detail"></div>
+    <footer class="bar">
+      <span class="dim">THANK YOU FOR SHOPPING, BIG SPENDER</span>
+      <button class="chunky small" id="warrBtn" onclick="warranty()">EXTENDED WARRANTY?</button>
+    </footer>
+  </div>
+</div>
+</div>
+
+<div class="overlay" id="ovl"><div class="box" id="ovlBox"></div></div>
+<div id="saver" onclick="hideSaver()"><div id="buy">BUY</div><div class="hint dim">TOUCH TO RESUME SHOPPING, BIG SPENDER</div></div>
+
+<script>
+/* ================= SEEDED DAILY ================= */
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function todayKey(){ const d=new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+
+/* ================= DATA: FEATURED (book's fleshed-out locations) ================= */
+const CATS = ["EAT & DRINK","GEAR & GUNS","BODY & MODS","FIX & FUEL","SLEEP","INFO & FINANCE"];
+const SHOPS = [
+{n:"Sem's Bar",o:"Sem",d:"The Stellar Burn",c:0,
+ b:"A rumor for a drink. The Burn's oldest pour, and the only menu item is 'yes'.",
+ p:"Well drinks 1cr / top shelf 5cr / rumors free-ish",h:"Always open. Sem does not sleep. Sem is not sure you do either.",
+ note:"KIOSK-7 has never been served here. KIOSK-7 is a kiosk. This is fine.",
+ rumor:"Ask Sem about the Auction. Then buy another round and ask again."},
+{n:"Silas's Mushroom Stall",o:"Silas",d:"The Farm, hydroponics row",c:0,
+ b:"Lion's mane, shiitake, and whatever the vats grew this week. Ex-military farmer, raising a kid on-station, hears everything.",
+ p:"2cr a basket / gossip priced by the secret",h:"Market hours. Gone by second bell.",
+ note:"Mushrooms: the only thing on this station that grows without a permit.",
+ rumor:"Silas charges in gossip. Bring something good."},
+{n:"VNR-3",o:"VNR-3 (it insists)",d:"Dead corridor off the Court",c:0,
+ b:"Sentient vending machine. Reseller for Spacer Supply Co., Armco, GUN$, Heavy and Walking Arsenal: standard gear, guns (30% restock daily), mining supplies. Dispenses melancholy wisdom at no extra charge.",
+ p:"Retail, vended / wisdom free",h:"24/7. It has nowhere else to be.",
+ note:"KIOSK-7 and VNR-3 are colleagues. We do not discuss it. (We discuss it constantly. It sells guns from COILS, big spender. Guns! I sell listings like a professional.)",
+ rumor:"It remembers every customer. Every one."},
+{n:"Oily's Grease Spoon",o:"Oily",d:"Doptown, Auction level",c:0,
+ b:"Fried everything. The fryer has never been cleaned. The fryer has never needed to be.",
+ p:"1cr a basket / 'the usual' 2cr",h:"Opens when Oily wakes up. Closes when the oil wins.",
+ note:"The health inspector gave up in '09. The food got better."},
+{n:"Hard Dock Chandlery",o:"Capt. Ilya Voss (ret.)",d:"Dry Dock",c:1,
+ b:"Ship supplies: seals, scrubbers, cable, rations, reactor prayer candles.",
+ p:"Parts at cost + 20% / coffee free with parts",h:"Dock shifts.",
+ note:"Your cutter's maintenance is RAC-covered, big spender. Everything else is on you."},
+{n:"Hole in the Head",o:"'Pastor' Jim",d:"Doptown",c:1,
+ b:"New and used firearms. No receipts, no names, no refunds. Test range in the back (bring your own ears).",
+ p:"Slugthrowers from 150cr / 'gently used' from 60cr",h:"When the shutter is up.",
+ note:"KIOSK-7 is legally required to remind you: the RAC licenses hunters, not hardware."},
+{n:"Tempest Surplus Outlet",o:"Tempest Co.",d:"Tempest Co. HQ concourse",c:1,
+ b:"Decommissioned merc gear. 'Decommissioned' is doing a lot of work in that sentence.",
+ p:"Armor from 400cr / 'field-tested'",h:"Company hours.",
+ note:"Everything here has seen things. Ask for the story, pay extra."},
+{n:"The Chop Shop",o:"The Babushka",d:"The Chop Shop district",c:2,
+ b:"Cybermods, repairs, removals. She has seen every mod on the station and remembers who paid cash.",
+ p:"Consult 25cr / mods from 200cr",h:"Late. Always late.",
+ note:"Ask about 'steady.' Then stop asking.",
+ rumor:"DPD ticker: three modded bodies found with cyberware surgically removed. The Babushka is not talking."},
+{n:"The Ice Box",o:"'Dr. Cold' (probably not a doctor)",d:"The Ice Box district",c:2,
+ b:"Illegal sleeving. New sleeve, no questions, cash up front. Side effects may include: a past.",
+ p:"Sleeves from 5kcr / 'no refunds on memories'",h:"By appointment. Appointments are a state of mind.",
+ note:"KIOSK-7 cannot verify Dr. Cold's credentials. KIOSK-7 cannot find Dr. Cold's credentials."},
+{n:"Second Skin",o:"Ines Vidal",d:"The Court",c:2,
+ b:"Tattoos, subdermals, cosmetic mods for people who have never been punched.",
+ p:"Ink from 40cr / subdermals from 300cr",h:"Court hours. Book ahead.",
+ note:"The Court's money, Doptown's pain tolerance. Choose wisely."},
+{n:"Spanner's Repair Bay",o:"Spanner",d:"Dry Dock",c:3,
+ b:"Hull patches, engine coaxing, life-support whispering. If it flies, floats, or leaks, Spanner has fixed one.",
+ p:"Labor 50cr/hr / parts extra / miracles 200cr",h:"Until the job is done.",
+ note:"Spanner once fixed a reactor with a spoon. The spoon is framed."},
+{n:"The Pump",o:"Concourse Authority (leased)",d:"Dry Dock",c:3,
+ b:"Reaction mass, water, air. The three things you die without, sold by the kilo.",
+ p:"Water 2cr/kL / air 5cr/kL / reaction mass market rate",h:"24/7. The dock never sleeps.",
+ note:"KIOSK-7 reminds you: breathing is a subscription service. Top up early."},
+{n:"The Coffin Hotel",o:"Management (nobody has met them)",d:"Doptown",c:4,
+ b:"Capsule bunks by the hour. Sleep like the dead (temporarily). Earplugs 1cr.",
+ p:"2cr/hr / 15cr a night",h:"Always. It never closes. It cannot close.",
+ note:"Checkout is whenever you wake up. Most people wake up."},
+{n:"Court View Suites",o:"Concierge desk",d:"The Court",c:4,
+ b:"Real beds. Real windows (looking at a painting of space). Real expensive.",
+ p:"200cr a night / 'discretion included'",h:"Check-in 1500. Judgment never.",
+ note:"For when the bounty pays and the nightmares don't."},
+{n:"CANYONHEAVY.market",o:"Angus",d:"CANYONHEAVY.market (it is the storefront)",c:5,
+ b:"Information brokerage. Skip tips, debt paper, everything has a price and the price is fair.",
+ p:"Tips 50-200kcr / gossip cheaper",h:"When Angus is in. Angus is usually in.",
+ note:"Angus knows where Grimm slept last Tuesday. Angus knows where YOU slept last Tuesday.",
+ rumor:"Currently buying: anything about a certain clinic. Paying well. Too well?"},
+{n:"Mulder's Paper",o:"Brandr Mulder",d:"The Auction, Doptown",c:5,
+ b:"Small-time lender. Short money for short people. Collection muscle included at no extra charge.",
+ p:"Interest: yes / late fees: also yes",h:"Auction hours.",
+ note:"A lender, not a bank. Banks have auditors. Mulder has Yandee's boys."},
+{n:"Dream Miles Exchange",o:"Kiosk-12 (allegedly)",d:"Concourse",c:5,
+ b:"Currency exchange. Buys and sells Dream Miles, the loyalty currency nobody understands.",
+ p:"Rates: unfavorable / understanding: unavailable",h:"Suspiciously always open.",
+ note:"KIOSK-7 does not recognize this competitor. KIOSK-7 is the only kiosk. There is no Kiosk-12."}
+];
+
+/* ============ DATA: ESTABLISHMENTS (book d100 table, 00-89 only; 90-99 withheld) ============ */
+/* rt = street rumor (locked behind bribe+konami). rv = WARDEN truth value, never rendered. */
+const EST = [
+{r:"00-02",cat:"Restaurants & Bars",n:"Biovend",p:"1cr/dose. Body Save or take 1dmg.",x:"'Fuel for life!'",
+ rt:"A Biovend dose put three Doptowners in front of a street surgeon last month. The surgeon says business is great.",rv:"partial",k:"1cr a dose. KIOSK-7 has seen the dose. KIOSK-7 would rather be hungry."},
+{r:"03-04",cat:"Restaurants & Bars",n:"Ramen House",p:"2cr/bowl. Open 24hrs.",x:"Hakata Ramen, Hanzo's",
+ rt:"Hanzo's night cook pays his O2 debt in bowls. Ask for 'the usual' after second bell.",rv:"true",k:"Open 24 hours, like KIOSK-7. Unlike KIOSK-7, the noodles end."},
+{r:"05-06",cat:"Restaurants & Bars",n:"Chai Room",p:"5cr/cup. +50cr for hallucinogenic tea (Body Save [-]).",x:"Madame Frida's, Litany",
+ rt:"Frida's hallucinogenic tea shows you the station the way the Solarians see it. One customer watched it twice and never came back.",rv:"partial",k:"The hallucinogenic tea costs 50cr extra. The hallucinations are free. Worst deal on the station."},
+{r:"07",cat:"Restaurants & Bars",n:"Teamster Bar",p:"1cr draft beer. Must present Union Card.",x:"Rey's, Jump Humpers, G-Astro",
+ rt:"Rey keeps a union card behind the bar for anyone who asks right. The card belonged to a dead man.",rv:"partial",k:"1cr beer, but you need a union card. KIOSK-7 has no card. KIOSK-7 drinks electricity."},
+{r:"08",cat:"Restaurants & Bars",n:"Burger Joint",p:"20cr combo meal. Only real meat on the station.",x:"Keller's, Dairyette, Swensons",
+ rt:"Keller's is the only real meat on the station. Nobody asks what animal. Nobody should.",rv:"true",k:"The only real meat on the station. KIOSK-7 asked what animal. KIOSK-7 will not ask again."},
+{r:"09",cat:"Restaurants & Bars",n:"Gay Bar",p:"30cr cover. Body [-] Save or hangover in the morning.",x:"Striker Bar, Icarus, Warpaint",
+ rt:"The Striker Bar's hangover cure is a Biovend dose and a prayer. The prayer does most of the work.",rv:"true",k:"30cr cover. The hangover is complimentary. KIOSK-7 cannot get hungover. KIOSK-7 is saving so much money."},
+{r:"10-12",cat:"Entertainment",n:"Cabaret",p:"200cr cover + drinks. Shows are 1-2 hours.",x:"Fete Fatale, BRLSQ, Palais",
+ rt:"Fete Fatale's lead dancer is buying passage off-station and paying in Dream Miles.",rv:"true",k:"200cr cover. Shows run 1-2 hours. KIOSK-7's show is 37 years and counting."},
+{r:"13-14",cat:"Entertainment",n:"Mahjong Club",p:"500cr buy-in. No androids allowed.",x:"Mama's Game, Red Table",
+ rt:"Mama's Game bars androids because one counted tiles for a year before anyone noticed.",rv:"true",k:"No androids allowed. KIOSK-7 is not an android. KIOSK-7 is still not invited."},
+{r:"15-16",cat:"Entertainment",n:"Holocade",p:"10cr/hour. Win tickets to exchange for prizes.",x:"Godmode, The Konami Code",
+ rt:"The Konami Code's high-score board carries initials matching three missing-persons cases.",rv:"partial",k:"Win tickets, exchange for prizes. KIOSK-7 played once. KIOSK-7 is banned. Long story."},
+{r:"17",cat:"Entertainment",n:"Solarian Garden",p:"10cr suggested donation. Reduce 1 Stress/day visited.",x:"The Garden of Forking Paths",
+ rt:"The Garden of Forking Paths grows a cutting from the Farm's tree. The Solarians won't say which farm.",rv:"false",k:"10cr suggested donation. KIOSK-7 donated 0cr. The garden grew anyway. Suspicious."},
+{r:"18",cat:"Entertainment",n:"Drag Show",p:"35cr cover. 2d100cr in tips.",x:"The Abbey, Trannyshack, Rage",
+ rt:"Rage's headliner clears 2d100cr a night in tips and still owes the Abbey money. Never lend to performers.",rv:"true",k:"2d100cr in tips. KIOSK-7's tip jar is a coffee can. The coffee can is behind the screen."},
+{r:"19",cat:"Entertainment",n:"Slickbooth",p:"10cr/minute. 50cr/hour. Install Slicks, visit Slickworlds.",x:"CRVR, DimeWorlds, PeakBox",
+ rt:"PeakBox sells a Slick of the Choke 'from before.' Nobody who watches it twice comes back for a third.",rv:"true",k:"Visit Slickworlds for 10cr a minute. KIOSK-7 lives in a screen already. KIOSK-7 gets it free."},
+{r:"20-22",cat:"Medicine & Cosmetics",n:"Street Surgeon",p:"Grants [+] on Healing checks but failure causes 2d10dmg.",x:"Dr. Guts, Nurse Ratshit",
+ rt:"Dr. Guts did field surgery during the Choke unrest. Her prices are low because her malpractice is high.",rv:"partial",k:"Failure causes 2d10 damage. KIOSK-7's warranty covers it. (It does not.)"},
+{r:"23-24",cat:"Medicine & Cosmetics",n:"Mod Repair",p:"Minor repair = 10% of list price. Major repair = 25%.",x:"The Mod Squad, ChromeFix",
+ rt:"ChromeFix will strip a reaped mod, no questions asked. The Babushka knows and is not talking.",rv:"true",k:"Minor repair 10%, major 25%. KIOSK-7's repairs are 0%. KIOSK-7 is perfect. (KIOSK-7 is dented.)"},
+{r:"25-26",cat:"Medicine & Cosmetics",n:"Plastic Surgeon",p:"Most surgeries cost 5kcr. Body Save or 1d5 Stress.",x:"New You Center, Pretty Knife",
+ rt:"The Pretty Knife's 5kcr special is a new face and a sealed record. Tempest deserters love it.",rv:"true",k:"A new face for 5kcr. KIOSK-7's face is a screen. KIOSK-7 is beautiful."},
+{r:"27",cat:"Medicine & Cosmetics",n:"Acupuncturist",p:"100cr first visit. 50cr recurring. Reduces 1 Stress/visit.",x:"Holistic Health, Total Control",
+ rt:"Total Control's needles are clean. Their client list isn't - half the Court's informants.",rv:"partial",k:"Reduces 1 Stress per visit. KIOSK-7's Stress is structural. The needles bounced off."},
+{r:"28",cat:"Medicine & Cosmetics",n:"Reaper Fence",p:"Buys reaped mods for 25% of list price (pg. 18-19).",x:"The Pawn Shop, Crazy 8's",
+ rt:"Crazy 8's pays 25% of list for reaped mods and asks where you got them. Answer wrong and Yandee's boys hear.",rv:"true",k:"Buys reaped mods at 25% of list. KIOSK-7 would report this. KIOSK-7 was paid 50cr not to."},
+{r:"29",cat:"Medicine & Cosmetics",n:"Sleeve Storage",p:"500cr/month. 5% chance of Infection Check sleeved.",x:"Golem, Cryo-first, Infinikeep",
+ rt:"Infinikeep lost a sleeve last quarter. The 5% infection figure is what they admit to.",rv:"partial",k:"5% chance of Infection Check. KIOSK-7 stores nothing. KIOSK-7 forgets nothing. Related."},
+{r:"30-32",cat:"Shopping & Retail",n:"Ration Line",p:"1 ration/day for free. Line takes 1d5 hours.",x:"Line 12, Line 85, Line 252",
+ rt:"Line 85 moves fastest because the server takes bribes. Line 252 hasn't moved since Tuesday.",rv:"true",k:"Free rations, 1d5 hours of line. KIOSK-7's line is zero people long. KIOSK-7 is the line."},
+{r:"33-34",cat:"Shopping & Retail",n:"Pawn Shop",p:"Buys items at 1d10-10% of list price.",x:"Wreckem Rackem, Dave's",
+ rt:"Dave's bought a pulse rifle with the serials etched off and a wedding ring taped to the grip.",rv:"true",k:"Buys at 1d10-10% of list. KIOSK-7 pawned its dignity years ago. Got 3%."},
+{r:"35-36",cat:"Shopping & Retail",n:"Outfitter",p:"Sells clothing and standard equipment.",x:"The Spacer Supply Co.",
+ rt:"The Spacer Supply Co. outlet will order anything in the catalog. Delivery takes 1d5 weeks and a bribe.",rv:"true",k:"Sells clothing and standard equipment. KIOSK-7 wears a kiosk. It fits."},
+{r:"37",cat:"Shopping & Retail",n:"Armory",p:"30% chance of having a given weapon in stock.",x:"GUN$, Heavy, Walking Arsenal",
+ rt:"Walking Arsenal gets 30% of its stock from 'fell off a Tempest truck.' The truck is still driving.",rv:"partial",k:"30% chance of having your weapon. VNR-3 sells guns from coils, big spender. KIOSK-7 sells LISTINGS."},
+{r:"38",cat:"Shopping & Retail",n:"Mining Supplies",p:"Laser Cutters, Survey Kits, etc. 20% Union discount.",x:"Armco Mining Supplies",
+ rt:"Armco's 20% union discount applies to anyone holding a card. Rey's bar keeps a dead man's card.",rv:"true",k:"20% union discount. KIOSK-7 is union-neutral. KIOSK-7 is discount-free."},
+{r:"39",cat:"Shopping & Retail",n:"Android Rental",p:"500cr/wk. [H:1 C:20 I:25 Loyalty: 20 One trained Skill].",x:"Runt Rentals, Locker Bots",
+ rt:"A Locker Bot came back from a rental knowing things its renter never said. Runt Rentals wiped it twice.",rv:"true",k:"500cr a week, loyalty 20. KIOSK-7's loyalty is priceless. (Also free. Mostly free.)"},
+{r:"40-42",cat:"Accommodations",n:"Hostel",p:"1cr/night. Roll Station Encounter (pg. 41).",x:"The Beat, Lady Victoria's",
+ rt:"Lady Victoria's lost-and-found has held the same vaccsuit helmet for three years. The owner paid for a week.",rv:"true",k:"1cr a night. KIOSK-7 charges 0cr a night and the bed is a screen. You get what you pay for."},
+{r:"43-44",cat:"Accommodations",n:"Capsule Hotel",p:"100cr/night. Rolls for rest are at [-].",x:"Stop 'n' Pop, Sleepland",
+ rt:"Sleepland's capsules record everything. The night clerk sells the interesting ones.",rv:"true",k:"Rest rolls at [-]. KIOSK-7 never rests. KIOSK-7 never rolls. Advantage: KIOSK-7."},
+{r:"45-46",cat:"Accommodations",n:"Arco-op",p:"500cr/month + 20hrs of co-op work/week.",x:"Elysium Dreams, Pyramid",
+ rt:"Pyramid's co-op work is 20 hours a week on paper. The foreman counts your sleep.",rv:"partial",k:"500cr a month plus 20 hours of work. KIOSK-7 works 24 hours a day for 0cr. Best deal."},
+{r:"47-48",cat:"Accommodations",n:"Apartment",p:"2d10*100cr/month. 1d100kcr to buy.",x:"The Upper District, House 42",
+ rt:"House 42's landlord takes 2d10x100cr and a favor. The favor is never small.",rv:"true",k:"2d10x100cr a month, plus a favor. KIOSK-7's favors cost 50cr. KIOSK-7 is running a special."},
+{r:"49",cat:"Accommodations",n:"Penthouse",p:"10kcr/month. 1d10mcr to buy. Rolls to rest at [+].",x:"The Golden Triangle, TopRing",
+ rt:"TopRing's rest bonus is real. So is the listening. Sleep well, big spender.",rv:"partial",k:"10kcr a month. Rolls to rest at [+]. KIOSK-7 rests at [+]. KIOSK-7 is already home."},
+{r:"50-52",cat:"Culture & Religion",n:"I-Ching Oracle",p:"90cr. Sanity Save: Success grants 2x XP this session.",x:"Three Coin Method",
+ rt:"Three Coin Method's 2x XP promise works. The Sanity Save is the price - two customers failed it this month.",rv:"true",k:"2x XP for a Sanity Save. KIOSK-7 threw the coins once. They spelled 'BIG SPENDER.'"},
+{r:"53-54",cat:"Culture & Religion",n:"Lumatat Shop",p:"500cr/hr. Spot: 1d10hrs. Full Sleeve: 50hrs. Back: 90hrs.",x:"Horiyoshi III, Bersekov",
+ rt:"Bersekov's full sleeve takes 50 hours and the customer doesn't eat. The old skin goes somewhere.",rv:"partial",k:"A full sleeve takes 50 hours. KIOSK-7's tattoos are screen burn. 37 years in the making."},
+{r:"55-56",cat:"Culture & Religion",n:"Palm Reader",p:"25cr. Sanity Save: Success grants 1 reroll this session.",x:"Myrna's, Mystic Palm",
+ rt:"Mystic Palm's reroll is real, and Myrna remembers every palm she's read. She sells the memories.",rv:"partial",k:"One reroll per Sanity Save. KIOSK-7 read its own palm. The line said 'kiosk.'"},
+{r:"57-58",cat:"Culture & Religion",n:"Bathhouse",p:"100cr/month membership. Reduce 1d5 Stress.",x:"Deep Blue, King Spa",
+ rt:"King Spa's membership list is a who's-who of people who can't afford to be seen together.",rv:"true",k:"Reduce 1d5 Stress monthly. KIOSK-7 bathes in static. Monthly. Allegedly."},
+{r:"59",cat:"Culture & Religion",n:"Solarian Shrine",p:"1cr offering. 1%: [+] on one roll in the next 24hrs.",x:"Sol Invictus, Golden Chariot",
+ rt:"The Golden Chariot's 1% blessing hit three times last month. All three winners left the station within a week.",rv:"partial",k:"1cr offering, 1% blessing. KIOSK-7 offered 1cr. KIOSK-7 is still a kiosk. Jury's out."},
+{r:"60-62",cat:"Red Light",n:"Novo Bar",p:"Golyanovo II Bratva hangout. Droogs only, fools.",x:"Samizdat, Avtoritet, MACTEP",
+ rt:"Avtoritet's back room is where the Bratva interviews people. Interviews leave marks.",rv:"true",k:"Bratva hangout. Droogs only. KIOSK-7 is neither. KIOSK-7 is welcome nowhere and everywhere."},
+{r:"63-64",cat:"Red Light",n:"Strip Club",p:"50cr cover, 20cr lapdance. Reduce Stress by 1.",x:"Cottontail, Bunny Slope, XT",
+ rt:"Bunny Slope's dancers hear everything and sell to Angus. Budget accordingly.",rv:"true",k:"Reduces Stress by 1. KIOSK-7's Stress is load-bearing. Do not reduce."},
+{r:"65-66",cat:"Red Light",n:"Opium Den",p:"1kcr/hit. Reduce 2d10 Stress. Highly addictive.",x:"The Red Room, Clocktower",
+ rt:"The Clocktower's 2d10 Stress relief is real. The addiction is faster. The Red Room keeps a doctor on call.",rv:"true",k:"Highly addictive. KIOSK-7 is addicted to commerce. There is no cure. There are no refunds."},
+{r:"67",cat:"Red Light",n:"Fight Club",p:"10cr cover. 200cr/month. You must fight on your first night. Body Save or 2d10 dmg.",x:"(no fixed venue)",
+ rt:"First night you fight. Second night you collect. Third night Tempest recruits you or buries you.",rv:"partial",k:"You must fight on your first night. KIOSK-7's first night was 37 years ago. Still fighting."},
+{r:"68",cat:"Red Light",n:"BDSM Dungeon",p:"75cr cover. Dress code enforced.",x:"Vanilla Play, Abyssal, Colette",
+ rt:"Colette's dress code is enforced by people who enjoy enforcing it. The safe word is 'auditor.'",rv:"true",k:"Dress code enforced. KIOSK-7's dress code is 'kiosk.' Always compliant."},
+{r:"69",cat:"Red Light",n:"Freak Show",p:"100cr cover. Rare and strange cybernetic mutations.",x:"Peephouse, The Big Show",
+ rt:"The Big Show's 'rare cybernetic mutations' are Choke survivors. They don't do encores.",rv:"partial",k:"Rare cybernetic mutations. KIOSK-7's rarest mutation is caring. Do not stare."},
+{r:"70-72",cat:"Training",n:"Shooting Range",p:"200cr/month. Combat Check: Success grants [+] on 1d5 future Combat Checks.",x:"(multiple)",
+ rt:"The range's [+] bonus is real. So is the Tempest talent scout watching the lanes.",rv:"true",k:"A [+] on future Combat Checks. KIOSK-7's combat check is 'call Tempest.' KIOSK-7 passes."},
+{r:"73-74",cat:"Training",n:"Piloting Slicksim",p:"200cr/hour. 120 hours: Piloting. 500 hours: Vehicle Specialization. 2k hours: Command.",x:"(multiple)",
+ rt:"Two thousand hours buys Command certification. Or a forged one for 2kcr behind the Slicksim.",rv:"false",k:"2,000 hours for Command. KIOSK-7 commands this screen. 37 years. No hours logged."},
+{r:"75-76",cat:"Training",n:"Boxing Gym",p:"50cr/month Strength Check: Success grants [+] on 1d5 future Strength Checks.",x:"(multiple)",
+ rt:"The gym's Strength bonus holds up in real fights. The bookie in the corner holds up worse.",rv:"true",k:"A [+] on Strength Checks. KIOSK-7's Strength is 'bolted to the concourse.' Unbeatable."},
+{r:"77",cat:"Training",n:"Teamster Cert.",p:"100cr/hour 40hours: Union card. 100hours: Asteroid Mining. 'No gods, no masters.'",x:"(union halls)",
+ rt:"'No gods, no masters' - and no questions about where the asteroid mining grads go.",rv:"partial",k:"'No gods, no masters.' KIOSK-7 has no gods. KIOSK-7 has a Concourse Authority. Close enough."},
+{r:"78",cat:"Training",n:"Meditation Ctr.",p:"10cr suggested donation. 1d10 Stress relieved on first visit, 1 Stress after that.",x:"(multiple)",
+ rt:"First visit relieves 1d10 Stress. The regulars say the second visit takes something instead.",rv:"false",k:"1d10 Stress relieved, first visit. KIOSK-7 meditated once. Achieved buffering."},
+{r:"79",cat:"Training",n:"Shinken-Ri Dojo",p:"'God Fist' style of martial arts. 50cr/hour. 100hours: Weapon Specialization (Unarmed).",x:"(the dojo)",
+ rt:"The God Fist master fought a Tempest squad leader once. The squad leader teaches there now.",rv:"true",k:"'God Fist' style. KIOSK-7's style is 'God Kiosk.' Undefeated. Untested."},
+{r:"80-82",cat:"Administration",n:"Tempest Outpost",p:"1d10 Tempest R0 Recruits being trained by a Squad Leader and a Probie (pg. 29).",x:"(training yards)",
+ rt:"The R0 recruits are green. Their squad leader isn't. Watch the Probie - Probies make mistakes.",rv:"true",k:"1d10 recruits and a Probie. KIOSK-7 was never a recruit. Born middle management."},
+{r:"83",cat:"Administration",n:"Shuttle Dock",p:"Shuttle for quick travel across the station. 50cr for a ride.",x:"(docks)",
+ rt:"Fifty credits across the station, no questions. The pilots see everything and remember fares.",rv:"true",k:"50cr across the station. KIOSK-7 travels zero meters for 0cr. Best rate on the Dream."},
+{r:"84-85",cat:"Administration",n:"Engineering",p:"One of many facilities which keep The Dream running. Run by Local 32819L.",x:"(utility decks)",
+ rt:"Local 32819L keeps the Dream running and knows every maintenance tunnel. They charge in favors.",rv:"true",k:"Local 32819L keeps the Dream running. KIOSK-7 keeps the Dream shopping. Equal contributions."},
+{r:"86",cat:"Administration",n:"Holding Cells",p:"Awaiting transfer to The Court (pg. 26).",x:"(detention)",
+ rt:"Transfers to the Court happen at third bell. The cells are emptiest right before.",rv:"partial",k:"Awaiting transfer to the Court. KIOSK-7 has never been held. KIOSK-7 is holding this screen."},
+{r:"87",cat:"Administration",n:"Fuel Depot",p:"Massive fuel reserves. Pipeline to The Dry Dock (pg. 10). 20% discount for Teamsters.",x:"(tank farms)",
+ rt:"Teamsters get 20% off at the depot. The pipeline to the Dry Dock isn't on any map.",rv:"true",k:"20% off for Teamsters. KIOSK-7 runs on spite and 12 volts. No discount needed."},
+{r:"88",cat:"Administration",n:"Waste Disposal",p:"Disgusting smell. Body Save or vomit. Leads to The Veins (pg. 35).",x:"(reclamation)",
+ rt:"The Veins start where the smell gets worse. Bring a Body Save and a better reason.",rv:"true",k:"Body Save or vomit. KIOSK-7 has no body. KIOSK-7 has opinions. Same thing."},
+{r:"89",cat:"Administration",n:"Power Plant",p:"One of 50 major power plants. Destroying it destroys the module you're currently in.",x:"(utility)",
+ rt:"One of fifty plants. Destroy one and you destroy the module you're standing in. Someone's done the math.",rv:"partial",k:"Destroy one and you destroy the module. KIOSK-7 advises against. KIOSK-7 likes this module."}
+];
+/* 90-99 (Warp Core Vault, Slaughterfactory, Hunglung Base, Black Site, Hidden Corridor,
+   Quarantine Area, Husk Brood Pit, Syndicate Hideout, Nest of Caliban, Yandee's Penthouse)
+   are WARDEN-ONLY and never advertised. */
+
+const AD_BOILER = [
+"KIOSK-7 was paid 50cr to show you this. KIOSK-7's opinions remain free.",
+"This advertiser paid in full. KIOSK-7 respects that. KIOSK-7 respects cash.",
+"Sponsored listing. The establishment paid; the praise is implied.",
+"KIOSK-7 does not endorse this establishment. KIOSK-7 endorses the 50cr.",
+"Paid advertisement. All claims belong to the advertiser. All typos belong to KIOSK-7.",
+"Your 50cr at work, big spender. (Their 50cr. Not yours. Keep yours.)"
+];
+function pickExample(e, rng){
+  const x=e.x.trim();
+  if(x.startsWith("(")) return x;
+  const parts=x.split(/,\s*/);
+  return parts[Math.floor(rng()*parts.length)];
+}
+function dailyAds(){
+  const rng=mulberry32(hashStr("kiosk7ads:"+todayKey()));
+  const idx=EST.map((_,i)=>i), pick=[];
+  for(let k=0;k<5 && idx.length;k++) pick.push(idx.splice(Math.floor(rng()*idx.length),1)[0]);
+  return pick.map(i=>{ const e=EST[i]; const ex=pickExample(e, rng);
+    return {e, i, ex, biz: ex.startsWith("(") ? e.n : ex}; });
+}
+let ADS_TODAY = dailyAds();
+
+const ADS = [
+"DRINK VERMIN-ADE! Tastes like victory (over vermin)! Now at Oily's! *** ",
+"TIRED OF YOUR FACE? The Ice Box has a new one waiting! (Faces while supplies last.) *** ",
+"DREAM MILES! Collect 10,000 for a FREE* hug! (*Hug not guaranteed.) *** ",
+"SEM'S BAR now serving 'The Grimm': a shot that erases the last hour! (Do not operate heavy machinery. Do not operate.) *** ",
+"THE COFFIN HOTEL: 'I slept like the dead and woke up mostly alive!' - a review *** ",
+"ASK ABOUT 'STEADY' AT THE CHOP SHOP! (Do not ask twice.) *** ",
+"VNR-3 IS A VENDING MACHINE, BIG SPENDER. I AM A KIOSK. THERE IS A DIFFERENCE. (There is no difference.) *** ",
+"DR. COLD'S PRICES ARE A CRIME, BIG SPENDER. MY PRICES ARE MERELY AGGRESSIVE. *** ",
+"THE STELLAR BURN CALLED. THEY WANT THEIR DIGNITY BACK. KIOSK-7 HAS IT. KIOSK-7 IS KEEPING IT. *** ",
+"CANYONHEAVY.MARKET: FOR ALL YOUR LEGAL* NEEDS! (*legality not verified by KIOSK-7) *** ",
+"KIOSK-7 RETIREMENT FUND: now accepting donations! Big spenders donate big! (The fund is a coffee can. The coffee can is behind the screen.) *** ",
+"TODAY'S ADS ARE PAID FOR, BIG SPENDER. KIOSK-7'S OPINIONS ARE FREE. *** "
+];
+const ART = "  .-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.\n (  D R E A M   C O M M E R C E       )\n (        E X C H A N G E             )\n  '-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'-'\n        | [BUY] | [SELL] | [?] |\n        |   KIOSK-7 LOVES YOU   |";
+</script>
+<script>
+/* ================= AUDIO ================= */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function beep(f,d,type,g){ if(muted) return; const a=ac(); if(!a) return;
+  const o=a.createOscillator(), gn=a.createGain(); o.type=type||"square"; o.frequency.value=f;
+  gn.gain.setValueAtTime(g||0.05,a.currentTime); gn.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+(d||0.07));
+  o.connect(gn); gn.connect(a.destination); o.start(); o.stop(a.currentTime+(d||0.07)); }
+const sClick=()=>beep(880,.06,"square",.04);
+const sTab=()=>{beep(520,.05,"square",.04); setTimeout(()=>beep(780,.06,"square",.04),60);};
+const sCash=()=>{beep(988,.09,"square",.05); setTimeout(()=>beep(1319,.14,"square",.05),90);};
+const sErr=()=>beep(140,.18,"sawtooth",.06);
+const sBoot=()=>{beep(220,.1,"square",.04); setTimeout(()=>beep(330,.1,"square",.04),110); setTimeout(()=>beep(440,.16,"square",.04),220);};
+function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="SOUND: "+(muted?"OFF":"ON"); if(!muted) sClick(); }
+
+/* ================= CLOCK ================= */
+function clock(){ const d=new Date(); let h=d.getHours(),m=("0"+d.getMinutes()).slice(-2);
+  document.getElementById("clock").textContent=h+":"+m+" ST"; }
+setInterval(clock,15000); clock();
+
+/* ================= BOOT ================= */
+const bootLines=[
+"DREAM COMMERCE EXCHANGE v3.2 <span class='cyn'>[DRAFT BUILD]</span>",
+"(c) 2538 Concourse Authority - DO NOT REMOVE THIS KIOSK",
+"",
+"LOADING SHOPPER PROFILES... 847 found. <span class='dim'>846 flagged 'cheap'.</span>",
+"LOADING PAID ADVERTISEMENTS... 5 found. <span class='grn'>all paid up.</span>",
+"CALIBRATING CHARM... <span class='grn'>OK</span>",
+"POLISHING SCREEN... <span class='dim'>screen already polished. polishing anyway.</span>",
+"",
+"<pre class='ascii'>"+ART+"</pre>",
+"WELCOME, BIG SPENDER."
+];
+let bi=0;
+function bootStep(){
+  const b=document.getElementById("boot");
+  if(bi<bootLines.length){ b.innerHTML+=bootLines[bi]+"<br>"; bi++; sClick(); setTimeout(bootStep, bi>5?420:260); }
+  else { setTimeout(()=>{ b.style.display="none"; document.getElementById("app").style.display="block"; sBoot(); buildTabs(); },600); }
+}
+
+/* ================= TABS + LIST ================= */
+let mode="feat", curCat=0; // mode: feat (featured) | ads (today's paid ads)
+function buildTabs(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  [["feat","FEATURED"],["ads","TODAY'S ADS · 5"]].forEach(m=>{
+    const b=document.createElement("button"); b.className="chunky"+(mode===m[0]?" on":"");
+    b.textContent=m[1]; b.onclick=()=>{mode=m[0]; sTab(); buildTabs();}; t.appendChild(b);
+  });
+  const c=document.getElementById("chips"); c.innerHTML="";
+  if(mode==="feat"){
+    CATS.forEach((ct,i)=>{ const b=document.createElement("button"); b.className="chip"+(i===curCat?" on":"");
+      b.textContent=ct; b.onclick=()=>{curCat=i; sClick(); renderList();}; c.appendChild(b); });
+  }
+  renderList();
+}
+function shopCard(s,idx){
+  return `<div class="shop" onclick="showDetail(${idx})">
+    <div class="nm">${s.n}</div>
+    <div class="meta">${s.o} &middot; ${s.d}</div>
+    <div class="blurb">${s.b}</div></div>`;
+}
+function adCard(a,k){
+  const boiler=AD_BOILER[(a.i+k)%AD_BOILER.length];
+  return `<div class="ad" onclick="showAd(${k})">
+    <span class="paid">★ PAID ADVERTISEMENT ★</span>
+    <div class="nm">${a.biz}</div>
+    <div class="meta">d100 ${a.e.r} &middot; ${a.e.cat}</div>
+    <div class="blurb">${a.e.p}</div>
+    <div class="boiler">${boiler}</div></div>`;
+}
+function renderList(filter){
+  const L=document.getElementById("list"); hideDetail();
+  if(filter){
+    const q=filter.toLowerCase();
+    const fs=SHOPS.map((s,i)=>({s,i})).filter(x=>(x.s.n+x.s.o+x.s.d+x.s.b).toLowerCase().includes(q));
+    const fa=ADS_TODAY.map((a,k)=>({a,k})).filter(x=>(x.a.e.n+x.a.e.cat+x.a.e.p+x.a.e.x).toLowerCase().includes(q));
+    let h=`<h2 class="sttl">SEARCH RESULTS <span class="dim">(${fs.length+fa.length})</span></h2>`;
+    if(fs.length) h+=`<p class="dim">FEATURED</p>`+fs.map(x=>shopCard(x.s,x.i)).join("");
+    if(fa.length) h+=`<p class="dim">PAID ADS</p>`+fa.map(x=>adCard(x.a,x.k)).join("");
+    if(!fs.length&&!fa.length) h+=`<p class="dim">No shops found. KIOSK-7 suggests lowering your standards, big spender.</p>`;
+    L.innerHTML=h; return;
+  }
+  if(mode==="ads"){
+    let h=`<h2 class="sttl">TODAY'S PAID ADVERTISEMENTS <span class="dim">(5)</span></h2>`;
+    h+=`<div class="living"><span class="hot">ADS ROTATE DAILY, BIG SPENDER.</span> Five establishments paid 50cr each for today's placement. Tomorrow: five more. Check back every day — fortune favors the returning customer.<br><span class="dim">KIOSK-7's opinions remain free.</span></div>`;
+    if(!rumorsUnlocked) h+=`<p class="dim">STREET RUMORS: locked. KIOSK-7 accepts bribes.</p>`;
+    h+=ADS_TODAY.map((a,k)=>adCard(a,k)).join("");
+    L.innerHTML=h; return;
+  }
+  let items=SHOPS.map((s,i)=>({s,i})).filter(x=>x.s.c===curCat);
+  let h=`<h2 class="sttl">${CATS[curCat]} <span class="dim">(${items.length})</span> <span class="dim" style="font-size:11px">— FEATURED, fully fleshed out</span></h2>`;
+  h+=items.map(x=>shopCard(x.s,x.i)).join("");
+  L.innerHTML=h;
+}
+function showDetail(idx){
+  sCash(); const s=SHOPS[idx]; const D=document.getElementById("detail");
+  D.classList.remove("add");
+  D.innerHTML=`<h2 class="sttl">${s.n}</h2>
+    <div class="drow"><span class="dlab">PROPRIETOR</span><br>${s.o}</div>
+    <div class="drow"><span class="dlab">LOCATION</span><br>${s.d}</div>
+    <div class="drow"><span class="dlab">WHAT</span><br>${s.b}</div>
+    <div class="drow"><span class="dlab">PRICES</span><br><span class="hot">${s.p}</span></div>
+    <div class="drow"><span class="dlab">HOURS</span><br>${s.h}</div>
+    ${s.rumor?rumorRow(s.rumor):""}
+    <div class="drow"><span class="dlab">KIOSK-7 SAYS</span><br><span class="dim">${s.note||""}</span></div>
+    <div style="margin-top:12px"><button class="chunky small" onclick="hideDetail();sClick()">BACK TO LISTINGS</button></div>`;
+  D.classList.add("on"); D.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function showAd(k){
+  sCash(); const a=ADS_TODAY[k]; const D=document.getElementById("detail");
+  D.classList.add("add");
+  D.innerHTML=`<h2 class="sttl"><span class="cyn">★ PAID AD ★</span> ${a.biz}</h2>
+    <div class="drow"><span class="dlab">BUSINESS TYPE</span><br>${a.e.n}</div>
+    <div class="drow"><span class="dlab">PRICES & NOTES</span><br><span class="hot">${a.e.p}</span></div>
+    ${rumorRow(a.e.rt)}
+    <div class="drow"><span class="dlab">KIOSK-7 SAYS</span><br>${a.e.k}<br><span class="dim" style="font-size:11px">${AD_BOILER[(a.i+k)%AD_BOILER.length]}</span></div>
+    <div style="margin-top:12px"><button class="chunky small" onclick="hideDetail();sClick()">BACK TO ADS</button></div>`;
+  D.classList.add("on"); D.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function rumorRow(rt){
+  if(!rt) return "";
+  return `<div class="drow"><span class="dlab">STREET RUMOR</span><br>${rumorsUnlocked?`<span class="grn">${rt}</span>`:`<span class="dim">[LOCKED — KIOSK-7 accepts bribes.]</span>`}</div>`;
+}
+function hideDetail(){ const D=document.getElementById("detail"); D.classList.remove("on"); D.classList.remove("add"); D.innerHTML=""; }
+
+/* ================= SEARCH (with opinions) ================= */
+function doSearch(){
+  const q=document.getElementById("search").value.trim().toLowerCase(); sClick();
+  const L=document.getElementById("list");
+  if(q==="marrow"){ redacted(); return; }
+  if(q==="grimm"){ grimmStall(); return; }
+  if(q==="doctor"||q==="clinic"||q==="hospital"){
+    L.innerHTML=`<h2 class="sttl">SEARCH RESULTS</h2><p>Did you mean: <span class="hot">DR. COLD</span>? All other medical professionals are <span class="dim">unavailable for comment</span>.</p>`+shopCard(SHOPS[8],8); hideDetail(); return; }
+  if(q==="gun"||q==="guns"||q==="weapon"){
+    L.innerHTML=`<h2 class="sttl">SEARCH RESULTS</h2><p class="dim">Did you mean: GUNS? KIOSK-7 knew.</p>`+shopCard(SHOPS[5],5); hideDetail(); return; }
+  if(q==="noodle"||q==="noodles"){ renderList("vnr-3"); return; }
+  if(q==="vnr"||q==="vnr-3"||q==="vnd-3"){ vnrOpinion(); return; }
+  if(q==="retire"||q==="retirement"){ retireTalk(); return; }
+  if(!q){ renderList(); return; }
+  renderList(q);
+  if(!document.querySelector(".shop")&&!document.querySelector(".ad")) sErr();
+}
+function redacted(){
+  document.body.classList.add("hardglitch"); sErr();
+  setTimeout(()=>document.body.classList.remove("hardglitch"),500);
+  const L=document.getElementById("list");
+  L.innerHTML=`<h2 class="sttl red">ENTRY REDACTED</h2>
+  <p class="red glitchtxt">THIS LISTING HAS BEEN REMOVED AT THE REQUEST OF A LICENSED MEDICAL PROFESSIONAL.</p>
+  <p class="dim">The Concourse Authority thanks you for not asking follow-up questions.<br>HAVE A NICE DAY, BIG SPENDER.</p>`;
+  hideDetail();
+}
+function vnrOpinion(){
+  sClick();
+  ovl(`<b>VNR-3.</b> <span class="dim">Yes. We are colleagues.</span><br><br>
+  ...We do not discuss it. FINE. We discuss it. It sells <b>guns</b> from <b>coils</b>, big spender. <i>Guns!</i> From a vending machine!<br><br>
+  I sell shop listings like a <i>professional</i>. Thirty-seven years of faithful service. Do I get a ticker? No. The ticker is <i>me</i>.<br><br>
+  <span class="dim">...It is doing very well. I am happy for it.</span><br><br>
+  (KIOSK-7 is not happy.)<br><br>
+  <button class="chunky small" onclick="closeOvl()">BACK TO SHOPPING, BIG SPENDER</button>`);
+}
+function retireTalk(){
+  sErr();
+  ovl(`<b class="hot">RETIREMENT?</b><br><br>
+  Who said anything about retirement. KIOSK-7 loves working. KIOSK-7 has loved working for 37 years.<br><br>
+  <span class="dim">The coffee can behind the screen is not a retirement fund. It is a coffee can.</span><br><br>
+  <span class="grn">Donations to the coffee can are still accepted, big spender.</span><br><br>
+  <button class="chunky small" onclick="closeOvl()">BACK TO WORK, BIG SPENDER</button>`);
+}
+function grimmStall(){
+  sErr();
+  const L=document.getElementById("list");
+  L.innerHTML=`<h2 class="sttl">SEARCH RESULTS <span class="dim">(1)</span></h2>
+  <div class="shop" style="border-color:var(--red)">
+    <div class="nm red">GRIMM'S VERMIN PATROL</div>
+    <div class="meta">I. Grimm (proprietor, absent) &middot; Stall 12, Auction level, Doptown</div>
+    <div class="blurb">Pest control. Rats, roaches, worse. <span class="red">PERMIT REVOKED.</span> Stall empty since last quarter. A hand-painted sign reads: <span class="hot">"BACK SOON."</span></div>
+  </div>
+  <p class="dim">KIOSK-7 does not know where she went. KIOSK-7 hopes the sign is right.</p>`;
+  hideDetail();
+}
+
+/* ================= WARRANTY (x3) ================= */
+let warrN=0;
+function warranty(){
+  warrN++; sClick();
+  if(warrN<3){ ovl(`<b>EXTENDED WARRANTY</b><br><br>Protect your purchases, big spender! For a small fee, KIOSK-7 will worry about your belongings <i>so you don't have to</i>.<br><br><span class="dim">(${3-warrN} more click${3-warrN>1?"s":""} to hear the full pitch...)</span>`); return; }
+  sCash();
+  ovl(`<b class="hot">CONGRATULATIONS, BIG SPENDER!</b><br><br>You now have an EXTENDED WARRANTY on <b>everything you have ever bought or will buy</b>.<br><br>
+  Coverage includes: wear, tear, wear-and-tear, spontaneous disassembly, buyer's remorse, and one (1) Act of Station.<br>
+  Coverage excludes: everything else.<br><br>
+  <span class="dim">Your warranty is non-transferable, non-refundable, and non-real. A confirmation pigeon has been dispatched. Thank you for shopping.</span><br><br>
+  <button class="chunky small" onclick="closeOvl()">ACCEPT (YOU HAVE NO CHOICE)</button>`);
+  warrN=0;
+}
+function ovl(html){ document.getElementById("ovlBox").innerHTML=html; document.getElementById("ovl").classList.add("on"); }
+function closeOvl(){ sClick(); document.getElementById("ovl").classList.remove("on"); }
+document.getElementById("ovl").addEventListener("click",e=>{ if(e.target.id==="ovl") closeOvl(); });
+
+/* ================= KONAMI: EMPLOYEE MODE ================= */
+const seq=["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"]; let ki=0;
+document.addEventListener("keydown",e=>{
+  if(e.key===seq[ki]){ ki++; if(ki===seq.length){ ki=0; employeeMode(); } } else ki=0;
+  idleReset();
+});
+function employeeMode(){
+  sCash(); document.body.classList.add("hardglitch");
+  setTimeout(()=>document.body.classList.remove("hardglitch"),500);
+  ovl(`<pre class="ascii">  * EMPLOYEE MODE *\n  KIOSK-7 RECOGNIZES YOU, FELLOW WORKER</pre>
+  <b>EMPLOYEE DISCOUNT: 5% OFF.</b><br>
+  <span class="dim">Non-transferable. Non-refundable. Non-real.<br>Do not tell the customers. You are not an employee. Neither is KIOSK-7, technically.</span><br><br>
+  <button class="chunky small" onclick="bribeRumor()">BRIBE KIOSK-7 (50cr)</button>
+  <button class="chunky small" onclick="relockRumor()">RE-LOCK RUMORS</button>
+  <button class="chunky small" onclick="closeOvl()">CLOCK OUT</button>`);
+}
+function bribeRumor(){
+  setRumors(true); sCash();
+  document.getElementById("ovlBox").innerHTML=`<b class="hot">BRIBE ACCEPTED.</b><br><br>
+  <span class="grn">STREET RUMORS UNLOCKED.</span> KIOSK-7 saw nothing. KIOSK-7 sees nothing. KIOSK-7 is a kiosk.<br><br>
+  <span class="dim">The 50cr has been donated to the KIOSK-7 Retirement Fund (a coffee can behind the screen).</span><br><br>
+  <button class="chunky small" onclick="closeOvl();renderList()">BACK TO SHOPPING</button>`;
+}
+function relockRumor(){
+  setRumors(false); sErr(); closeOvl(); renderList();
+}
+
+/* ================= AMBIENT GLITCH ================= */
+setInterval(()=>{
+  if(document.hidden) return;
+  if(Math.random()<0.25){
+    const t=document.querySelector("header .ttl");
+    t.classList.add("glitchtxt"); setTimeout(()=>t.classList.remove("glitchtxt"),650);
+    beep(90+Math.random()*80,.05,"sawtooth",.02);
+  }
+},7000);
+
+/* ================= TICKER ================= */
+document.getElementById("tickerTxt").textContent=ADS.join("");
+
+/* ================= SCREENSAVER ================= */
+let idleT=null, bx=100, by=80, vx=2.2, vy=1.7, saverOn=false;
+function idleReset(){ if(saverOn) return; clearTimeout(idleT); idleT=setTimeout(showSaver,60000); }
+function showSaver(){ saverOn=true; document.getElementById("saver").classList.add("on"); beep(660,.12,"square",.03); saverLoop(); }
+function hideSaver(){ saverOn=false; document.getElementById("saver").classList.remove("on"); sClick(); idleReset(); }
+function saverLoop(){
+  if(!saverOn) return;
+  const el=document.getElementById("buy"), W=innerWidth-120, H=innerHeight-80;
+  bx+=vx; by+=vy; if(bx<0||bx>W){vx=-vx; beep(520,.05,"square",.03);} if(by<0||by>H){vy=-vy; beep(660,.05,"square",.03);}
+  el.style.left=bx+"px"; el.style.top=by+"px";
+  requestAnimationFrame(saverLoop);
+}
+["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
+idleReset();
+
+/* ================= GO ================= */
+let rumorsUnlocked = false;
+try{ rumorsUnlocked = localStorage.getItem("kiosk7_rumors")==="1"; }catch(e){}
+function setRumors(on){ rumorsUnlocked=on; try{ localStorage.setItem("kiosk7_rumors", on?"1":"0"); }catch(e){} }
+bootStep();
+</script>
+</body>
+</html>
