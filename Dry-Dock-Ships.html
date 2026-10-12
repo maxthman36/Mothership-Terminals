@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>DRY DOCK // VESSEL TRAFFIC BOARD</title>
+<style>
+:root{
+  --phos:#ffe9c4; --phos-dim:#8f7c55; --red:#ff5040; --grn:#7dffb0;
+  --bg:#060606; --panel:#0b0b0b;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{background:var(--bg); color:var(--phos);
+  font-family:"Courier New",Courier,monospace;
+  text-shadow:0 0 6px rgba(255,233,196,.5);
+  overflow-x:hidden; padding:10px;}
+#crt{position:fixed; inset:0; pointer-events:none; z-index:90;}
+#crt::before{content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.32) 0 1px, transparent 1px 3px);}
+#crt::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.6) 100%);}
+#term{max-width:960px; margin:0 auto; border:3px solid var(--phos-dim); background:var(--panel);
+  box-shadow:0 0 22px rgba(255,233,196,.10), inset 0 0 60px rgba(0,0,0,.7);
+  border-radius:6px; overflow:hidden;}
+header.bar{border-bottom:3px solid var(--phos-dim); padding:12px 16px;
+  display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
+header.bar .ttl{font-weight:bold; letter-spacing:.1em; font-size:clamp(14px,3vw,20px);}
+header.bar .sub{font-size:clamp(10px,2vw,13px); color:var(--phos-dim);}
+#dateline{padding:8px 16px; border-bottom:2px dashed var(--phos-dim); font-size:clamp(11px,2.2vw,14px);
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;}
+table{width:100%; border-collapse:collapse; font-size:clamp(10px,2vw,13px);}
+thead th{text-align:left; padding:8px 10px; color:var(--phos-dim); letter-spacing:.14em; font-size:11px;
+  border-bottom:2px solid var(--phos-dim);}
+tbody td{padding:9px 10px; border-bottom:1px solid #1c1a14; vertical-align:top;}
+tbody tr{transform-origin:top;}
+tbody tr.flip{animation:flap .5s ease-out;}
+@keyframes flap{0%{transform:perspective(600px) rotateX(88deg); opacity:0}60%{opacity:1}100%{transform:perspective(600px) rotateX(0)}}
+td.ves{font-weight:bold; white-space:nowrap;}
+td.st-ok{color:var(--grn); text-shadow:0 0 6px rgba(125,255,176,.5); white-space:nowrap;}
+td.st-warn{color:var(--phos); white-space:nowrap;}
+td.st-bad{color:var(--red); text-shadow:0 0 6px rgba(255,80,64,.5); white-space:nowrap;}
+td.notice{max-width:340px;}
+tr.bookship td.ves{color:var(--grn); text-shadow:0 0 6px rgba(125,255,176,.5);}
+#notice{margin:14px 16px; border:2px dashed var(--red); padding:10px 12px; font-size:12px; cursor:pointer;}
+#notice .rh{color:var(--red); font-weight:bold; letter-spacing:.1em;}
+footer.bar{border-top:3px solid var(--phos-dim); padding:10px 16px; display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between; font-size:11px; color:var(--phos-dim);}
+button.chunky{font-family:inherit; font-weight:bold; text-transform:uppercase; letter-spacing:.08em;
+  background:#0b0b0b; color:var(--phos); border:3px solid var(--phos);
+  padding:10px 14px; font-size:12px; cursor:pointer; min-height:44px;
+  box-shadow:4px 4px 0 #000; text-shadow:0 0 6px rgba(255,233,196,.5);}
+button.chunky:active{transform:translate(3px,3px); box-shadow:1px 1px 0 #000;}
+#boot{padding:24px 18px; font-size:14px; line-height:1.8;}
+.dim{color:var(--phos-dim); text-shadow:none;}
+</style>
+</head>
+<body>
+<div id="crt"></div>
+<div id="term">
+  <header class="bar">
+    <div>
+      <div class="ttl">DRY DOCK // VESSEL TRAFFIC</div>
+      <div class="sub">CONCOURSE AUTHORITY &middot; BERTH ASSIGNMENTS &middot; BOARD 3 OF 3 (BOARDS 1-2 OUT OF ORDER)</div>
+    </div>
+    <button class="chunky" id="muteBtn" onclick="toggleMute()">SOUND: ON</button>
+  </header>
+  <div id="dateline"><span id="dateTxt"></span><span id="updTxt"></span></div>
+  <div id="boot"></div>
+  <div id="board" style="display:none; overflow-x:auto;">
+    <table>
+      <thead><tr><th>BERTH</th><th>VESSEL</th><th>NOTICE</th><th>STATUS</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div id="notice" onclick="cormorant()">
+      <span class="rh">OVERDUE — REPORT SIGHTINGS</span><br>
+      <span class="dim">MV CORMORANT (MPT-3301), Capt. I. Voss. Last seen Tau Sigma run. Reward 500cr for confirmed sighting. Inquiries: Hard Dock Chandlery.</span>
+    </div>
+  </div>
+  <footer class="bar">
+    <span>REPORT ANOMALIES TO DOCK CONTROL. DO NOT APPROACH QUARANTINED VESSELS. DO NOT FEED THE INSPECTORS.</span>
+    <button class="chunky" onclick="refreshJoke()">REFRESH</button>
+  </footer>
+</div>
+<script>
+/* ============ AUDIO ============ */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function clack(){ if(muted) return; const a=ac(); if(!a) return;
+  const o=a.createOscillator(), g=a.createGain(); o.type="square";
+  o.frequency.value=160+Math.random()*120;
+  g.gain.setValueAtTime(0.06,a.currentTime); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.045);
+  o.connect(g); g.connect(a.destination); o.start(); o.stop(a.currentTime+0.05); }
+function sad(){ if(muted) return; const a=ac(); if(!a) return;
+  [330,311,294,262].forEach((f,i)=>{ const o=a.createOscillator(), g=a.createGain(); o.type="triangle"; o.frequency.value=f;
+    const t=a.currentTime+i*0.22; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.07,t+0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.2); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+0.22); }); }
+function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="SOUND: "+(muted?"OFF":"ON"); }
+
+/* ============ DATA ============ */
+/* Book ships: A Pound of Flesh p.11, "Ships Currently Docked" (d10). */
+const BOOK_SHIPS=[
+["Conquer All","Looking for gunmen. Leaves tomorrow. 200cr/day. 6 month tour.","HIRING","warn"],
+["Bartzabel","Strikebreakers heading to Tybalt Blue research station. 100cr/day.","HIRING","warn"],
+["Decade of Therion","Blockade runner heading to DMZ. Room for 5. Tickets 1000cr/ea.","BOARDING","ok"],
+["Horns of Baphomet","Rescue mission. Looking for a ship called The Defiance.","SEEKING INFO","warn"],
+["In the Absence ov Light","Needs 2 scientists, heading to remote research station for 3 weeks. Pays 50kcr.","HIRING","ok"],
+["Ov Fire and Void","Smuggler looking for work. 1.5kcr advance and 10% of profits.","FOR HIRE","warn"],
+["Daimonos","Needs 100 doses of Sycorax.","BUYING","bad"],
+["Alas, Lord is Upon Me","Mining crew taking apprentices. 1% share of profits. 3 month tour.","HIRING","ok"],
+["Inner Sanctum","Solarians on a pilgrimage to Paivatar 1019. Will take anyone.","BOARDING","ok"],
+["From the Pagan Vastlands","Sensitive cargo heading to the Thelema Sector. Guards needed. 500cr/day. 1 month tour.","HIRING GUARDS","warn"]
+];
+/* Invented fill: the dock's regulars. */
+const MADE_SHIPS=[
+["MV Obol","machine parts","LOADING","ok"],
+["Vesper","mail & parcels","DEPARTING 0600","ok"],
+["Pale Horse","medical isotopes","DEPARTING 1430","ok"],
+["The Long Con","miscellaneous","LOADING","warn"],
+["The Unpaid Intern","coffee (28 tonnes)","LOADING","ok"],
+["Perihelion","passengers (12)","BOARDING","ok"],
+["Widow's Walk","personal effects","DEPARTING 0900","ok"],
+["Dutiful Son","construction mass","LOADING","ok"],
+["Sainted Rust","hulls (scrap)","REFIT","warn"],
+["MV Gallowglass","arms (licensed)","DEPARTING 0415","ok"],
+["G3 MV Axiom","containerized (G3 Transit)","LOADING","warn"],
+["G3 MV Parable","containerized (G3 Transit)","DEPARTING 1130","warn"],
+["Dawnseeker Tribute","'reclamation goods'","HOLD — CUSTOMS","bad"],
+["The Patient Ox","livestock (frozen)","REFIT","warn"]
+];
+const BERTHS=["D-02","D-05","D-07","D-09","D-11","D-14","D-16","D-19","D-21","D-23","D-26","D-28","D-31","D-33","D-36","D-38"];
+const ODD=[
+"CARGO MANIFEST SEALED BY COURT ORDER",
+"INSPECTOR ABOARD — EXPECT DELAYS",
+"CREW REFUSES TO DISEMBARK",
+"RUNNING LIGHTS OUT — FINED 200cr",
+"MASTER REQUESTED EXORCIST (DENIED)"
+];
+
+/* ============ SEEDED DAILY DRAW ============ */
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function todayKey(){ const d=new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+function pickDay(){
+  const rng=mulberry32(hashStr(todayKey()));
+  const books=BOOK_SHIPS.slice(), made=MADE_SHIPS.slice(), berths=BERTHS.slice(), out=[];
+  const nBook=2+(rng()<0.5?1:0); /* 2-3 book ships, guaranteed */
+  for(let i=0;i<nBook;i++){ const k=Math.floor(rng()*books.length); out.push({book:true, d:books.splice(k,1)[0]}); }
+  while(out.length<8){ const k=Math.floor(rng()*made.length); out.push({book:false, d:made.splice(k,1)[0]}); }
+  out.forEach(r=>{ r.berth=berths.splice(Math.floor(rng()*berths.length),1)[0]; });
+  out.sort((a,b)=>a.berth<b.berth?-1:1);
+  const oddIdx=Math.floor(rng()*out.length);
+  return {out, oddIdx, odd:ODD[Math.floor(rng()*ODD.length)]};
+}
+
+/* ============ RENDER ============ */
+function stClass(s){ return s==="ok"?"st-ok":(s==="bad"?"st-bad":"st-warn"); }
+function render(){
+  const {out, oddIdx, odd}=pickDay();
+  const tb=document.getElementById("rows"); tb.innerHTML="";
+  out.forEach((r,i)=>{
+    const tr=document.createElement("tr"); if(r.book) tr.className="bookship";
+    const notice = (i===oddIdx) ? r.d[1]+" <span class='dim'>["+odd+"]</span>" : r.d[1];
+    tr.innerHTML=`<td>${r.berth}</td><td class="ves">${r.d[0]}</td><td class="notice">${notice}</td><td class="${stClass(r.d[3])}">${r.d[2]}</td>`;
+    tb.appendChild(tr);
+    setTimeout(()=>{ tr.classList.add("flip"); clack(); }, 350+i*260);
+  });
+}
+function refreshJoke(){ clack(); alert("BOARD UPDATES AT 00:00 ST.\nPATIENCE, TRAVELER."); }
+function cormorant(){ sad();
+  alert("MV CORMORANT — MPT-3301\n\nDeclared lost on the Tau Sigma run, three years back. Capt. I. Voss (now: Hard Dock Chandlery) still pays 500cr for a confirmed sighting and still insists the reactor fault was sabotage.\n\nDock Control's position: space is big and reactors are honest.");
+}
+
+/* ============ BOOT ============ */
+const now=new Date();
+const months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+document.getElementById("dateTxt").textContent="DATE: "+("0"+now.getDate()).slice(-2)+" "+months[now.getMonth()]+" 2538";
+document.getElementById("updTxt").textContent="NEXT UPDATE 00:00 ST";
+const boot=["CONCOURSE AUTHORITY TRAFFIC BOARD v1.9","(c) 2538 - DO NOT ADJUST THIS BOARD","",
+"READING BERTH SENSORS... <span style='color:var(--grn)'>14 OF 16 RESPONDING</span>",
+"SEEDING MANIFEST... <span class='dim'>done</span>",""];
+let bi=0;
+function step(){
+  const b=document.getElementById("boot");
+  if(bi<boot.length){ b.innerHTML+=boot[bi]+"<br>"; bi++; clack(); setTimeout(step,300); }
+  else setTimeout(()=>{ b.style.display="none"; document.getElementById("board").style.display="block"; render(); },500);
+}
+step();
+</script>
+</body>
+</html>

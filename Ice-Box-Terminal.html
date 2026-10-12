@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>ICE BOX // CRYO-COMMERCE TERMINAL</title>
+<style>
+:root{
+  --cy:#00e5ff; --ice:#c8fbff; --dim:#1e6a80; --deep:#02070d; --panel:#04121e;
+  --mag:#ff3df0;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{background:var(--deep); color:var(--ice);
+  font-family:"Courier New",Courier,monospace;
+  text-shadow:0 0 8px rgba(0,229,255,.6);
+  overflow-x:hidden; padding:12px;}
+/* TRON grid floor */
+#grid{position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+  background:
+    linear-gradient(transparent 95%, rgba(0,229,255,.14) 100%),
+    linear-gradient(90deg, transparent 95%, rgba(0,229,255,.14) 100%);
+  background-size:44px 44px;
+  transform:perspective(700px) rotateX(42deg) scale(1.6);
+  transform-origin:50% 0%;
+  mask-image:linear-gradient(to bottom, transparent, black 30%);}
+#crt{position:fixed; inset:0; pointer-events:none; z-index:90;}
+#crt::before{content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 3px);}
+#crt::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,10,20,.7) 100%);}
+#sweep{position:fixed; left:0; right:0; height:120px; z-index:91; pointer-events:none; opacity:.12;
+  background:linear-gradient(to bottom, transparent, var(--cy), transparent);
+  animation:sweep 9s linear infinite;}
+@keyframes sweep{from{top:-140px}to{top:110%}}
+#frost{position:fixed; inset:0; z-index:95; pointer-events:none; opacity:0; transition:opacity 8s;
+  background:radial-gradient(ellipse at center, transparent 30%, rgba(200,251,255,.28) 75%, rgba(200,251,255,.5) 100%);}
+#term{position:relative; z-index:2; max-width:900px; margin:0 auto; border:1px solid var(--cy);
+  background:rgba(4,18,30,.92);
+  box-shadow:0 0 30px rgba(0,229,255,.25), inset 0 0 80px rgba(0,40,60,.5);
+  clip-path:polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px);}
+header.bar{border-bottom:1px solid var(--cy); padding:14px 20px;
+  display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+header.bar .ttl{font-size:clamp(16px,3.4vw,24px); letter-spacing:.3em; color:#fff;
+  text-shadow:0 0 16px var(--cy);}
+header.bar .sub{font-size:clamp(10px,2vw,13px); color:var(--cy); letter-spacing:.18em; margin-top:4px;}
+#flake{cursor:pointer; font-size:26px; user-select:none; filter:drop-shadow(0 0 8px var(--cy));}
+nav.tabs{display:flex; gap:10px; padding:16px 20px 0; flex-wrap:wrap;}
+button.hex{font-family:inherit; font-weight:bold; letter-spacing:.22em; text-transform:uppercase;
+  font-size:clamp(11px,2.2vw,14px); color:var(--cy); background:rgba(0,229,255,.06);
+  border:1px solid var(--cy); padding:12px 18px; cursor:pointer; min-height:48px;
+  clip-path:polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  text-shadow:0 0 8px rgba(0,229,255,.6);}
+button.hex:active{transform:scale(.96);}
+button.hex.on{background:var(--cy); color:#02141d; text-shadow:none;
+  box-shadow:0 0 18px rgba(0,229,255,.7);}
+#searchRow{display:flex; gap:10px; padding:14px 20px 0; flex-wrap:wrap;}
+#search{flex:1; min-width:200px; font-family:inherit; font-size:14px; letter-spacing:.1em;
+  background:#010a12; color:var(--ice); border:1px solid var(--dim); padding:11px 14px;
+  clip-path:polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);}
+#search::placeholder{color:var(--dim);}
+#search:focus{outline:none; border-color:var(--cy);}
+main{padding:18px 20px;}
+.panel{border:1px solid var(--dim); background:rgba(0,229,255,.04); margin:0 0 12px; padding:14px 16px;
+  clip-path:polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  cursor:pointer;}
+.panel:hover{border-color:var(--cy);}
+.panel .nm{font-size:16px; letter-spacing:.12em; color:#fff; text-shadow:0 0 12px var(--cy);}
+.panel .pr{color:var(--cy); font-weight:bold; letter-spacing:.1em;}
+.panel .ds{font-size:13px; margin-top:8px; color:var(--ice); line-height:1.6;}
+.panel .coldd{font-size:12px; margin-top:8px; color:var(--dim); letter-spacing:.06em;}
+.panel .cold{font-size:13px; margin-top:10px; padding-top:8px; border-top:1px dashed var(--dim);
+  color:var(--cy); letter-spacing:.14em; display:none;}
+.panel.open .cold{display:block;}
+.panel .req{font-size:11px; color:var(--dim); margin-top:6px; letter-spacing:.08em;}
+h2.sttl{font-size:clamp(13px,2.8vw,17px); letter-spacing:.3em; color:#fff;
+  text-shadow:0 0 12px var(--cy); border-bottom:1px solid var(--dim); padding-bottom:10px; margin:4px 0 16px;}
+.dim{color:var(--dim); text-shadow:none;}
+#notices{margin:0 20px 6px; border:1px dashed var(--dim); padding:10px 14px; font-size:12px; line-height:1.9;}
+#notices .nh{letter-spacing:.3em; color:var(--cy); font-size:11px;}
+footer.bar{border-top:1px solid var(--cy); padding:12px 20px; display:flex; gap:10px; flex-wrap:wrap;
+  align-items:center; justify-content:space-between; font-size:11px; color:var(--dim); letter-spacing:.1em;}
+#boot{padding:30px 24px; font-size:15px; line-height:2.1; letter-spacing:.08em;}
+.overlay{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+  background:rgba(2,10,18,.92); padding:18px;}
+.overlay.on{display:flex;}
+.overlay .box{max-width:540px; background:var(--panel); border:1px solid var(--cy); padding:26px;
+  clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+  box-shadow:0 0 30px rgba(0,229,255,.35); font-size:14px; line-height:1.8; letter-spacing:.06em; text-align:center;}
+.glitch{animation:gt .3s steps(2) 2;}
+@keyframes gt{0%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}100%{transform:translateX(0)}}
+</style>
+</head>
+<body>
+<div id="grid"></div><div id="crt"></div><div id="sweep"></div><div id="frost" onclick="thaw()"></div>
+<div id="term">
+  <header class="bar">
+    <div>
+      <div class="ttl">ICE BOX</div>
+      <div class="sub">CRYO-COMMERCE TERMINAL // SLEEVING &amp; SLICKWARE</div>
+    </div>
+    <div id="flake" onclick="flakeClick()" title="">❄</div>
+    <button class="hex" id="muteBtn" onclick="toggleMute()">AUDIO: ON</button>
+  </header>
+
+  <div id="boot"></div>
+
+  <div id="app" style="display:none">
+    <nav class="tabs" id="tabs"></nav>
+    <div id="searchRow">
+      <input id="search" placeholder="QUERY THE COLD... (try 'cold')" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="hex" onclick="doSearch()">SCAN</button>
+    </div>
+    <main id="list"></main>
+    <div id="notices">
+      <div class="nh">SERVICE NOTICES</div>
+      <div class="dim">// SLICKBAY ADVISORY: users report vivid dreams. This is normal. Do not follow the girl.</div>
+      <div class="dim">// LOST: one (1) identity. If found, return to the Ice Box. Reward: yourself.</div>
+      <div class="dim">// REMINDER: the Ice Box is not responsible for memories found in Reclamation Sleeves.</div>
+    </div>
+    <footer class="bar">
+      <span>NO REFUNDS ON MEMORIES. APPOINTMENTS: WALK-INS ACCEPTED. EXIT IS THROUGH THE GRILLE.</span>
+    </footer>
+  </div>
+</div>
+<div class="overlay" id="ovl"><div class="box" id="ovlBox"></div></div>
+
+<script>
+/* ================= AUDIO: crystalline ================= */
+let AC=null, muted=false;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function ping(f,d,g){ if(muted) return; const a=ac(); if(!a) return;
+  [1,2.01,2.98].forEach((m,i)=>{ const o=a.createOscillator(), gn=a.createGain();
+    o.type="sine"; o.frequency.value=f*m;
+    const t=a.currentTime;
+    gn.gain.setValueAtTime((g||0.05)/(i+1),t); gn.gain.exponentialRampToValueAtTime(0.0001,t+(d||0.3));
+    o.connect(gn); gn.connect(a.destination); o.start(t); o.stop(t+(d||0.3)+0.05); }); }
+const sClick=()=>ping(1320,.18,.04);
+const sTab=()=>{ping(880,.2,.04); setTimeout(()=>ping(1320,.2,.04),90);};
+const sOpen=()=>{ping(660,.25,.05); setTimeout(()=>ping(990,.25,.05),110); setTimeout(()=>ping(1480,.3,.05),220);};
+const sErr=()=>ping(180,.4,.06);
+function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="AUDIO: "+(muted?"OFF":"ON"); if(!muted) sClick(); }
+
+/* ================= DATA (APoF p.21, verified) ================= */
+const CATS=["SLEEVES","SLICKWARE","SERVICES"];
+const ITEMS=[
+{c:0,n:"Reclamation Sleeve",p:"100kcr",d:"Sleeves built by memory-wiping prisoners. Reroll stats. 10% chance you learn a random skill. 10% chance of gaining someone else's memories.",cold:"A PAST, INCLUDED AT NO EXTRA CHARGE."},
+{c:0,n:"Model-A Series Sleeve",p:"500kcr",d:"Bulk issue. Ten physical models (A1-A10). Reduce all Stats and Saves by 5. Heavily discriminated against.",cold:"YOU WILL BE JUDGED. EVERYONE IS."},
+{c:0,n:"Atlas X Premium Sleeve",p:"2.2mcr",d:"Custom designed sleeve. +5 Strength, Speed and Body. Recovery only takes 48hrs.",cold:"THE BODY YOU WERE PROMISED."},
+{c:0,n:"Narcissus-1 Sleeve",p:"50mcr",d:"Luxury designer sleeve. All new stats: 240 points across Strength, Intellect, Combat and Speed. Recovery: 12hrs.",cold:"PERFECTION HAS A PRICE. THIS IS IT."},
+{c:1,n:"God Mode",p:"85kcr",s:"2 slots",d:"[+] on Hacking Checks when jacked into a terminal. Gain 1d5 Stress per use.",r:"Requires: Slicksocket, Terminal Jack",cold:"OMNISCIENCE, RENTED."},
+{c:1,n:"Espernetic Feedback Loop",p:"3mcr",s:"5 slots",d:"Psionic attack overloading targeted electronics (incl. androids, cybernetics). Sanity Save [+]: damage = amount rolled; fail = half damage + 1d5 Stress.",r:"Requires: Slicksocket",cold:"THINK LOUDLY."},
+{c:1,n:"Holopet",p:"75kcr",s:"2 slots",d:"Medium holographic AI pet, 30m radius. Heal 1 Stress whenever you rest. Panic Check [-] if destroyed.",r:"Requires: Slicksocket, Holoprojector",cold:"LOVE, PROJECTED."},
+{c:1,n:"Looky-loo",p:"550cr",s:"1 slot",d:"Picks up transmissions on all non-encrypted bands. Audio recording with a Black Box.",r:"Requires: Slicksocket, Loudmouth",cold:"EVERYONE IS BROADCASTING."},
+{c:1,n:"Machine Code",p:"350kcr",s:"4 slots",d:"Converse with powerful AI at a level it finds comfortable. Sanity Save: 1 Stress/hour; fail = 1/minute.",r:"Requires: Slicksocket, Black Box, Terminal Jack",cold:"SPEAK WITH GODS. BRING SANITY."},
+{c:1,n:"Sentinel System",p:"8,500cr",s:"3 slots",d:"Doubles Stimpak, rest and healing effectiveness. Addiction Body Saves at [-].",r:"Requires: Slicksocket",cold:"YOUR BODY, OPTIMIZED."},
+{c:1,n:"Skillslick (Trained)",p:"50kcr",s:"1 slot",d:"Gain the purchased Skill while installed. Selection very limited, closely guarded.",r:"Requires: Slicksocket, OGRE",cold:"KNOWLEDGE, TEMPORARY."},
+{c:1,n:"Skillslick (Expert)",p:"550kcr",s:"2 slots",d:"Gain the purchased Skill while installed. Selection very limited, closely guarded.",r:"Requires: Slicksocket, OGRE",cold:"KNOWLEDGE, TEMPORARY."},
+{c:1,n:"Skillslick (Master)",p:"4mcr",s:"3 slots",d:"Gain the purchased Skill while installed. Selection very limited, closely guarded.",r:"Requires: Slicksocket, OGRE",cold:"KNOWLEDGE, TEMPORARY."},
+{c:1,n:"Twitch Booster",p:"125kcr",s:"3 slots",d:"[+] on Speed Checks for 3 rounds. 2d10 damage to user as nerve endings burn.",r:"Requires: Slicksocket",cold:"SPEED HAS A COST."},
+{c:1,n:"Vox Box",p:"25kcr",s:"1 slot",d:"Perfectly mimic any voice after 10min of exposure. Stores up to 3 voices.",r:"Requires: Loudmouth",cold:"BE ANYONE."},
+{c:2,n:"Sleeve Backup (NeMo Machine)",p:"10kcr",d:"Download your memories. 24 hours. Sanity Save or forget 1d10 days. Critical failure: Panic Check + total amnesia.",cold:"FORGETTING IS A FEATURE."},
+{c:2,n:"Sleeve Storage",p:"500cr/mo",d:"Monthly storage fees. Climate controlled. Judgment free.",cold:"WE KEEP YOUR OLD SELF SAFE."},
+{c:2,n:"Slickbay (1hr)",p:"50cr",d:"Enough time to install a Slick.",cold:"ONE HOUR TO BECOME SOMEONE ELSE."},
+{c:2,n:"Slickworld (1mo)",p:"100cr",d:"DIY or join a Clan Server.",cold:"WORLDS, RENTED MONTHLY."}
+];
+
+/* ================= BOOT ================= */
+const bootLines=[
+"ICE BOX // CRYO-COMMERCE TERMINAL v2.4",
+"PRESSURIZING CHAMBER... -40C... -80C... <span style='color:#fff'>STABLE</span>",
+"CALIBRATING GRILLE MICROPHONE... <span class='dim'>voice like a freezer door: OK</span>",
+"",
+"WELCOME.",
+"PLEASE SELECT YOUR NEW SELF."
+];
+let bi=0;
+function bootStep(){
+  const b=document.getElementById("boot");
+  if(bi<bootLines.length){ b.innerHTML+=bootLines[bi]+"<br>"; bi++; ping(440+bi*110,.15,.03); setTimeout(bootStep,420); }
+  else setTimeout(()=>{ b.style.display="none"; document.getElementById("app").style.display="block"; sOpen(); buildTabs(); },600);
+}
+
+/* ================= TABS + LIST ================= */
+let curCat=0;
+function buildTabs(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  CATS.forEach((c,i)=>{ const b=document.createElement("button");
+    b.className="hex"+(i===curCat?" on":""); b.textContent=c;
+    b.onclick=()=>{curCat=i; sTab(); buildTabs();}; t.appendChild(b); });
+  renderList();
+}
+function card(m){
+  return `<div class="panel" onclick="this.classList.toggle('open');sClick()">
+    <div class="nm">${m.n} <span class="pr">${m.p}</span></div>
+    ${m.s?`<div class="req">${m.s}</div>`:""}
+    <div class="ds">${m.d}</div>
+    ${m.r?`<div class="req">${m.r}</div>`:""}
+    <div class="cold">DR. COLD: ${m.cold}</div></div>`;
+}
+function renderList(filter){
+  const L=document.getElementById("list");
+  const items=ITEMS.map((m,i)=>({m,i})).filter(x=>filter?(x.m.n+x.m.d).toLowerCase().includes(filter):x.m.c===curCat);
+  let h=`<h2 class="sttl">${filter?"SCAN RESULTS":CATS[curCat]} <span class="dim">[${items.length}]</span></h2>`;
+  h+=items.length?items.map(x=>card(x.m)).join(""):`<p class="dim">// NO MATCH. THE COLD PROVIDES WHAT IT PROVIDES.</p>`;
+  L.innerHTML=h;
+}
+
+/* ================= SEARCH ================= */
+function doSearch(){
+  const q=document.getElementById("search").value.trim().toLowerCase(); sClick();
+  if(q==="cold"||q==="dr cold"||q==="doctor"){ coldSpeaks(); return; }
+  if(!q){ renderList(); return; }
+  renderList(q);
+  if(!document.querySelector(".panel")) sErr();
+}
+function coldSpeaks(){
+  ping(110,.6,.07);
+  ovl(`<div style="color:var(--cy); letter-spacing:.2em">❄ DR. COLD ❄</div><br>
+  You wish to speak with me directly.<br><br>
+  <span class="dim">A pause. Somewhere, a freezer door opens and closes.</span><br><br>
+  I have seen every body on this station.<br>
+  Yours is adequate. It could be better.<br>
+  Everything here can make it better.<br><br>
+  <span class="dim">The grille goes quiet. The conversation is over.</span><br><br>
+  <button class="hex" onclick="closeOvl()">RETURN TO SELECTION</button>`);
+}
+
+/* ================= FLAKE (x5) ================= */
+let flakeN=0;
+function flakeClick(){
+  flakeN++; ping(1560,.12,.03);
+  if(flakeN>=5){ flakeN=0; sErr();
+    ovl(`<div style="color:var(--cy)">CREDENTIALS NOT FOUND.</div><br>DR. COLD IS UNAVAILABLE.<br>DR. COLD HAS ALWAYS BEEN UNAVAILABLE.<br><br><button class="hex" onclick="closeOvl()">ACKNOWLEDGE</button>`);
+  }
+}
+
+/* ================= OVERLAY ================= */
+function ovl(html){ document.getElementById("ovlBox").innerHTML=html; document.getElementById("ovl").classList.add("on"); }
+function closeOvl(){ sClick(); document.getElementById("ovl").classList.remove("on"); }
+document.getElementById("ovl").addEventListener("click",e=>{ if(e.target.id==="ovl") closeOvl(); });
+
+/* ================= FROST (idle) ================= */
+let idleT=null;
+function idleReset(){ document.getElementById("frost").style.opacity=0; clearTimeout(idleT);
+  idleT=setTimeout(()=>{ document.getElementById("frost").style.opacity=1; ping(220,.8,.04); },75000); }
+function thaw(){ document.getElementById("frost").style.opacity=0; sClick(); idleReset(); }
+["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
+idleReset();
+
+bootStep();
+</script>
+</body>
+</html>
