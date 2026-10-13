@@ -57,12 +57,13 @@ bounties: [
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
 
+  // FOLLOW-UP (Phoenix Mesh, internal) — paired with the Brackish job, same Ersa trip. Travel shared, not doubled.
   { id: "B-0186", target: "BEECH, REIDAR", type: "WELFARE CHECK", bl: 1,
     reward: "5 Kcr", status: "OPEN",
     client: "Alicia Wolff (private)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Ersa — Split Log township",
-    terms: "Welfare check; the family is posting the bond. Subject missed two check-ins at the Split Log settlement on Ersa. Locals describe a haunting in the tunnels below town and will not go down there after dark. Report anything unusual. Anything.",
+    terms: "Welfare check; the family is posting the bond. Subject missed two check-ins at the Split Log settlement on Ersa. Locals describe a haunting in the tunnels below town and will not go down there after dark. Report anything unusual. Anything. RAC note: pairs with the Brackish work on Ersa. One round trip covers both jobs.",
     travel: { jumps: 1,
               busRoute: "Prospero's Dream → Ersa hub",
               local: "Shuttle from the hub down to Split Log (250cr × 4 hunters)",
