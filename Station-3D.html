@@ -113,8 +113,12 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.06;
 controls.minDistance = 28;
 controls.maxDistance = 260;
-controls.autoRotate = true;
-controls.autoRotateSpeed = 0.6;
+/* camera auto-orbit is driven manually in tick() so the ROTATE toggle is a hard stop */
+const UP = new THREE.Vector3(0, 1, 0);
+const CAM_ORBIT_STEP = (Math.PI * 2 / 60 / 60) * 0.6; // same period as the old autoRotateSpeed 0.6
+let userOrbiting = false;
+controls.addEventListener('start', () => { userOrbiting = true; });
+controls.addEventListener('end', () => { userOrbiting = false; });
 
 /* ---------- lights ---------- */
 scene.add(new THREE.AmbientLight(0x887788, 1.0));
@@ -437,7 +441,6 @@ btnL.onclick = () => {
 };
 btnR.onclick = () => {
   rotateOn = !rotateOn;
-  controls.autoRotate = rotateOn;
   btnR.textContent = 'ROTATE: ' + (rotateOn ? 'ON' : 'OFF');
   btnR.classList.toggle('off', !rotateOn);
 };
@@ -463,7 +466,13 @@ const clock = new THREE.Clock();
     const s = 1 + 0.35 * Math.sin(t * 3 + i * 1.7);
     b.scale.set(s, s, s);
   });
-  station.rotation.y += rotateOn ? 0.0004 : 0;
+  if (rotateOn && !userOrbiting) {
+    station.rotation.y += 0.0004;
+    // manual camera orbit: stops the instant rotateOn flips, no damping glide
+    const off = camera.position.clone().sub(controls.target);
+    off.applyAxisAngle(UP, CAM_ORBIT_STEP);
+    camera.position.copy(controls.target).add(off);
+  }
   controls.update();
   renderer.render(scene, camera);
 })();
