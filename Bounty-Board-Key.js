@@ -81,6 +81,15 @@ bounties: [
   /* B-0204 THE CHOP SHOP KILLER retired to the refill queue 2026-10-12 —
      solid job, weakest printed backing of the five. Restore when the board
      needs a Dream body-horror slot. */
+  /* B-0025 WALDEK McCUNE (WoS Bounty 25) bumped up the refill queue 2026-10-13 —
+     Dream-local fit. Book: BL3, 50 Kcr, Last Word Insurance; sole survivor of
+     the wrecked Samnite Wedding fled the medbay mid-testimony. Blog adaptation
+     (Empiricist's Theories, unplaytested — credit if used): set on the Dream,
+     Dockside 50.5-A, Cabin 102-B chase timeline, 100 Kcr / FlySafe in that
+     version. Fit: McCune is Teamsters Local 32819L (the Strike union; Hal Otis
+     thread); Cabin 102-B reappears in a random Dockside building. Flag: the
+     blog's "Crora" backstory (50.5-A as a captured station melded 22 yrs ago)
+     is blog invention, NOT printed. */
 
   { id: "B-0220", target: "BORGES, AMARUQ", type: "APPREHENSION (DEAD)", bl: 3,
     reward: "20 Kcr", status: "OPEN",
