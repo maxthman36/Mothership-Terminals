@@ -57,17 +57,17 @@ bounties: [
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
 
-  // FOLLOW-UP (Phoenix Mesh, internal) — paired with the Brackish job, same Ersa trip. Travel shared, not doubled.
-  { id: "B-0186", target: "BEECH, REIDAR", type: "WELFARE CHECK", bl: 1,
-    reward: "5 Kcr", status: "OPEN",
-    client: "Alicia Wolff (private)",
+  // B-0186 BEECH absorbed into B-0241 as a bonus (2026-10-13). Full Warden detail in sector-pencils.md (Bounty 86).
+  { id: "B-0241", target: "LAB 46B (BARIDON OUTPOST)", type: "INSURANCE APPRAISAL", bl: 3,
+    reward: "30 Kcr, docked 25% per unaccounted staff member, +30% for complete documentation. Bonus: 5 Kcr Split Log welfare check on the same trip.", status: "OPEN",
+    client: "Di-Nobra Investigative Services (for the Baridon Marine Institute)",
     fee: "1 Kcr license fee applies",
-    lastKnown: "Ersa — Split Log township",
-    terms: "Welfare check; the family is posting the bond. Subject missed two check-ins at the Split Log settlement on Ersa. Locals describe a haunting in the tunnels below town and will not go down there after dark. Report anything unusual. Anything. RAC note: pairs with the Brackish work on Ersa. One round trip covers both jobs.",
+    lastKnown: "Ersa — Observation Laboratory 46B, coastal outpost",
+    terms: "Observation Laboratory 46B, a coastal marine-research outpost, sent a distress signal and went silent. Di-Nobra seeks a Contracted Investigation Team to verify all 12 staff present or accounted for, and document cause of death and responsible parties. Evidence via the Authorised Capture Device only. Bonus: RAC adds a 5 Kcr welfare check at Split Log township on the same Ersa trip. One round-trip fare covers both.",
     travel: { jumps: 1,
               busRoute: "Prospero's Dream → Ersa hub",
-              local: "Shuttle from the hub down to Split Log (250cr × 4 hunters)",
-              localKcr: 1 } },
+              local: "Charter to the 46B coast + shuttle to Split Log",
+              localKcr: 2 } },
 
   { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
     reward: "10 Kcr (+100 Kcr bonus for proof of death)", status: "OPEN",
