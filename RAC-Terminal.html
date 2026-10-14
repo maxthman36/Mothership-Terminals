@@ -74,6 +74,16 @@ h2.sttl{font-size:clamp(14px,3vw,18px); letter-spacing:.1em; border-bottom:2px d
   font-size:clamp(12px,2.5vw,15px); line-height:1.65;}
 #detail .kv{display:grid; grid-template-columns:130px 1fr; gap:4px 10px; margin:10px 0;}
 #detail .kv b{color:var(--amber); font-weight:bold; text-shadow:0 0 7px rgba(255,176,0,.55);}
+/* ---- board lock ---- */
+#tab-board{position:relative;}
+#boardLock{position:absolute; inset:0; background:rgba(2,8,3,.94); z-index:5;
+  display:flex; align-items:center; justify-content:center; text-align:center; padding:20px;}
+#boardLock .lockbox{max-width:440px;}
+#boardLock input{background:#031007; border:1px solid var(--phos-dim); color:var(--phos);
+  font-family:inherit; font-size:18px; letter-spacing:3px; text-align:center;
+  padding:10px 12px; width:220px; margin:12px 0; text-transform:uppercase;}
+#boardLock input:focus{outline:none; border-color:var(--phos);}
+#lockErr{color:#ff5555; min-height:1.4em; margin-top:8px; font-size:13px;}
 /* ---- ticker ---- */
 #ticker{border-top:3px solid var(--phos-dim); border-bottom:3px solid var(--phos-dim);
   margin:16px -14px 0; overflow:hidden; white-space:nowrap; padding:8px 0; background:#030a04;}
@@ -140,6 +150,12 @@ footer.bar{border-top:3px solid var(--phos-dim); padding:8px 14px; font-size:cla
   <main>
     <section class="tab on" id="tab-board">
       <h2 class="sttl">OPEN WARRANTS <span class="dim">// 5 POSTED</span></h2>
+      <div id="boardLock"><div class="lockbox">
+        <div class="sttl">WARRANT BOARD — LOCKED</div>
+        <p><span class="dim">Probationary crews see one warrant: the one they're assigned.<br>Enter the board access code issued at payout.</span></p>
+        <form id="lockForm" autocomplete="off"><input id="lockInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters"><br><button class="chunky small" type="submit">[ UNLOCK BOARD ]</button></form>
+        <div id="lockErr"></div>
+      </div></div>
       <table class="btable" id="boardTable">
         <thead><tr>
           <th>ID</th><th>TARGET</th><th class="hidemob">TYPE</th><th>BL</th><th>REWARD</th><th>STATUS</th>
@@ -387,6 +403,18 @@ const BOOT_LINES=[
     if(li<BOOT_LINES.length){ bt.innerHTML+=BOOT_LINES[li].replace(/ /g,"&nbsp;")+"<br>"; blip(); li++; }
     else{ clearInterval(iv); setTimeout(hide,900); }
   },130);
+})();
+const BOARD_CODE = "U7Q3-GWCM";
+(function(){
+  const lock = document.getElementById('boardLock');
+  if(new URLSearchParams(location.search).get('relock')){ localStorage.removeItem('rac_board_unlocked'); }
+  if(localStorage.getItem('rac_board_unlocked')==='1'){ lock.style.display='none'; return; }
+  document.getElementById('lockForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const v = document.getElementById('lockInput').value.trim().toUpperCase();
+    if(v === BOARD_CODE){ localStorage.setItem('rac_board_unlocked','1'); lock.style.display='none'; blip(); }
+    else { document.getElementById('lockErr').textContent = 'CODE REJECTED — CHECK WITH YOUR HANDLER.'; }
+  });
 })();
 renderBoard();
 if(activeWarrant) showWarrant();
