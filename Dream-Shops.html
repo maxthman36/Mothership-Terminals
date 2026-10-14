@@ -533,7 +533,6 @@ function hideDetail(){ const D=document.getElementById("detail"); D.classList.re
 function doSearch(){
   const q=document.getElementById("search").value.trim().toLowerCase(); sClick();
   const L=document.getElementById("list");
-  if(q==="marrow"){ redacted(); return; }
   if(q==="grimm"){ grimmStall(); return; }
   if(q==="doctor"||q==="clinic"||q==="hospital"){
     L.innerHTML=`<h2 class="sttl">SEARCH RESULTS</h2><p>Did you mean: <span class="hot">DR. COLD</span>? All other medical professionals are <span class="dim">unavailable for comment</span>.</p>`+shopCard(SHOPS[8],8); hideDetail(); return; }
