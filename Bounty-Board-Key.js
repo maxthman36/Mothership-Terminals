@@ -42,7 +42,7 @@ bounties: [
     client: "Brandr Mulder (via RAC)",
     fee: "1 Kcr — STAMPED PAID (PROBATIONARY)",
     lastKnown: "Doptown, Prospero's Dream",
-    terms: "Subject is non-violent but evasive. Apprehend and deliver to Brandr Mulder's office in TopRing within 48 standard hours, then debrief Handler Venn at the RAC Annex. Minimal collateral damage. The client pays DOUBLE for alive and coherent delivery. This warrant is ASSIGNED to your crew — the board opens when it closes.",
+    terms: "Subject is non-violent but evasive. Apprehend and deliver to Brandr Mulder's office in TopRing within 48 standard hours, then debrief Brunhildh at the RAC Annex. Minimal collateral damage. The client pays DOUBLE for alive and coherent delivery. This warrant is ASSIGNED to your crew — the board opens when it closes.",
     travel: { jumps: 0,
               local: "Station transit — the target is in Doptown, on the Dream.",
               localKcr: 0 } },
@@ -104,9 +104,9 @@ bounties: [
 
   { id: "B-0132", target: "[SEALED]", type: "[SEALED]", bl: 6,
     reward: "[SEALED]", status: "CLOSED",
-    client: "[SEALED]", fee: "—",
+    client: "[SEALED]", fee: "200kcr",
     lastKnown: "[SEALED]",
-    terms: "This warrant is closed to general licensees. Aspirational posting — build your rank. Inquiries: Handler Venn, RAC Annex.",
+    terms: "This warrant is closed to general licensees. Build your rank. Inquiries: RAC Annex.",
     travel: null }
 ],
 
