@@ -141,18 +141,19 @@ footer.bar{border-top:3px solid var(--phos-dim); padding:8px 14px; font-size:cla
   </header>
 
   <nav class="tabs">
-    <button class="chunky on" data-tab="board">[ BOUNTY BOARD ]</button>
-    <button class="chunky" data-tab="warrant">[ ACTIVE WARRANT ]</button>
+    <button class="chunky on" data-tab="warrant">[ ACTIVE WARRANT ]</button>
+    <button class="chunky" data-tab="board">[ BOUNTY BOARD ]</button>
     <button class="chunky" data-tab="trace">[ SKIP-TRACE ]</button>
     <button class="chunky small warn" id="muteBtn">[ SOUND: ON ]</button>
   </nav>
 
   <main>
-    <section class="tab on" id="tab-board">
+    <section class="tab" id="tab-board">
       <h2 class="sttl">OPEN WARRANTS <span class="dim">// 5 POSTED</span></h2>
       <div id="boardLock"><div class="lockbox">
         <div class="sttl">WARRANT BOARD — LOCKED</div>
         <p><span class="dim">Probationary crews see one warrant: the one they're assigned.<br>Enter the board access code issued at payout.</span></p>
+        <p class="amber">YOUR ASSIGNED WARRANT IS ON THE [ACTIVE WARRANT] TAB.</p>
         <form id="lockForm" autocomplete="off"><input id="lockInput" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters"><br><button class="chunky small" type="submit">[ UNLOCK BOARD ]</button></form>
         <div id="lockErr"></div>
       </div></div>
@@ -166,7 +167,7 @@ footer.bar{border-top:3px solid var(--phos-dim); padding:8px 14px; font-size:cla
       <div id="ticker"><span>+++ RIM WIRE: CREDIT IRREGULARITIES REPORTED ON TWO RIM STATIONS — MAGISTRATES INVESTIGATING +++ TEAMSTER FREIGHTERS HELD BY STRATEMEYER SYNDICATE — YANDEE DECLINES RANSOM +++ G3 CONGLOMERATE POSTS RECORD QUARTERLY DIVIDEND +++ O2 TAX DUE: DEBTORS REMANDED TO DOPTOWN +++ ODC LEGENDS: LIFER WALKS OUT OF GREEN HELL, GUARDS BAFFLED +++</span></div>
     </section>
 
-    <section class="tab" id="tab-warrant">
+    <section class="tab on" id="tab-warrant">
       <h2 class="sttl">WARRANT OF APPREHENSION</h2>
       <div id="warrant"><span class="dim">NO ACTIVE WARRANT.<br><br>Select a warrant from the BOUNTY BOARD.</span></div>
     </section>
@@ -237,7 +238,7 @@ document.querySelector("#ticker span").textContent = BOARD_KEY.ticker;
    pick the next job at the table or in the group channel during the week. */
 let activeWarrantId=null;
 try{ activeWarrantId=localStorage.getItem("rac_active_warrant"); }catch(e){}
-let activeWarrant=BOUNTIES.find(b=>b.id===activeWarrantId)||BOUNTIES[0];
+let activeWarrant=BOUNTIES.find(b=>b.id===activeWarrantId)||BOUNTIES.find(b=>b.id==="B-0101")||BOUNTIES[0];
 const tbody=document.querySelector("#boardTable tbody"),
       detail=document.getElementById("detail");
 function statusTag(b){
