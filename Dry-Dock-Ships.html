@@ -128,6 +128,12 @@ const MADE_SHIPS=[
 ["Dawnseeker Tribute","'reclamation goods'","HOLD — CUSTOMS","bad"],
 ["The Patient Ox","livestock (frozen)","REFIT","warn"]
 ];
+/* Fixed listing, always on the board: the Helena 14 passenger run
+   (Apostles of the Burnt Augur — Max's call 2026-10-15).
+   Spoiler-free: a pilgrimage charter, nothing about the fire or the loop. */
+const FIXED_SHIPS=[
+["D-01","Helena 14","Passenger transport. Boarding the Apostles of the Burnt Augur pilgrimage charter. Solarian faithful gathering dockside — expect crowds.","BOARDING","ok"]
+];
 const BERTHS=["D-02","D-05","D-07","D-09","D-11","D-14","D-16","D-19","D-21","D-23","D-26","D-28","D-31","D-33","D-36","D-38"];
 const ODD=[
 "CARGO MANIFEST SEALED BY COURT ORDER",
@@ -158,12 +164,19 @@ function stClass(s){ return s==="ok"?"st-ok":(s==="bad"?"st-bad":"st-warn"); }
 function render(){
   const {out, oddIdx, odd}=pickDay();
   const tb=document.getElementById("rows"); tb.innerHTML="";
+  let n=0;
+  FIXED_SHIPS.forEach(f=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${f[0]}</td><td class="ves">${f[1]}</td><td class="notice">${f[2]}</td><td class="${stClass(f[4])}">${f[3]}</td>`;
+    tb.appendChild(tr);
+    setTimeout(()=>{ tr.classList.add("flip"); clack(); }, 350+n*260); n++;
+  });
   out.forEach((r,i)=>{
     const tr=document.createElement("tr"); if(r.book) tr.className="bookship";
     const notice = (i===oddIdx) ? r.d[1]+" <span class='dim'>["+odd+"]</span>" : r.d[1];
     tr.innerHTML=`<td>${r.berth}</td><td class="ves">${r.d[0]}</td><td class="notice">${notice}</td><td class="${stClass(r.d[3])}">${r.d[2]}</td>`;
     tb.appendChild(tr);
-    setTimeout(()=>{ tr.classList.add("flip"); clack(); }, 350+i*260);
+    setTimeout(()=>{ tr.classList.add("flip"); clack(); }, 350+n*260); n++;
   });
 }
 function refreshJoke(){ clack(); alert("BOARD UPDATES AT 00:00 ST.\nPATIENCE, TRAVELER."); }
