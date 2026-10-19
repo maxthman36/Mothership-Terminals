@@ -38,7 +38,7 @@ travelConfig: {
 /* ---------- the board ---------- */
 bounties: [
   { id: "B-0101", target: "GRIMM, IANERIA", type: "DEBTOR — SKIP-TRACE", bl: 1,
-    reward: "1D10 Kcr (×2 IF ALIVE)", status: "ASSIGNED",
+    rewardDice: "1d10", rewardUnit: "Kcr", rewardNote: "(×2 IF ALIVE)", status: "ASSIGNED",
     client: "Brandr Mulder (via RAC)",
     fee: "1 Kcr — STAMPED PAID (PROBATIONARY)",
     lastKnown: "Doptown, Prospero's Dream",
@@ -48,63 +48,66 @@ bounties: [
               localKcr: 0 } },
 
   { id: "B-0129", target: "CUESTA, MAGDA", type: "NARCOTICS (MINOR)", bl: 2,
-    reward: "1D5×10 Kcr", status: "OPEN",
+    rewardDice: "1d5", rewardMult: 10, rewardUnit: "Kcr", status: "OPEN",
     client: "Doenides Police Department (via RAC annex)",
     fee: "1 Kcr license fee applies",
-    lastKnown: "Prospero's Dream (fled Doenides)",
-    terms: "Teen dealer selling Choir, a hive-mind narcotic cooked from recycled slick-ware gel. Apprehend ALIVE — the DPD wants the supply chain, not a corpse. Users report dreaming each other's dreams. Do not engage Harlow Syndicate personnel without backup. Repeat client: good work here brings more work.",
+    lastKnown: "Doenides — Harlow",
+    terms: "Teen dealer selling Choir, a drug cooked from recycled slick-ware gel. Apprehend ALIVE — the DPD wants the supply chain, not a corpse. Do not engage Harlow Syndicate personnel without backup. Repeat client: good work here brings more work.",
     travel: { jumps: 0,
-              local: "Station transit — the target is on the Dream.",
+              local: "RAC cutter to Doenides (5 days transit)",
               localKcr: 0 } },
 
   // B-0186 BEECH absorbed into B-0241 as a bonus (2026-10-13). Full Warden detail in sector-pencils.md (Bounty 86).
   { id: "B-0241", target: "LAB 46B (BARIDON OUTPOST)", type: "INSURANCE APPRAISAL", bl: 3,
-    reward: "30 Kcr, docked 25% per unaccounted staff member, +30% for complete documentation. Bonus: 5 Kcr Split Log welfare check on the same trip.", status: "OPEN",
+    reward: "30 Kcr (docked 25% per unaccounted staff; +30% for complete documentation)",
+    sideJob: "5 Kcr — Split Log welfare check (B-0186), same Ersa trip. Knock, confirm, report. One round-trip fare covers both jobs.",
+    status: "OPEN",
     client: "Di-Nobra Investigative Services (for the Baridon Marine Institute)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Ersa — Observation Laboratory 46B, coastal outpost",
-    terms: "Observation Laboratory 46B, a coastal marine-research outpost, sent a distress signal and went silent. Di-Nobra seeks a Contracted Investigation Team to verify all 12 staff present or accounted for, and document cause of death and responsible parties. Evidence via the Authorised Capture Device only. Bonus: RAC adds a 5 Kcr welfare check at Split Log township on the same Ersa trip. One round-trip fare covers both.",
+    terms: "Observation Laboratory 46B, a coastal marine-research outpost, sent a distress signal and went silent. Di-Nobra seeks a Contracted Investigation Team to verify all 12 staff present or accounted for, and document cause of death and responsible parties. Evidence via the Authorised Capture Device only.",
     travel: { jumps: 1,
               busRoute: "Prospero's Dream → Ersa hub",
               local: "Charter to the 46B coast + shuttle to Split Log",
               localKcr: 2 } },
 
-  // B-0233 sleeve trade (2026-10-16, Max's session-2 plan): the proof-of-death
-  // bonus is posted in kind by the Ice Box proprietor — one reclamation sleeve
-  // (house price 100kcr per the Ice Box terminal). This is the mechanism for
-  // saving Grimm's backed-up consciousness after the Change.
+  // B-0233 bonus (2026-10-19, Max): the Quick family leaves the proof-of-death
+  // bonus as the hunter's choice — 100 Kcr OR one reclamation sleeve
+  // (house price 100kcr) from the proprietor of the Ice Box. This is the
+  // mechanism for saving Grimm's backed-up consciousness after the Change.
   { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
-    reward: "10 Kcr (+1 reclamation sleeve for proof of death — posted by the Ice Box proprietor)", status: "OPEN",
+    reward: "10 Kcr + bonus (hunter's choice): 100 Kcr OR one reclamation sleeve", status: "OPEN",
     client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",
-    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings. Supplemental offer from the proprietor of the Ice Box: one reclamation sleeve (house price 100kcr) to the licensed team that brings verified proof of death. Inquire at the Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
+    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, plus a bonus — the team's choice: 100 Kcr, or one reclamation sleeve (house price 100kcr) from the proprietor of the Ice Box. Inquire at the Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
     travel: { jumps: 0,
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
   /* B-0204 THE CHOP SHOP KILLER retired to the refill queue 2026-10-12 —
      solid job, weakest printed backing of the five. Restore when the board
      needs a Dream body-horror slot. */
-  /* B-0025 WALDEK McCUNE (WoS Bounty 25) bumped up the refill queue 2026-10-13 —
-     Dream-local fit. Book: BL3, 50 Kcr, Last Word Insurance; sole survivor of
-     the wrecked Samnite Wedding fled the medbay mid-testimony. Blog adaptation
-     (Empiricist's Theories, unplaytested — credit if used): set on the Dream,
-     Dockside 50.5-A, Cabin 102-B chase timeline, 100 Kcr / FlySafe in that
-     version. Fit: McCune is Teamsters Local 32819L (the Strike union; Hal Otis
-     thread); Cabin 102-B reappears in a random Dockside building. Flag: the
-     blog's "Crora" backstory (50.5-A as a captured station melded 22 yrs ago)
-     is blog invention, NOT printed. */
+  /* B-0025 WALDEK McCUNE promoted to the board 2026-10-19 — see the live entry. */
 
-  { id: "B-0220", target: "BORGES, AMARUQ", type: "APPREHENSION (DEAD)", bl: 3,
-    reward: "20 Kcr", status: "OPEN",
-    client: "Allie Winchester (private)",
+  /* B-0220 BORGES, AMARUQ pulled from the board 2026-10-19 (Max): too early as
+     a posting. Borges is now a forecast rival — licensed hunter
+     (Hunter 09 "Memorius") asking after the open postings. See the ticker. */
+
+  // B-0025 WALDEK McCUNE promoted from the refill queue 2026-10-19 (Max).
+  // Book: BL3, 50 Kcr, Last Word Insurance; sole survivor of the wrecked
+  // Samnite Wedding, fled the medbay mid-testimony. Teamsters Local 32819L
+  // (the Strike union — Hal Otis thread). Blog adaptation notes (Empiricist's
+  // Theories, unplaytested, credit if used): Dockside 50.5-A, Cabin 102-B
+  // chase timeline; the blog's "Crora" backstory is blog invention, NOT printed.
+  { id: "B-0025", target: "McCUNE, WALDEK", type: "MATERIAL WITNESS — SKIP-TRACE", bl: 3,
+    reward: "50 Kcr", status: "OPEN",
+    client: "Last Word Insurance (via RAC annex)",
     fee: "1 Kcr license fee applies",
-    lastKnown: "Argent — dockside bar, surface downport",
-    terms: "Open bounty on a licensed hunter (Hunter 09 'Memorius'). Approach with extreme caution. The RAC reminds licensees that hunter-on-hunter warrants are legal, and final.",
-    travel: { jumps: 1,
-              busRoute: "Prospero's Dream → Argent (PIRAD ONE)",
-              local: "Shuttle from PIRAD ONE down to the surface docks (250cr × 4 hunters)",
-              localKcr: 1 } },
+    lastKnown: "Prospero's Dream — Dockside, Cabin 102-B",
+    terms: "Sole survivor of the wrecked Samnite Wedding. Fled the medbay mid-testimony and dropped off every manifest since. Last Word carries the hull policy and wants him found before the claim settles — alive and talking. Teamsters Local 32819L has him listed active; the union isn't cooperating. Start at Cabin 102-B, Dockside.",
+    travel: { jumps: 0,
+              local: "Station transit — the target is on the Dream.",
+              localKcr: 0 } },
 
   { id: "B-0132", target: "[SEALED]", type: "[SEALED]", bl: 6,
     reward: "[SEALED]", status: "CLOSED",
@@ -115,6 +118,6 @@ bounties: [
 ],
 
 /* ---------- news ticker (public feed only — encyclopedia, not newspaper) ---------- */
-ticker: "+++ RIM WIRE: CREDIT IRREGULARITIES REPORTED ON TWO RIM STATIONS — MAGISTRATES INVESTIGATING +++ TEAMSTER FREIGHTERS HELD BY STRATEMEYER SYNDICATE — YANDEE DECLINES RANSOM +++ G3 CONGLOMERATE POSTS RECORD QUARTERLY DIVIDEND +++ O2 TAX DUE: DEBTORS REMANDED TO DOPTOWN +++ ODC LEGENDS: LIFER WALKS OUT OF GREEN HELL, GUARDS BAFFLED +++"
+ticker: "+++ RIM WIRE: CREDIT IRREGULARITIES REPORTED ON TWO RIM STATIONS — MAGISTRATES INVESTIGATING +++ TEAMSTER FREIGHTERS HELD BY STRATEMEYER SYNDICATE — YANDEE DECLINES RANSOM +++ G3 CONGLOMERATE POSTS RECORD QUARTERLY DIVIDEND +++ O2 TAX DUE: DEBTORS REMANDED TO DOPTOWN +++ ODC LEGENDS: LIFER WALKS OUT OF GREEN HELL, GUARDS BAFFLED +++ RAC ANNEX: LICENSED HUNTER AMARUQ BORGES (09 'MEMORIUS') RENEWED HIS TICKET — ASKING AFTER THE OPEN POSTINGS +++"
 
 }; /* end BOARD_KEY — don't edit below this line */

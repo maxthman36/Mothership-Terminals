@@ -234,6 +234,28 @@ document.querySelectorAll("nav.tabs button[data-tab]").forEach(b=>{
 const BOUNTIES = BOARD_KEY.bounties;
 const TRAVEL = BOARD_KEY.travelConfig;
 document.querySelector("#ticker span").textContent = BOARD_KEY.ticker;
+/* Daily advantage roll: variable rewards are rolled once per UTC day
+   (two rolls, take the higher), so every terminal shows the same value. */
+function dailyRoll(spec){
+  const now = new Date();
+  const seedStr = `${now.getUTCFullYear()}-${now.getUTCMonth()}-${now.getUTCDate()}:${spec}`;
+  let h = 2166136261;
+  for (const c of seedStr){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
+  const rnd = () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+  const [n, sides] = spec.toLowerCase().split("d").map(Number);
+  const roll = () => { let t = 0; for (let i = 0; i < n; i++) t += 1 + Math.floor(rnd() * sides); return t; };
+  return Math.max(roll(), roll());
+}
+function rewardText(b){
+  if (!b.rewardDice) return b.reward;
+  const v = dailyRoll(b.rewardDice) * (b.rewardMult || 1);
+  return `${v} ${b.rewardUnit || "Kcr"}${b.rewardNote ? " " + b.rewardNote : ""}`;
+}
 /* Active warrant persists between sessions (localStorage) so the crew can
    pick the next job at the table or in the group channel during the week. */
 let activeWarrantId=null;
@@ -254,7 +276,7 @@ function renderBoard(){
   BOUNTIES.forEach((b,i)=>{
     const tr=document.createElement("tr"); tr.className="row";
     tr.innerHTML=`<td class="amber">${b.id}</td><td><b>${b.target}</b></td>`+
-      `<td class="hidemob dim">${b.type}</td><td>${b.bl}</td><td>${b.reward}</td><td>${statusTag(b)}</td>`;
+      `<td class="hidemob dim">${b.type}</td><td>${b.bl}</td><td>${rewardText(b)}</td><td>${statusTag(b)}</td>`;
     tr.addEventListener("click",()=>{blip(); selectBounty(i);});
     tbody.appendChild(tr);
   });
@@ -290,9 +312,10 @@ function selectBounty(i){
   detail.innerHTML=
    `<div><span class="amber" style="font-size:1.15em">▸ ${b.id} — ${b.target}</span></div>`+
    `<div class="kv"><b>TYPE</b><span>${b.type}</span>`+
-   `<b>BOUNTY LEVEL</b><span>${b.bl}</span><b>REWARD</b><span>${b.reward}</span>`+
+   `<b>BOUNTY LEVEL</b><span>${b.bl}</span><b>REWARD</b><span>${rewardText(b)}</span>`+
    `<b>CLIENT</b><span>${b.client}</span><b>LICENSE FEE</b><span>${b.fee}</span></div>`+
    `<div><b class="amber">TERMS</b><br>${b.terms}</div>`+
+   (b.sideJob?`<div style="margin-top:8px"><b class="amber">SIDE JOB</b><br>${b.sideJob}</div>`:"")+
    travelHtml(b)+
    `<div style="margin-top:14px">`+
    (isActive?`<span class="amber">ACTIVE WARRANT — SEE THE WARRANT TAB.</span>`
@@ -332,7 +355,7 @@ function showWarrant(){
    `<div><b class="amber">LAST KNOWN</b> ${b.lastKnown}</div>`+
    `<div class="rule"></div>`+
    `<div><b class="amber">TERMS</b><br>${b.terms}</div>`+
-   `<div style="margin-top:8px"><b class="amber">REWARD</b> ${b.reward}</div>`+
+   `<div style="margin-top:8px"><b class="amber">REWARD</b> ${rewardText(b)}</div>`+
    `<div><b class="amber">LICENSE FEE</b> ${b.fee}</div>`+
    `<div class="rule"></div>`+
    `<div class="sig"><div>HANDLER<br><b>BRUNHILDH</b>, RAC LIAISON</div>`+
