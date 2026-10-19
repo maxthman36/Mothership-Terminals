@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RAC NAVCOM // MIRANDA SYSTEM CHART</title>
+<title>RAC NAVCOM // CLUSTER CHART</title>
 <style>
 :root{
   --grn:#33ff66;
@@ -11,6 +11,7 @@
   --grn-faint:#0d3a1c;
   --amb:#ffb000;
   --red:#ff5544;
+  --cyn:#00e5ff;
   --bg:#020a04;
   --panel:#03130a;
 }
@@ -51,6 +52,7 @@ body{
 .glow{text-shadow:0 0 6px rgba(51,255,102,.75),0 0 22px rgba(51,255,102,.28)}
 .amb{color:var(--amb);text-shadow:0 0 6px rgba(255,176,0,.75),0 0 22px rgba(255,176,0,.3)}
 .red{color:var(--red);text-shadow:0 0 6px rgba(255,85,68,.8)}
+.cyn{color:var(--cyn);text-shadow:0 0 6px rgba(0,229,255,.7)}
 .dim{color:var(--grn-dim)}
 /* ---------- STARFIELD ---------- */
 #stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
@@ -60,6 +62,8 @@ body{
 /* ---------- HEADER ---------- */
 header.pre{white-space:pre;font-size:clamp(6px,1.35vw,11px);line-height:1.15;color:var(--grn);
   text-shadow:0 0 8px rgba(51,255,102,.8);margin:6px 0 2px;overflow-x:auto}
+header.titletext{font-size:clamp(26px,4.2vw,42px);font-weight:700;letter-spacing:16px;color:var(--grn);
+  text-shadow:0 0 10px rgba(51,255,102,.8);margin:10px 0 4px}
 .subhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
   border-top:1px solid var(--grn-dim);border-bottom:1px solid var(--grn-dim);padding:6px 2px;margin-bottom:8px}
 /* ---------- CONTROLS ---------- */
@@ -72,10 +76,11 @@ button:hover{background:#0a2c16;color:#d6ffe2}
 button.active{background:var(--grn);color:#02120a;font-weight:bold;
   box-shadow:0 0 12px rgba(51,255,102,.6)}
 button.warn{border-color:var(--amb);color:var(--amb)}
+button.big{font-size:14px;padding:9px 18px;margin-top:10px;width:100%}
 button:focus-visible{outline:2px solid var(--amb);outline-offset:2px}
 .hint{font-size:12px;color:var(--grn-dim)}
 /* ---------- LAYOUT ---------- */
-#main{display:grid;grid-template-columns:1fr 320px;gap:10px;align-items:start}
+#main{display:grid;grid-template-columns:1fr 330px;gap:10px;align-items:start}
 @media (max-width:900px){#main{grid-template-columns:1fr}}
 .panel{border:1px solid var(--grn-dim);background:rgba(3,19,10,.88);padding:8px;position:relative}
 .panel h3{margin:0 0 6px;font-size:13px;letter-spacing:2px;border-bottom:1px dashed var(--grn-dim);padding-bottom:4px}
@@ -84,7 +89,6 @@ svg.chart{width:100%;height:auto;display:block;background:radial-gradient(ellips
 svg text{font-family:"Courier New",Courier,monospace;fill:var(--grn);user-select:none}
 .slabel{font-size:12px;letter-spacing:1px;text-shadow:0 0 6px rgba(51,255,102,.7)}
 .slabel-sm{font-size:10.5px;fill:var(--grn-dim);letter-spacing:1px}
-.jtitle{font-size:34px;letter-spacing:8px;text-shadow:0 0 10px rgba(51,255,102,.8)}
 .orbit{fill:none;stroke:#14532a;stroke-width:1;stroke-dasharray:5 7;opacity:.8}
 .body{stroke:var(--grn);stroke-width:1.6}
 .hit{fill:transparent;stroke:none;cursor:pointer}
@@ -123,49 +127,49 @@ a{color:var(--amb)}
 <div id="stars"></div>
 <div id="boot"><pre id="boottext"></pre></div>
 <div id="screen">
-<header class="pre glow" aria-label="Miranda system title"> ███╗   ███╗██╗██████╗  █████╗ ███╗   ██╗██████╗   █████╗
- ████╗ ████║██║██╔══██╗██╔══██╗████╗  ██║██╔══██╗ ██╔══██╗
- ██╔████╔██║██║██████╔╝███████║██╔██╗ ██║██║  ██║ ███████║
- ██║╚██╔╝██║██║██╔══██╗██╔══██║██║╚██╗██║██║  ██║ ██╔══██║
- ██║ ╚═╝ ██║██║██║  ██║██║  ██║██║ ╚████║██████╔╝ ██║  ██║
- ╚═╝     ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝  ╚═╝  ╚═╝</header>
+<header class="pre glow" aria-label="RAC NAVCOM">██████╗   █████╗    ██████╗    ███╗   ██╗  █████╗    ██╗   ██╗  ██████╗   ██████╗   ███╗   ███╗
+██╔══██╗  ██╔══██╗  ██╔════╝    ████╗  ██║  ██╔══██╗  ██║   ██║  ██╔════╝  ██╔══██╗  ████╗ ████║
+██████╔╝  ███████║  ██║    ██╔██╗ ██║  ███████║  ██║   ██║  ██║       ██║  ██║  ██╔████╔██║
+██╔══██╗  ██╔══██║  ██║    ██║╚██╗██║  ██╔══██║  ╚██╗ ██╔╝  ██║       ██║  ██║  ██║╚██╔╝██║
+██║  ██║  ██║  ██║  ╚██████╗    ██║ ╚████║  ██║  ██║  ╚████╔╝    ╚██████╗  ██████╔╝  ██║ ╚═╝ ██║
+╚═╝  ╚═╝  ╚═╝  ╚═╝  ╚═════╝    ╚═╝  ╚═══╝  ╚═╝  ╚═╝  ╚═══╝      ╚═════╝   ╚═════╝   ╚═╝     ╚═╝</header>
 <div class="subhead">
-  <span class="glow">RAC NAVCOM // SYSTEM + JUMP CHART // PUBLIC FEED // EPHEMERIS 2186.10</span>
+  <span class="glow">RAC NAVCOM // CLUSTER + REGION CHARTS // PUBLIC FEED // EPHEMERIS 2821.10</span>
   <span class="dim">OPERATOR: LICENSED TEAM // <a href="RAC-Terminal.html">OPEN RAC TERMINAL</a></span>
 </div>
 
 <div class="controls">
-  <button id="btnSys" class="active">[1] SYSTEM CHART</button>
-  <button id="btnJump">[2] JUMP CHART</button>
+  <button id="btnCluster" class="active">[1] CLUSTER CHART</button>
+  <button id="btnBack" class="hidden warn">&larr; BACK TO CLUSTER</button>
+  <button id="btnTransit">TRANSIT DESK</button>
   <button id="btnMotion">MOTION: ON</button>
   <button id="btnFlicker">FLICKER: ON</button>
   <button id="btnSound">SOUND: ON</button>
-  <span class="hint">CLICK A BODY FOR DOSSIER // KEYS 1 2 M F S</span>
+  <span class="hint">CLICK A SYSTEM FOR ITS FILE // KEYS 1 T M F S</span>
 </div>
 
 <div id="main">
   <div>
     <div class="panel">
-      <h3 class="glow" id="chartTitle">&gt; MIRANDA SYSTEM — CUTTER RANGE</h3>
-      <svg id="sysSvg" class="chart" viewBox="0 0 1000 640" role="img" aria-label="Miranda system chart"></svg>
-      <svg id="jumpSvg" class="chart hidden" viewBox="0 0 1000 640" role="img" aria-label="Jump chart"></svg>
-      <div class="legend" id="legendSys">
-        <b class="amb">&#9632;</b> STAR&nbsp;&nbsp;<b>&#9679;</b> PLANET&nbsp;&nbsp;<b>&#9646;</b> STATION&nbsp;&nbsp;<b>&#9672;</b> MOON&nbsp;&nbsp;
-        <span class="dim">DASHED RINGS = ORBITS // SIZES NOT TO SCALE // ALL TRANSITS BY RAC CUTTER UNLESS NOTED</span>
+      <h3 class="glow" id="chartTitle">&gt; MIRANDA REACH — CLUSTER JUMP MAP</h3>
+      <svg id="chartSvg" class="chart" viewBox="0 0 1000 720" role="img" aria-label="Cluster jump chart"></svg>
+      <div class="legend" id="legendCluster">
+        <b class="amb">&#9679;</b> BUS SYSTEM&nbsp;&nbsp;<b class="red">&#9679;</b> CHARTER ONLY&nbsp;&nbsp;<b class="cyn">&#9679;</b> DEEP-RANGE CONTRACT&nbsp;&nbsp;<b>&#9679;</b> OFF-CHART&nbsp;&nbsp;
+        <span class="dim">AMBER ROUTE = J1 BUS // RED ROUTE = J2 CHARTER // SIZES NOT TO SCALE</span>
       </div>
-      <div class="legend hidden" id="legendJump">
-        <b class="amb">──</b> J1 ROUTE (~15KCR)&nbsp;&nbsp;<b class="red">──</b> J2 ROUTE (~40KCR)&nbsp;&nbsp;<b class="red">●</b> DARK SYSTEM — NO PUBLIC DATA&nbsp;&nbsp;
-        <span class="dim">MPT BUS: 1KCR/PERSON/JUMP // 132 CRYOPODS // THEY LOCK FROM THE OUTSIDE</span>
+      <div class="legend hidden" id="legendRegion">
+        <b class="amb">&#9632;</b> STAR&nbsp;&nbsp;<b>&#9679;</b> PLANET&nbsp;&nbsp;<b>&#9650;</b> STATION&nbsp;&nbsp;<b>&#9672;</b> MOON&nbsp;&nbsp;
+        <span class="dim">DASHED RINGS = ORBITS // SIZES NOT TO SCALE // CLICK A BODY FOR ITS FILE LINE</span>
       </div>
     </div>
   </div>
   <aside class="panel" id="dossier" aria-live="polite">
-    <h3 class="glow">DOSSIER</h3>
+    <h3 class="glow">SYSTEM FILE</h3>
     <div id="dossierBody">
       <div class="dname glow">AWAITING INPUT</div>
-      <div class="row"><span class="k">></span> SELECT A BODY ON THE CHART.</div>
-      <div class="row"><span class="k">></span> GREEN = CUTTER RANGE. AMBER = ONE JUMP. RED = TWO JUMPS.</div>
-      <div class="row"><span class="k">></span> PUBLIC FEED DATA ONLY. WARRANT BRIEFINGS CARRY THE REST.<span class="cursorblink"></span></div>
+      <div class="row"><span class="k">&gt;</span> SELECT A SYSTEM ON THE CHART.</div>
+      <div class="row"><span class="k">&gt;</span> AMBER = BUS ROUTE. RED = CHARTER ONLY.</div>
+      <div class="row"><span class="k">&gt;</span> PUBLIC FEED DATA ONLY. WARRANT BRIEFINGS CARRY THE REST.<span class="cursorblink"></span></div>
     </div>
   </aside>
 </div>
@@ -178,79 +182,190 @@ a{color:var(--amb)}
 var NS="http://www.w3.org/2000/svg";
 function el(tag,attrs,parent){var n=document.createElementNS(NS,tag);for(var k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n;}
 function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
 
-/* ================= DATA ================= */
-var DOSSIER={
-miranda:{tone:"amb",name:"MIRANDA",cls:"G-TYPE STAR // SYSTEM PRIMARY",transit:"--",
- desc:"System primary. The old spacers call this system Tempest's wake — Caliban's shadow, Ariel's light, Sycorax green. Ask a lifer dirtside and they will talk.",
- hooks:["Navigation hazard: none.","Ephemeris current to 2186.10."]},
-ferdinand:{tone:"amb",name:"FERDINAND",cls:"PLANET 1 // FOUNDRY WORLD",transit:"2 DAYS BY CUTTER",
- desc:"Scorched foundry world in close orbit. Shipyards and drydocks ring the planet; the RAC cutter was built here.",
- hooks:["Refits, repairs, upgrades — bring money.","Union halls and hiring boards; working spacer culture."]},
-doenides:{tone:"grn",name:"DOENIDES",cls:"PLANET 2 // URBAN WORLD",transit:"5 DAYS BY CUTTER",
- desc:"City planet, ward stacked on ward. The Doenides Police Department posts municipal warrants; RAC teams in good standing may apply.",
- hooks:["Ward stacked on ward.","Mind the local uniforms."]},
-shatter:{tone:"grn",name:"THE SHATTER",cls:"ASTEROID BELT // DOENIDES-JANUS GAP",transit:"1-3 DAYS BY CUTTER",
- desc:"Mining claims, unregistered caches, and a thousand places to hide a ship. The claims registry is open; unregistered finds are finders-keepers.",
- hooks:["Belt runs: 1-3 days.","Claims registry is open; unregistered finds are finders-keepers."]},
-janus:{tone:"grn",name:"JANUS",cls:"GAS GIANT // SYSTEM ANCHOR",transit:"--",
- desc:"The gravity well everything useful hangs off. Karth rides it as a moon; the Dream rides its L4 point.",
- hooks:["Licensed skimming runs.","Gravity assist shaves a day off outer transits."]},
-karth:{tone:"amb",name:"KARTH",cls:"MOON OF JANUS // DESERT WORLD",transit:"36 HOURS BY CUTTER",
- desc:"Desert moon. No-fly zone enforced by relic defense satellites; total EM blackout below the Karman line. One space elevator serves Larstown — the only way down, and the only way up.",
- hooks:["Factions dirtside: MEF security, Dawnseeker missions, Valley Ranger charters.","The Marshal's office requires a separate license interview and fee for all bounty work."]},
-dream:{tone:"grn",name:"PROSPERO'S DREAM",cls:"STATION // JANUS L4 // HOME",transit:"0 — YOU ARE HERE",
- desc:"Prospero's Dream. 8M+ residents, 12.98km across, riding Janus's L4. Administered under Golyanovo II charter. The RAC annex sits in the Court district — warrants, licensing, intake.",
- hooks:["Ten districts: Dry Dock, the Stellar Burn, the Chop Shop, the Ice Box, the Farm, CANYONHEAVY.market, the Court, Tempest Co. HQ, Doptown, the Choke.","Oxygen tax: 10cr/day. Pay at any kiosk.","Brunhildh runs the license desk and issues local warrants."]},
-cocytus:{tone:"grn",name:"COCYTUS",cls:"PLANET 4 // RINGED GIANT",transit:"--",
- desc:"Ringed giant, cold and far. Automated ring mining; claims registered.",
- hooks:["Nobody lives on Cocytus. Everybody it owns lives on Offit."]},
-offit:{tone:"red",name:"OFFIT",cls:"MOON OF COCYTUS // PRISON WORLD",transit:"8 DAYS BY CUTTER",
- desc:"The ODC: for-profit prison and lumber camp. 26-hour days, the Green Hell forest, a three-day twilight every month.",
- hooks:["Prisoner transfer contracts post regularly."]},
-transit:{tone:"amb",name:"TRANSIT DESK",cls:"INTERSTELLAR // THE CUTTER CAN'T JUMP",transit:"CHARTER OR BUS",
- desc:"The issued cutter is jump-0: fast inside the system, useless between stars. Three ways out.",
- hooks:["CHARTER, JUMP-1: ~15kcr per leg. JUMP-2: ~40kcr per leg plus fuel. About a week ship-time per jump.","MPT BUS: 1kcr per person per jump. 132 cryopods. They lock from the outside.","MPT BUS: scheduled routes only — the charted systems. Off-chart, the bus will not go.","RAC PRIORITY TRANSPORT: the firm covers the trip on priority warrants. The firm chooses the destination and the timetable.","RAC ADVISORY: standard warrant payouts do not cover interstellar charter. Budget accordingly.","DARK SYSTEMS: uncharted waypoints on the deep routes. No public data. Passage at your own risk."]},
-ersa:{tone:"amb",name:"ERSA",cls:"ONE JUMP // OCEAN WORLD",transit:"~15KCR CHARTER / 1KCR BUS",
- desc:"Ocean world, 80 percent water. Three stops on the public boards.",
- hooks:["BARIDON OUTPOST 46B — coastal research station.","THE CHEER — habitat station in high orbit. Shore leave and refit.","SPLIT LOG — rustic township on the main landmass.","Nearest city: Nadir, 110km inland. Half a day off-road."]},
-tybalt:{tone:"amb",name:"TYBALT",cls:"ONE JUMP // RESEARCH SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
- desc:"Research system. One station, and the staging point for a Company expedition two jumps out.",
- hooks:["TYBALT BLUE — research station. Tempest Co. contracts desk; spare parts and refits.","Support staging for the Vanir terraforming expedition (Vanaheim)."]},
-argent:{tone:"amb",name:"ARGENT",cls:"ONE JUMP // CORPORATE SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
- desc:"G³ system. Everything here is invitation-only.",
- hooks:["PIRAD ONE — G³ research station on the far route. Docking by corporate invitation only.","G³ SECTOR OFFICES — corporate contracts desk. Standard rates. Impeccable manners."]},
-carmentis:{tone:"amb",name:"CARMENTIS",cls:"ONE JUMP // COLONY SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
- desc:"Colonial system under Company survey.",
- hooks:["CARMENTIS VI — colony world. Eden settlement; teralith formations under survey.","PRAYCO PORT — port facility. Pilgrim traffic heavy; corporate security heavier."]},
-utpala:{tone:"amb",name:"UTPALA",cls:"ONE JUMP // FRINGE SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
- desc:"Rough space. No extradition treaties, no questions at the counter.",
- hooks:["UTPALA — hollowed asteroid, free port.","PINK ICE — older station, partial occupancy."]},
-tausigma:{tone:"amb",name:"TAU SIGMA",cls:"ONE JUMP // SURVEY SYSTEM",transit:"~15KCR CHARTER / 1KCR BUS",
- desc:"Quiet system.",
- hooks:["YPSILON 14 — asteroid. Mining station.","TAU SIGMA 7 — deep-range research station.","VELDAT — colony world. NWH Colonial Enterprise; temperate, terraformed."]},
-bell:{tone:"red",name:"THE BELL",cls:"TWO JUMPS // RELAY STATION",transit:"~40KCR CHARTER / 2KCR BUS",
- desc:"The Bell. Deep-range relay and dive platform.",
- hooks:["Access restricted to contract crews.","No public berthing."]},
-brilotis:{tone:"red",name:"BRILOTIS X-1",cls:"TWO JUMPS // BLACK HOLE",transit:"~40KCR CHARTER / 2KCR BUS",
- desc:"Brilotis X-1. Black hole with a gamma pulse pattern on record.",
- hooks:["Science crews only."]},
-vanaheim:{tone:"red",name:"VANAHEIM",cls:"TWO JUMPS // EXPEDITION SITE",transit:"~40KCR CHARTER / 2KCR BUS",
- desc:"Vanir terraforming expedition, Company contract. Staged via Tybalt Blue.",
- hooks:["Details restricted to contract holders.","No public manifest at this time."]},
-ku9:{tone:"red",name:"KU-9",cls:"DARK SYSTEM // J2 ROUTE",transit:"PASS-THROUGH ONLY",
- desc:"Uncharted waypoint on the rimward deep route. No public feed data.",
- hooks:["Ships pass through on the Tybalt to Vanaheim run.","No port, no beacon, no manifest."]},
-longfall:{tone:"red",name:"LONG FALL",cls:"TWO JUMPS // RESTRICTED",transit:"NO PUBLIC DATA",
- desc:"No public feed data available at your clearance.",
- hooks:["File a query with the RAC annex for restricted destinations."]},
-ku17:{tone:"red",name:"KU-17",cls:"DARK SYSTEM // J2 ROUTE",transit:"PASS-THROUGH ONLY",
- desc:"Uncharted waypoint on the spinward deep route. No public feed data.",
- hooks:["Ships pass through on the Tau Sigma to Bell run.","No port, no beacon, no manifest."]},
-ku2b:{tone:"red",name:"KU-2B",cls:"DARK SYSTEM // J2 ROUTE",transit:"PASS-THROUGH ONLY",
- desc:"Uncharted waypoint on the coreward deep route. No public feed data.",
- hooks:["Ships pass through on the Argent to Brilotis run.","No port, no beacon, no manifest."]}
+/* ================= ENCYCLOPEDIA (PUBLIC FEED ONLY) ================= */
+var SYS={
+miranda:{tone:"amb",name:"MIRANDA",cls:"HOME SYSTEM // G-TYPE STAR",transit:"IN-SYSTEM: CUTTER / SHUTTLE",orbital:true,
+ locs:[["Prospero's Dream","Trade hub station at Janus L4 — 8M+ residents. You are here."],
+  ["Karth","Desert moon of Janus. One space elevator serves Larstown."],
+  ["Doenides","Doenides is the urban world, ward stacked on ward from crust to cloudline. Harlow and Nidi City are the names visitors know; the wards underneath have their own names. It is crowded, loud, and always hiring. The DPD keeps the peace in the parts of it that can be kept."],
+  ["Ferdinand","Foundry world. Shipyards and drydocks ring the planet."],
+  ["Offit","Prison moon of Cocytus. ODC contract labor."],
+  ["Balonov","Balonov is a mined-out colony world, planet five. The mines are played out; Downport City lives on servicing what passes through. Senga works hire labor by the day; bring your own mask. It is the kind of place people pass through on their way somewhere else."]],
+ imports:"Food, manufactured goods, luxuries.",
+ exports:"Trade services; foundry output (Ferdinand); prison labor contracts (Offit).",
+ gov:"Golyanovo II station charter; system authority coordinates cutter traffic."},
+ersa:{tone:"amb",name:"ERSA",cls:"J1 // OCEAN WORLD",transit:"1KCR BUS / ~15KCR CHARTER",orbital:true,
+ locs:[["Stormlee","Inland capital. Colonial administration sits here."],
+  ["Split Log","Rustic township on the main landmass. Known for the fancy crabs: dinner-plate-sized locals that creep out at night, attracted to anything shiny. 400cr per claw."],
+  ["Lab 46B","Marine research outpost. Restricted waters."],
+  ["The Cheer","Orbital habitat. Shore leave and refit."],
+  ["Azure Base","Azure Base is a lunar survey and comms relay on Ersa's airless moon. The crew is small, mostly technicians keeping the relay aligned and the telescopes cold. Visiting ships can top up reaction mass and file jump tapes, but there is no shore leave to speak of. Half the system's traffic control runs through here, which makes it important and boring in equal measure."],
+  ["The Spray","The Spray is an ice-asteroid swarm in a wide trailing orbit, worked by independent water-mining claims. Claim law is first-come: stake a rock, work it, defend it. The ice goes to Ersa's townships, the Cheer, and passing ships at good prices. Claim jumpers are the main occupational hazard; the colonial administration does not patrol this far out."]],
+ imports:"Manufactured goods, machinery, colonists.",
+ exports:"Seafood, water and ice, marine bioproducts.",
+ gov:"Colonial administration at Stormlee."},
+tybalt:{tone:"amb",name:"TYBALT",cls:"J1 // RESEARCH SYSTEM",transit:"1KCR BUS / ~15KCR CHARTER",orbital:true,
+ locs:[["Tybalt Blue","Station-city. Tempest Co. contracts desk; spare parts and refits."],
+  ["Vanir staging yards","Expedition staging for the Vanaheim run. Contract crews."]],
+ imports:"Research equipment, contract crews.",
+ exports:"Staging and refit services, survey data.",
+ gov:"Station authority."},
+argent:{tone:"amb",name:"ARGENT",cls:"J1 // CORPORATE SYSTEM",transit:"1KCR BUS / ~15KCR CHARTER",orbital:true,
+ locs:[["Anvollapolis","Huge megacity on Gubion, billions stacked in her steel skin; wealth corresponds to height. D-Crypt archaeological institute; universities; old markets."],
+  ["PIRAD ONE","PIRAD ONE is a corporate station in high orbit over Gubion. Docking is by invitation only, and the invitations are hard to come by. What happens aboard is corporate business at the highest level. The public feed lists it as an administrative hub; spacers call it the velvet airlock."],
+  ["Domia","Domia is a HypeLabs research world under full corporate security. Approach vectors must be filed in advance, and unfiled traffic is turned away at range. The surface facilities are closed to visitors. What HypeLabs researches here is proprietary; the public feed says advanced materials."],
+  ["Inrupa","Cold industrial planet under the Kohut Worlds charter. Nacelle City sprawl; SolidState Banking branch."]],
+ imports:"Raw materials, labor contracts.",
+ exports:"Finance, corporate services, research output.",
+ gov:"Corporate charters; sector offices."},
+carmentis:{tone:"amb",name:"CARMENTIS",cls:"J1 // COLONY SYSTEM",transit:"1KCR BUS / ~15KCR CHARTER",orbital:true,
+ locs:[["Carmentis VI","Carmentis VI is the colony world: the Eden settlement, the PrayCo port, and the pilgrim traffic that keeps both busy. Shore leave here is A-class, the best on this side of the Dream. The pilgrim port-city is the system's megacity and the bus terminus. Between pilgrims, Drihatume produce, and Ruliv diamonds, the system does very well for itself."],
+  ["Carmentis III — Drihatume","Agri-world. Planned farm towns, standardized buildings, high quotas; Tse-Aquati Futures answers problems with force. The militia takes independence seriously."],
+  ["Ruliv","Ruliv is the system's diamond world, under full corporate extraction. The mines are company towns with company rules. Aurora diamonds ship out under heavy guard to buyers who do not ask questions. Independent prospectors are not welcome, and say so loudly in every bar on Carmentis VI."],
+  ["Carmentis I, II, IV, V","Unpopulated. Surveyed and left alone."]],
+ imports:"Manufactured goods, pilgrims.",
+ exports:"Food, diamonds, pilgrim services.",
+ gov:"Colonial administration; PrayCo port authority."},
+tausigma:{tone:"amb",name:"TAU SIGMA",cls:"J1 // SURVEY SYSTEM",transit:"1KCR BUS / ~15KCR CHARTER",orbital:true,
+ locs:[["Veldat","Veldat is Tau Sigma's colony world, a temperate NWH enterprise colony. Veldat City is the administrative center and the system's megacity, all colonial offices and frontier commerce. The colony is young, growing, and permanently short of everything. Warrants out here tend to be straightforward: missing persons, claim disputes, payroll."],
+  ["Ypsilon 14","Ypsilon 14 is a mining station currently dark under a survey lease. The leaseholder is not talking, and the station is not answering hails. Officially it is between operators; unofficially, spacers tell stories. The RAC lists it as a salvage-lease site: licensed recovery crews only."],
+  ["Tau Sigma 7","Tau Sigma 7 is a claim under survey, held by Nakatomi and closed to traffic. Survey crews rotate through on long contracts. The claim assays are sealed. Whatever they are surveying, they are taking their time about it."]],
+ imports:"Colonial supplies, survey equipment.",
+ exports:"Minerals, colonial goods.",
+ gov:"Survey charter (NWH Colonial Enterprise)."},
+hadal:{tone:"cyn",name:"HADAL",cls:"J2 // DEEP RANGE",transit:"~40KCR CHARTER — NO BUS SERVICE",orbital:true,
+ locs:[["Maonus","Colonial administration hub, halfway down the long decline; postings here punish upstarts or reward retirees. Lethal cold, rootless vegetation."],
+  ["The Bell","The Bell is a deep-range relay and survey station, access restricted to contract crews. It handles deep-space relay traffic and stages survey rotations into the dark. File approach vectors early; unfiled traffic is refused. Old hands treat deep rotations with respect, and decompression protocols are strictly enforced."]],
+ imports:"Contract crews, survey equipment.",
+ exports:"Survey data.",
+ gov:"Contract authority. Spacer caution: decompression hazard on deep rotations."},
+brilotis:{tone:"red",name:"BRILOTIS X-1",cls:"J2 // BLACK HOLE",transit:"~40KCR CHARTER — SCIENCE CREWS ONLY",orbital:false,
+ locs:[["Brilotis X-1","Black hole with a gamma pulse pattern on record."]],
+ imports:"None public.",
+ exports:"None public.",
+ gov:"Science charter."},
+vanaheim:{tone:"red",name:"VANAHEIM",cls:"J2 // EXPEDITION SITE",transit:"~40KCR CHARTER — NO BUS SERVICE",orbital:true,
+ locs:[["Vanir expedition camp","Company terraforming survey. Staged via Tybalt Blue. Details restricted to contract holders."]],
+ imports:"Expedition supplies.",
+ exports:"Survey data (contract holders only).",
+ gov:"Company expedition charter."},
+dautamica:{tone:"dim",name:"DAUTAMICA STATION",cls:"OFF-CHART // RESEARCH STATION",transit:"CHARTER BY QUOTE",orbital:false,
+ locs:[["Dautamica domes","Grey-research domes. Appointment only; need-to-know access."]],
+ imports:"None public.",
+ exports:"None public.",
+ gov:"Corporate courts, corporate cells."},
+uyema:{tone:"dim",name:"UYEMA",cls:"OFF-CHART // CAMPUS WORLD",transit:"CHARTER BY QUOTE",orbital:false,
+ locs:[["Uyema","Xenological Institute campus world. Retirement villages, mine country."],
+  ["Kamet","Irradiated moon. Institute restriction; no landings."]],
+ imports:"None public.",
+ exports:"None public.",
+ gov:"Xenological Institute."},
+mania:{tone:"dim",name:"MANIA",cls:"OFF-CHART // SURVEY SECTOR",transit:"NO PUBLIC ROUTE",orbital:false,
+ locs:[["Mania sector","No public feed data at this time."]],
+ imports:"None public.",
+ exports:"None public.",
+ gov:"None public."},
+longfall:{tone:"dim",name:"THE LONG FALL",cls:"OFF-CHART // RESTRICTED",transit:"NO PUBLIC DATA",orbital:false,
+ locs:[["The Long Fall","No public feed data available at your clearance."]],
+ imports:"None public.",
+ exports:"None public.",
+ gov:"File a query with the RAC annex for restricted destinations."},
+transit:{tone:"amb",name:"TRANSIT DESK",cls:"INTERSTELLAR // THE CUTTER CAN'T JUMP",transit:"CHARTER OR BUS",orbital:false,
+ locs:[["Charter, jump-1","~15kcr per leg. Jump-2: ~40kcr per leg plus fuel. About a week ship-time per jump."],
+  ["MPT Bus","1kcr per person per jump. 132 cryopods. They lock from the outside."],
+  ["Bus routes","Megacity systems only. No black holes. No terraforming systems. Off-chart, the bus will not go."],
+  ["Bus J2","Two separate fares (2kcr); the bus stops along the way."],
+  ["RAC priority transport","The firm covers the trip on priority warrants. The firm chooses the destination and the timetable."]],
+ imports:"—",exports:"—",
+ gov:"RAC advisory: standard warrant payouts do not cover interstellar charter. Budget accordingly."}
 };
+
+/* ================= ORBITAL DATA (one renderer, many systems) =================
+   kind: planet | moon | station | belt. moons/stations may name a parent index. */
+var ORBITALS={
+ersa:{title:"ERSA SYSTEM — ORBITAL CHART",star:"ERSA",starCls:"G-TYPE STAR",
+ bodies:[
+  {name:"ERSA",kind:"planet",orbit:170,size:17,color:"#33ff66",blurb:"Ersa is an ocean world and one of the busiest colonial ports on the J1 bus line. Stormlee, the inland capital, holds the colonial administration and the planet's main starport, while Split Log and the smaller townships work the storm coasts. Visitors come for the seafood markets, the water trade, and Lab 46B's marine research contracts. The Spray's ice-miners and the Cheer's orbital docks keep the whole system turning."},
+  {name:"AZURE BASE",kind:"moon",parent:0,orbitR:36,size:5,blurb:"Azure Base is a lunar survey and comms relay on Ersa's airless moon. The crew is small, mostly technicians keeping the relay aligned and the telescopes cold. Visiting ships can top up reaction mass and file jump tapes, but there is no shore leave to speak of. Half the system's traffic control runs through here, which makes it important and boring in equal measure."},
+  {name:"BUTUNE STATION",kind:"station",orbit:280,size:7,blurb:"Butune Station is the system's orbital habitat and first port of call for incoming traffic. Docking control is strict: visitors surrender firearms at the lock, no exceptions, and the station watch means it. The concourse has chandleries, a hiring hall, and the usual transient bars. Most spacers pass through in a day; almost nobody stays."},
+  {name:"THE SPRAY",kind:"belt",orbit:360,blurb:"The Spray is an ice-asteroid swarm in a wide trailing orbit, worked by independent water-mining claims. Claim law is first-come: stake a rock, work it, defend it. The ice goes to Ersa's townships, the Cheer, and passing ships at good prices. Claim jumpers are the main occupational hazard; the colonial administration does not patrol this far out."},
+  {name:"RIME",kind:"planet",orbit:440,size:8,color:"#9adfff",blurb:"Rime is a small ice moon in a far orbit, unpopulated and never surveyed in any detail. Telescope time is cheap and the view is good, which is about all anyone says for it. A few prospectors have filed speculative claims; none have been worked. Officially, there is nothing here worth the fuel."}]},
+tybalt:{title:"TYBALT SYSTEM — ORBITAL CHART",star:"TYBALT",starCls:"K-TYPE STAR",
+ bodies:[
+  {name:"TYBALT PRIME",kind:"planet",orbit:200,size:11,color:"#8a8a7a",blurb:"Tybalt Prime is a rocky world, surveyed and left unexploited. The survey charters found nothing worth the extraction cost, and the system moved on. It gets scientific overflights every few years and not much else. The planet's main function is giving the system its name."},
+  {name:"TYBALT BLUE",kind:"station",orbit:300,size:8,blurb:"Tybalt Blue is a station-city and the system's megacity, home to the Vanir expedition staging yards. Contract crews bound for the Vanaheim run muster here; Tempest Co. runs the contracts desk and the spare-parts market. Refits are the local specialty and the yards run three shifts. Shore leave is decent if you do not mind company-town prices."}]},
+argent:{title:"ARGENT SYSTEM — ORBITAL CHART",star:"ARGENT",starCls:"G-TYPE STAR",
+ bodies:[
+  {name:"GUBION",kind:"planet",orbit:180,size:13,color:"#c9a227",blurb:"Gubion is Argent's corporate world, home to the megacity of Anvollapolis: a huge megacity growing on the surface like a metal tick, billions densely stacked and layered within her steel skin, where wealth corresponds to height. Villas dot the rugged wilderness beyond; service workers outnumber owners five to one in the single large settlement, and movement beyond the high-rise cluster needs special permits or an executive sponsor. The D-Crypt archaeological institute anchors the university district, and the Gubion Orbital Shipyards handle extended repair stays."},
+  {name:"PIRAD ONE",kind:"station",orbit:260,size:7,blurb:"PIRAD ONE is a corporate station in high orbit over Gubion. Docking is by invitation only, and the invitations are hard to come by. What happens aboard is corporate business at the highest level. The public feed lists it as an administrative hub; spacers call it the velvet airlock."},
+  {name:"DOMIA",kind:"planet",orbit:350,size:12,color:"#7ab5d6",blurb:"Domia is a HypeLabs research world under full corporate security. Approach vectors must be filed in advance, and unfiled traffic is turned away at range. The surface facilities are closed to visitors. What HypeLabs researches here is proprietary; the public feed says advanced materials."},
+  {name:"INRUPA",kind:"planet",orbit:440,size:11,color:"#b0875a",blurb:"Inrupa is Argent's industrial planet: terrestrial, earth-sized, terraformed, and cold under the Kohut Worlds charter. Nacelle City is the urban anchor, a sprawl of manufactories, machine shops, and the SolidState Banking branch under a permanent haze. Air quality is poor and the work is steady. The planet builds the things the corporate worlds prefer not to build at home."}]},
+carmentis:{title:"CARMENTIS SYSTEM — ORBITAL CHART",star:"CARMENTIS",starCls:"G-TYPE STAR",
+ bodies:[
+  {name:"CARMENTIS I",kind:"planet",orbit:90,size:9,color:"#ff7a3c",blurb:"Carmentis I is a hellish liquid giant in a tight orbit, crushing gravity under a corrosive atmosphere. No landings, no stations, no plans. It exists on charts as a navigation hazard and a gravity well to slingshot around. Survey drones do not last long here."},
+  {name:"CARMENTIS II",kind:"planet",orbit:140,size:10,color:"#a08a4a",blurb:"Carmentis II is a heavy-gravity terrestrial world with a toxic atmosphere. Surveyed, flagged, and left alone: the gravity alone rules out settlement, and there is nothing under the haze worth the trouble. It gets a flyby on the long schedule. Officially unpopulated, likely to stay that way."},
+  {name:"DRIHATUME",kind:"planet",orbit:190,size:13,color:"#33ff66",blurb:"Drihatume, Carmentis III, is the system's agri-world: terraformed, rainy, and earth-sized. No station looms above its skies; the scant towns are planned, the buildings standardized, and the production quotas high. Much of the world is untouched, parcels sold off to corporations or earmarked for farm expansion. Tse-Aquati Futures is the distant power here, summoned only when there are problems and always answering with force. The Drihatume Militia takes local independence seriously. It feeds Carmentis VI and exports surplus down the bus line."},
+  {name:"CARMENTIS IV",kind:"planet",orbit:240,size:10,color:"#7ab5d6",blurb:"Carmentis IV is a cold gas dwarf with a thin terraformed atmosphere. Unpopulated; the only traffic is skimming surveys and the occasional fuel scoop. Every decade or so someone floats a cloud-mining lease, and nothing ever comes of it. It keeps the system's outer orbits company."},
+  {name:"CARMENTIS V",kind:"planet",orbit:290,size:9,color:"#5a7a9a",blurb:"Carmentis V is a freezing gas dwarf with a pristine atmosphere, the outermost named body. Unpopulated and largely unvisited. Long-range telescopes use it as a calibration target. On public charts it is a dot with a number."},
+  {name:"CARMENTIS VI",kind:"planet",orbit:340,size:12,color:"#33ff66",blurb:"Carmentis VI is the colony world: the Eden settlement, the PrayCo port, and the pilgrim traffic that keeps both busy. Shore leave here is A-class, the best on this side of the Dream. The pilgrim port-city is the system's megacity and the bus terminus. Between pilgrims, Drihatume produce, and Ruliv diamonds, the system does very well for itself."},
+  {name:"RULIV",kind:"planet",orbit:400,size:8,color:"#d6c86a",blurb:"Ruliv is the system's diamond world, under full corporate extraction. The mines are company towns with company rules. Aurora diamonds ship out under heavy guard to buyers who do not ask questions. Independent prospectors are not welcome, and say so loudly in every bar on Carmentis VI."}]},
+tausigma:{title:"TAU SIGMA SYSTEM — ORBITAL CHART",star:"TAU SIGMA",starCls:"SURVEY STAR",
+ bodies:[
+  {name:"VELDAT",kind:"planet",orbit:170,size:13,color:"#33ff66",blurb:"Veldat is Tau Sigma's colony world, an NWH enterprise colony that started as a barely-viable prospect and grew anyway. Most residents are still the aging first-generation colonists, happy to have escaped their corporate lives on subsistence farming, though the first Veldat-born generation is just coming of age. Veldat City is the administrative center and the system's megacity: colonial offices, frontier commerce, and a permanent shortage of everything. Warrants out here tend to be straightforward: missing persons, claim disputes, payroll."},
+  {name:"YPSILON 14",kind:"station",orbit:260,size:7,blurb:"Ypsilon 14 is a mining station currently dark under a survey lease. The leaseholder is not talking, and the station is not answering hails. Officially it is between operators; unofficially, spacers tell stories. The RAC lists it as a salvage-lease site: licensed recovery crews only."},
+  {name:"TAU SIGMA 7",kind:"station",orbit:340,size:6,blurb:"Tau Sigma 7 is a claim under survey, held by Nakatomi and closed to traffic. Survey crews rotate through on long contracts. The claim assays are sealed. Whatever they are surveying, they are taking their time about it."},
+  {name:"OGROITUM",kind:"planet",orbit:430,size:11,color:"#6a8a9a",blurb:"Ogrotium is a freezing toxic Earth-sized world; its Step City shaft-cities cluster around the furnace stacks and form the system's urban anchor after Veldat. Android-rights politics run hot here, and the ATU keeps offices in the shafts. Waveform salvage traffic passes through on the outer run. It is the part of the system the brochures skip."}]},
+hadal:{title:"HADAL SYSTEM — ORBITAL CHART",star:"HADAL",starCls:"DEEP-RANGE DWARF",
+ bodies:[
+  {name:"MAONUS",kind:"planet",orbit:200,size:12,color:"#6a8a7a",blurb:"Maonus is a colonial administration hub halfway down the long decline, where frontiers become backwaters. Postings here punish young upstarts or reward those approaching retirement. The lethal cold leaves the surface barren but for creeping, rootless vegetation. Maonus City holds the spaceport and the colonial admin building under the Cvetkov and Wilkins Administration. Traffic is thin: supply ships, reassigned officers desperate for imported luxuries, and ships passing through to the Bell."},
+  {name:"THE BELL",kind:"station",orbit:320,size:8,blurb:"The Bell is a deep-range relay and survey station, access restricted to contract crews. It handles deep-space relay traffic and stages survey rotations into the dark. File approach vectors early; unfiled traffic is refused. Old hands treat deep rotations with respect, and decompression protocols are strictly enforced."}]},
+vanaheim:{title:"VANAHEIM — ORBITAL CHART",star:"VANAHEIM",starCls:"ICE-GIANT PRIMARY",
+ bodies:[
+  {name:"VANAHEIM",kind:"planet",orbit:220,size:14,color:"#9adfff",blurb:"Vanaheim is a Company terraforming survey site, staged out of Tybalt Blue. The survey is long-term and close-held; details are restricted to contract holders. Supply ships run the Tybalt leg on a fixed schedule. The public feed lists it as an active expedition, nothing more."},
+  {name:"VANIR CAMP",kind:"station",orbit:300,size:6,blurb:"The Vanir expedition camp is the surface footprint of the Vanaheim survey. Company personnel only; the camp is closed to visitors. Resupply is by scheduled lander. What the survey has found so far is under contract seal."}]}
+};
+/* Miranda bodies keep their bespoke renderer below; blurbs for clicks: */
+var MIRANDA_BLURBS={
+ferdinand:["FERDINAND P1","Ferdinand is the system's foundry world, all shipyards and drydocks. The RAC cutter was built here, and most of the system's hulls have passed through its slips. Workers live in yard housing; visitors come for refits and leave when the work is done. If your ship needs major surgery, this is where it happens."],
+doenides:["DOENIDES P2","Doenides is the urban world, ward stacked on ward from crust to cloudline. Harlow and Nidi City are the names visitors know; the wards underneath have their own names. It is crowded, loud, and always hiring. The DPD keeps the peace in the parts of it that can be kept."],
+shatter:["THE SHATTER","The Shatter is the system's asteroid belt, worked by mining claims of every size. Claim law is finders-keepers on unregistered finds; registered claims are enforced. Prospectors, wildcatters, and salvage crews make the rounds. The RAC does not patrol the belt, which everyone involved prefers."],
+janus:["JANUS","Janus is the gas giant everything useful hangs off: Karth, the Dream's orbit, the whole inner traffic pattern. Its gravity well shapes every route in the system. Fuel scooping is licensed and busy. Nobody lands on Janus; everybody uses it."],
+karth:["KARTH","Karth is Janus's desert moon, under a strict no-fly zone. One space elevator serves Larstown, the surface settlement, and all traffic goes through it. The restrictions are old and absolute. Visitors clear the elevator authority or they do not go down."],
+dream:["PROSPERO'S DREAM","Prospero's Dream is the trade hub station at Janus L4, home to eight million-plus residents. Markets, docks, wards, and everything in between: if it is for sale in the system, it is for sale here. The RAC annex handles licenses and warrants. You are here."],
+cocytus:["COCYTUS","Cocytus is the ringed giant of the outer system. Automated ring mining works the ice and rock; the operation is almost entirely robotic. A small human crew oversees from the shepherd station. It keeps the system's reaction mass cheap."],
+offit:["OFFIT","Offit is Cocytus's prison moon, run by the ODC as a for-profit prison and lumber camp. Transport in is one-way for the inmates; transport out is on a schedule nobody publishes. The lumber operation is the moon's other economy. Visitors need ODC clearance, which is rarely granted."],
+balonov:["BALONOV P5","Balonov is a mined-out colony world, planet five. The mines are played out; Downport City lives on servicing what passes through. Senga works hire labor by the day; bring your own mask. It is the kind of place people pass through on their way somewhere else."],
+miranda:["MIRANDA","Miranda is the system's G-type primary, a stable star with a busy retinue. Everything in local space keys off it. Jump calculations use it as the reference point. It is the reason the cluster has a name."]};
+
+/* ================= CLUSTER NODES (radial mind-map) ================= */
+var NODES=[
+ {id:"miranda",x:500,y:360,r:34,hex:true,color:"#ffb000",label:"MIRANDA",sub:"HOME"},
+ {id:"ersa",x:500,y:130,r:26,color:"#ffb000",label:"ERSA"},
+ {id:"tybalt",x:699,y:245,r:26,color:"#ffb000",label:"TYBALT"},
+ {id:"argent",x:699,y:475,r:26,color:"#ffb000",label:"ARGENT"},
+ {id:"carmentis",x:500,y:590,r:26,color:"#ffb000",label:"CARMENTIS"},
+ {id:"tausigma",x:301,y:475,r:26,color:"#ffb000",label:"TAU SIGMA"},
+ {id:"hadal",x:154,y:560,r:26,color:"#00e5ff",label:"HADAL"},
+ {id:"brilotis",x:846,y:560,r:30,color:"#ff5544",label:"BRILOTIS X-1"},
+ {id:"vanaheim",x:846,y:160,r:30,color:"#ff5544",label:"VANAHEIM"},
+ {id:"dautamica",x:665,y:646,r:12,color:"#5a5348",label:"DAUTAMICA",faint:true},
+ {id:"uyema",x:335,y:646,r:12,color:"#5a5348",label:"UYEMA",faint:true},
+ {id:"mania",x:335,y:74,r:12,color:"#5a5348",label:"MANIA",faint:true},
+ {id:"longfall",x:665,y:74,r:12,color:"#5a5348",label:"LONG FALL",faint:true}
+];
+var ROUTES=[
+ {from:"miranda",to:"ersa",color:"#8a6a00",tag:"J1"},
+ {from:"miranda",to:"tybalt",color:"#8a6a00",tag:"J1"},
+ {from:"miranda",to:"argent",color:"#8a6a00",tag:"J1"},
+ {from:"miranda",to:"carmentis",color:"#8a6a00",tag:"J1"},
+ {from:"miranda",to:"tausigma",color:"#8a6a00",tag:"J1"},
+ {from:"tausigma",to:"hadal",color:"#7a2a22",tag:"J2"},
+ {from:"argent",to:"brilotis",color:"#7a2a22",tag:"J2"},
+ {from:"tybalt",to:"vanaheim",color:"#7a2a22",tag:"J2"}
+];
+function nodeById(id){for(var i=0;i<NODES.length;i++)if(NODES[i].id===id)return NODES[i];return null;}
 
 /* ================= AUDIO ================= */
 var audioCtx=null, soundOn=true;
@@ -291,179 +406,272 @@ $("tickerText").textContent=
 "O2 TAX DUE: 10CR/DAY — PAY AT ANY KIOSK /// RAC ANNEX HOURS 0600-2200 /// BOUNTY BOARD UPDATED 0600 DAILY /// "+
 "REPORT MIRROR-FACE SIGHTINGS TO STATION SECURITY /// THE CHOP SHOP: NO REFUNDS ON REAPED MODS /// "+
 "MPT BUS DEPARTS FRIDAY — CRYOPODS LOCK FROM THE OUTSIDE /// BRUNHILDH REMINDS: DELIVER THEM BREATHING /// "+
-"DOENIDES DPD: REWARD POSTED — INFORMATION LEADING TO THE ARREST OF MAGDA CUESTA /// KARTH ELEVATOR: ONLY WAY DOWN /// ";
+"HADAL: THE BELL RUNS CONTRACT CREWS ONLY — FILE VECTORS EARLY /// KARTH ELEVATOR: ONLY WAY DOWN /// "+
+"BALONOV DOWNPORT CITY: Senga works hiring — bring your own mask /// ";
 
-/* ================= SYSTEM CHART ================= */
-var CX=170,CY=320;
-var sysBodies=[
- {id:"ferdinand", orbit:105, size:9,  period:64,  angle:0.7, stroke:"#ffb000"},
- {id:"doenides",orbit:165, size:12, period:96,  angle:2.6},
- {id:"janus",   orbit:295, size:24, period:150, angle:4.4},
- {id:"cocytus", orbit:395, size:18, period:215, angle:5.6}
-];
-var moonState={karth:{angle:1.2,period:26,orbit:44},offit:{angle:3.4,period:34,orbit:34}};
-var janusRef=null;
-function buildSystem(){
-  var svg=$("sysSvg");
-  // orbit rings
-  [105,165,208,232,295,395].forEach(function(r){el("circle",{cx:CX,cy:CY,r:r,"class":"orbit"},svg);});
-  // shatter belt dots
+/* ================= SYSTEM FILE PANEL ================= */
+var lastSysId=null;
+function toneCls(t){return t==="amb"?"amb":(t==="red"?"red":(t==="cyn"?"cyn":(t==="dim"?"dim":"glow")));}
+function showSysPanel(id){
+  var d=SYS[id];if(!d)return;
+  blipSelect();
+  lastSysId=id;
+  var tc=toneCls(d.tone);
+  var locs=d.locs.map(function(l){return "<li><b>"+esc(l[0])+"</b> — "+esc(l[1])+"</li>";}).join("");
+  var inRegion=(typeof view!=="undefined"&&view.mode==="region"&&view.key===id);
+  var btn=(d.orbital&&!inRegion)?'<button class="big warn" id="btnRegion">VIEW REGION MAP &rarr;</button>':"";
+  $("dossierBody").innerHTML=
+   '<div class="dname '+tc+'">'+esc(d.name)+'</div>'+
+   '<div class="row"><span class="k">CLASS:</span> '+esc(d.cls)+'</div>'+
+   '<div class="row"><span class="k">TRANSIT:</span> <span class="'+tc+'">'+esc(d.transit)+'</span></div>'+
+   '<div class="row" style="margin-top:8px"><span class="k">LOCATIONS:</span></div><ul>'+locs+'</ul>'+
+   '<div class="row"><span class="k">IMPORTS:</span> '+esc(d.imports)+'</div>'+
+   '<div class="row"><span class="k">EXPORTS:</span> '+esc(d.exports)+'</div>'+
+   '<div class="row"><span class="k">GOVERNANCE:</span> '+esc(d.gov)+'</div>'+
+   btn+'<div class="row"><span class="cursorblink"></span></div>';
+  var br=$("btnRegion");
+  if(br)br.addEventListener("click",function(){setRegion(id);});
+}
+function showBodyBlurb(sysKey,name,blurb){
+  blipSelect();
+  $("dossierBody").innerHTML=
+   '<div class="dname glow">'+esc(name)+'</div>'+
+   '<div class="row"><span class="k">ENTRY:</span> '+esc(blurb)+'</div>'+
+   '<button class="big" id="btnBackSys">&larr; SYSTEM FILE</button>'+
+   '<div class="row"><span class="cursorblink"></span></div>';
+  $("btnBackSys").addEventListener("click",function(){if(lastSysId)showSysPanel(lastSysId);});
+}
+function wireHit(node,id,fn){
+  node.addEventListener("mouseenter",function(){blipHover();});
+  node.addEventListener("click",function(e){e.stopPropagation();fn(id);});
+}
+
+/* ================= CLUSTER CHART (radial mind-map) ================= */
+function hexPoints(cx,cy,r){var p=[];for(var i=0;i<6;i++){var a=Math.PI/3*i-Math.PI/6;p.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1));}return p.join(" ");}
+function buildCluster(){
+  var svg=$("chartSvg");svg.innerHTML="";
+  var title=el("text",{x:36,y:64,"class":"slabel",fill:"#ffb000","font-size":20,"letter-spacing":6},svg);
+  title.textContent="MIRANDA REACH";
+  var sub=el("text",{x:38,y:88,"class":"slabel-sm"},svg);
+  sub.textContent="RAC NAVCOM SURVEY 2821 // JUMP ROUTES // CLICK A SYSTEM FOR ITS FILE";
+  // routes first (under nodes)
+  ROUTES.forEach(function(r){
+    var a=nodeById(r.from),b=nodeById(r.to);
+    var attrs={x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:r.color,"stroke-width":r.from==="miranda"?2:1.4,opacity:0.8};
+    if(r.dash)attrs["stroke-dasharray"]="7 6";
+    el("line",attrs,svg);
+    if(r.tag){
+      var t=el("text",{x:((a.x+b.x)/2).toFixed(1),y:((a.y+b.y)/2-10).toFixed(1),"text-anchor":"middle","class":"slabel-sm",fill:r.color},svg);
+      t.textContent=r.tag;
+    }
+  });
+  // nodes
+  NODES.forEach(function(n){
+    var g=el("g",{"class":"node"},svg);
+    el("circle",{cx:n.x,cy:n.y,r:n.r+10,fill:n.color,opacity:0.10,"class":"halo"},g);
+    if(n.hex){
+      el("polygon",{points:hexPoints(n.x,n.y,n.r),fill:"#0d1a08",stroke:n.color,"stroke-width":2},g);
+    }else{
+      el("circle",{cx:n.x,cy:n.y,r:n.r,fill:"#0d1a08",stroke:n.color,"stroke-width":n.faint?1.2:2,opacity:n.faint?0.75:1},g);
+    }
+    var fs=n.label.length>9?10:12;
+    var t=el("text",{x:n.x,y:n.y+(n.faint?-n.r-8:4),"text-anchor":"middle","font-size":fs,fill:n.color,"letter-spacing":1},g);
+    t.textContent=n.label;
+    if(n.sub){
+      var s2=el("text",{x:n.x,y:n.y+n.r+22,"text-anchor":"middle","class":"slabel-sm",fill:n.color},g);
+      s2.textContent=n.sub;
+    }
+    el("circle",{cx:n.x,cy:n.y,r:n.r+14,"class":"hit"},g);
+    wireHit(g,n.id,showSysPanel);
+  });
+  var oc=el("text",{x:500,y:700,"text-anchor":"middle","class":"slabel-sm",fill:"#5a5348"},svg);
+  oc.textContent="O U T E R   N O D E S — O F F - C H A R T";
+}
+
+/* ================= GENERIC ORBITAL RENDERER ================= */
+var OCX=500,OCY=340;
+var genBodies=[]; // {g,orbit,angle,period,parent}
+/* Deterministic placement: seeded PRNG so re-renders never shuffle bodies. */
+function srand(seed){var t=seed>>>0;return function(){t+=0x6D2B79F5;var r=Math.imul(t^t>>>15,1|t);r^=r+Math.imul(r^r>>>7,61|r);return((r^r>>>14)>>>0)/4294967296;};}
+function keySeed(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function buildOrbital(key){
+  var data=ORBITALS[key];if(!data)return;
+  var rnd=srand(keySeed("orbital:"+key));
+  var svg=$("chartSvg");svg.innerHTML="";
+  genBodies=[];
+  // star
+  var sg=el("g",{},svg);
+  el("circle",{cx:OCX,cy:OCY,r:52,fill:"#ffb000",opacity:0.10},sg);
+  el("circle",{cx:OCX,cy:OCY,r:40,fill:"none",stroke:"#ffb000","stroke-width":1,"stroke-dasharray":"4 6",opacity:0.7},sg);
+  el("circle",{cx:OCX,cy:OCY,r:28,fill:"#0d1a08",stroke:"#ffb000","stroke-width":2},sg);
+  var st=el("text",{x:OCX,y:OCY+5,"text-anchor":"middle","class":"slabel",fill:"#ffb000"},sg);
+  st.textContent=data.star;
+  // bodies
+  data.bodies.forEach(function(b,idx){
+    if(b.kind==="belt"){
+      el("circle",{cx:OCX,cy:OCY,r:b.orbit,"class":"orbit"},svg);
+      var belt=el("g",{},svg);
+      for(var i=0;i<60;i++){
+        var a=rnd()*Math.PI*2,rr=b.orbit-12+rnd()*24;
+        el("circle",{cx:OCX+rr*Math.cos(a),cy:OCY+rr*Math.sin(a),r:1+rnd()*1.6,fill:"#1e8f43",opacity:0.5+rnd()*0.4},belt);
+      }
+      var bt=el("text",{x:OCX+b.orbit,y:OCY-10,"class":"slabel-sm"},svg);bt.textContent=b.name;
+      var bh=el("circle",{cx:OCX+b.orbit,cy:OCY,r:22,"class":"hit"},svg);
+      wireHit(bh,key,function(){showBodyBlurb(key,b.name,b.blurb);});
+      return;
+    }
+    var entry={angle:rnd()*Math.PI*2,period:60+b.orbit*0.9};
+    if(b.kind==="moon"||b.kind==="station"){
+      if(b.parent!==undefined&&genBodies[b.parent]){
+        entry.parent=genBodies[b.parent];
+        entry.orbitR=b.orbitR||30;
+        entry.period=18+b.orbitR*0.4;
+      }else{
+        el("circle",{cx:OCX,cy:OCY,r:b.orbit,"class":"orbit"},svg);
+        entry.soloOrbit=b.orbit;
+        entry.period=60+b.orbit*0.9;
+      }
+    }else{
+      el("circle",{cx:OCX,cy:OCY,r:b.orbit,"class":"orbit"},svg);
+      entry.soloOrbit=b.orbit;
+    }
+    var g=el("g",{},svg);
+    entry.g=g;
+    var col=b.color||"#33ff66";
+    if(b.kind==="station"){
+      el("polygon",{points:"0,-10 8,6 -8,6",fill:"none",stroke:col,"stroke-width":2},g);
+      el("circle",{cx:0,cy:0,r:2.5,fill:col},g);
+    }else{
+      el("circle",{cx:0,cy:0,r:b.size,fill:"#07130c",stroke:col,"stroke-width":1.6,"class":"body"},g);
+    }
+    var t=el("text",{x:0,y:-(b.size||8)-9,"text-anchor":"middle","class":"slabel",fill:col,"font-size":11},g);
+    t.textContent=b.name;
+    el("circle",{cx:0,cy:0,r:(b.size||8)+14,"class":"hit"},g);
+    (function(bd){wireHit(g,key,function(){showBodyBlurb(key,bd.name,bd.blurb);});})(b);
+    genBodies.push(entry);
+  });
+}
+
+/* ================= MIRANDA BESPOKE ORBITAL ================= */
+var MCX=170,MCY=320;
+var mirBodies=[];
+var mirMoons={karth:{angle:1.2,period:26,orbit:44},offit:{angle:3.4,period:34,orbit:34}};
+var mirJanus=null;
+function buildMiranda(){
+  var svg=$("chartSvg");svg.innerHTML="";
+  mirBodies=[];mirJanus=null;
+  var rnd=srand(keySeed("orbital:miranda"));
+  var defs=[
+   {id:"ferdinand",orbit:105,size:9,period:64,angle:0.7,stroke:"#ffb000",label:"FERDINAND P1"},
+   {id:"doenides",orbit:165,size:12,period:96,angle:2.6,label:"DOENIDES P2"},
+   {id:"janus",orbit:295,size:24,period:150,angle:4.4,label:"JANUS"},
+   {id:"cocytus",orbit:395,size:18,period:215,angle:5.6,label:"COCYTUS"},
+   {id:"balonov",orbit:470,size:14,period:320,angle:5.9,stroke:"#c98f2e",label:"BALONOV P5"}
+  ];
+  [105,165,208,232,295,395,470].forEach(function(r){el("circle",{cx:MCX,cy:MCY,r:r,"class":"orbit"},svg);});
   var belt=el("g",{},svg);
   for(var i=0;i<70;i++){
-    var a=Math.random()*Math.PI*2, r=208+Math.random()*24;
-    el("circle",{cx:CX+r*Math.cos(a),cy:CY+r*Math.sin(a),r:1+Math.random()*1.6,fill:"#1e8f43",opacity:0.5+Math.random()*0.4},belt);
+    var a=rnd()*Math.PI*2,r=208+rnd()*24;
+    el("circle",{cx:MCX+r*Math.cos(a),cy:MCY+r*Math.sin(a),r:1+rnd()*1.6,fill:"#1e8f43",opacity:0.5+rnd()*0.4},belt);
   }
-  // star
-  var sg=el("g",{id:"g-miranda"},svg);
-  el("circle",{cx:CX,cy:CY,r:52,fill:"#ffb000",opacity:0.12},sg);
-  el("circle",{cx:CX,cy:CY,r:40,fill:"none",stroke:"#ffb000","stroke-width":1,"stroke-dasharray":"4 6",opacity:0.7},sg);
-  el("circle",{cx:CX,cy:CY,r:28,fill:"#0d1a08",stroke:"#ffb000","stroke-width":2},sg);
-  var st=el("text",{x:CX,y:CY+5,"text-anchor":"middle","class":"slabel",fill:"#ffb000"},sg);
+  var sh=el("text",{x:MCX+232,y:MCY-8,"class":"slabel-sm"},svg);sh.textContent="THE SHATTER";
+  var shh=el("circle",{cx:MCX+220,cy:MCY,r:26,"class":"hit"},svg);
+  wireHit(shh,"miranda",function(){var b=MIRANDA_BLURBS.shatter;showBodyBlurb("miranda",b[0],b[1]);});
+  var sg=el("g",{},svg);
+  el("circle",{cx:MCX,cy:MCY,r:52,fill:"#ffb000",opacity:0.12},sg);
+  el("circle",{cx:MCX,cy:MCY,r:40,fill:"none",stroke:"#ffb000","stroke-width":1,"stroke-dasharray":"4 6",opacity:0.7},sg);
+  el("circle",{cx:MCX,cy:MCY,r:28,fill:"#0d1a08",stroke:"#ffb000","stroke-width":2},sg);
+  var st=el("text",{x:MCX,y:MCY+5,"text-anchor":"middle","class":"slabel",fill:"#ffb000"},sg);
   st.textContent="MIRANDA";
-  el("circle",{cx:CX,cy:CY,r:52,"class":"hit","data-id":"miranda"},sg);
-  wireHit(sg,"miranda");
-
-  sysBodies.forEach(function(b){
-    var g=el("g",{id:"g-"+b.id},svg);
-    b.g=g;
+  el("circle",{cx:MCX,cy:MCY,r:52,"class":"hit"},sg);
+  wireHit(sg,"miranda",function(){var b=MIRANDA_BLURBS.miranda;showBodyBlurb("miranda",b[0],b[1]);});
+  defs.forEach(function(b){
+    var g=el("g",{},svg);
+    var entry={id:b.id,g:g,orbit:b.orbit,angle:b.angle,period:b.period};
+    mirBodies.push(entry);
     if(b.id==="janus"){
-      janusRef=b;
-      // bands
+      mirJanus=entry;
       for(var k=-1;k<=1;k++)el("line",{x1:-b.size+3,y1:k*8,x2:b.size-3,y2:k*8,stroke:"#1e8f43","stroke-width":1.4,opacity:0.8},g);
       el("circle",{cx:0,cy:0,r:b.size,fill:"#07130c",stroke:"#33ff66","stroke-width":1.6,"class":"body"},g);
-      el("circle",{cx:0,cy:0,r:b.size+14,"class":"hit","data-id":"janus"},g);wireHit(g,"janus");
-      // karth (amber moon)
-      var kg=el("g",{id:"g-karth"},g);b.karthG=kg;
+      var kg=el("g",{},g);entry.karthG=kg;
       el("circle",{cx:0,cy:0,r:6.5,fill:"#171106",stroke:"#ffb000","stroke-width":1.6},kg);
       var kt=el("text",{x:0,y:-12,"text-anchor":"middle","class":"slabel-sm",fill:"#ffb000"},kg);kt.textContent="KARTH";
-      el("circle",{cx:0,cy:0,r:20,"class":"hit","data-id":"karth"},kg);wireHit(kg,"karth");
-      // dream at L4
-      var dg=el("g",{id:"g-dream"},svg);b.dreamG=dg;
-      var tri=el("polygon",{points:"0,-11 9,7 -9,7",fill:"none",stroke:"#33ff66","stroke-width":2},dg);
+      el("circle",{cx:0,cy:0,r:20,"class":"hit"},kg);
+      wireHit(kg,"miranda",function(){var bb=MIRANDA_BLURBS.karth;showBodyBlurb("miranda",bb[0],bb[1]);});
+      var dg=el("g",{},svg);entry.dreamG=dg;
+      el("polygon",{points:"0,-11 9,7 -9,7",fill:"none",stroke:"#33ff66","stroke-width":2},dg);
       el("circle",{cx:0,cy:0,r:3,fill:"#33ff66"},dg);
       var dt=el("text",{x:0,y:-18,"text-anchor":"middle","class":"slabel"},dg);dt.textContent="PROSPERO'S DREAM";
-      var yh=el("text",{x:0,y:24,"text-anchor":"middle","class":"slabel-sm",fill:"#ffb000"},dg);yh.textContent="\u25b2 YOU ARE HERE";
-      el("circle",{cx:0,cy:0,r:24,"class":"hit","data-id":"dream"},dg);wireHit(dg,"dream");
+      var yh=el("text",{x:0,y:24,"text-anchor":"middle","class":"slabel-sm",fill:"#ffb000"},dg);yh.textContent="▲ YOU ARE HERE";
+      el("circle",{cx:0,cy:0,r:24,"class":"hit"},dg);
+      wireHit(dg,"miranda",function(){var bb=MIRANDA_BLURBS.dream;showBodyBlurb("miranda",bb[0],bb[1]);});
+      var lt=el("text",{x:0,y:-b.size-14,"text-anchor":"middle","class":"slabel"},g);lt.textContent="JANUS";
+      el("circle",{cx:0,cy:0,r:b.size+16,"class":"hit"},g);
+      wireHit(g,"miranda",function(){var bb=MIRANDA_BLURBS.janus;showBodyBlurb("miranda",bb[0],bb[1]);});
     }else if(b.id==="cocytus"){
       el("ellipse",{cx:0,cy:0,rx:38,ry:12,fill:"none",stroke:"#1e8f43","stroke-width":1.6},g);
       el("circle",{cx:0,cy:0,r:b.size,fill:"#07130c",stroke:"#33ff66","stroke-width":1.6,"class":"body"},g);
-      var og=el("g",{id:"g-offit"},g);b.offitG=og;
+      var og=el("g",{},g);entry.offitG=og;
       el("circle",{cx:0,cy:0,r:5.5,fill:"#0d0a0a",stroke:"#ff5544","stroke-width":1.4},og);
       var ot=el("text",{x:0,y:-11,"text-anchor":"middle","class":"slabel-sm"},og);ot.textContent="OFFIT";
-      el("circle",{cx:0,cy:0,r:18,"class":"hit","data-id":"offit"},og);wireHit(og,"offit");
-      var lt=el("text",{x:0,y:-b.size-16,"text-anchor":"middle","class":"slabel"},g);lt.textContent="COCYTUS";
-      el("circle",{cx:0,cy:0,r:b.size+16,"class":"hit","data-id":"cocytus"},g);wireHit(g,"cocytus");
+      el("circle",{cx:0,cy:0,r:18,"class":"hit"},og);
+      wireHit(og,"miranda",function(){var bb=MIRANDA_BLURBS.offit;showBodyBlurb("miranda",bb[0],bb[1]);});
+      var lt2=el("text",{x:0,y:-b.size-16,"text-anchor":"middle","class":"slabel"},g);lt2.textContent="COCYTUS";
+      el("circle",{cx:0,cy:0,r:b.size+16,"class":"hit"},g);
+      wireHit(g,"miranda",function(){var bb=MIRANDA_BLURBS.cocytus;showBodyBlurb("miranda",bb[0],bb[1]);});
     }else{
       var sc=b.stroke||"#33ff66";
       el("circle",{cx:0,cy:0,r:b.size,fill:"#07130c",stroke:sc,"stroke-width":1.6,"class":"body"},g);
       if(b.id==="doenides"){
         [[-4,-3],[3,-5],[0,4]].forEach(function(p){el("circle",{cx:p[0],cy:p[1],r:1.4,fill:"#ffb000"},g);});
       }
-      var names={ferdinand:"FERDINAND P1",doenides:"DOENIDES P2"};
-      var t=el("text",{x:0,y:-b.size-10,"text-anchor":"middle","class":"slabel",fill:sc},g);t.textContent=names[b.id];
-      el("circle",{cx:0,cy:0,r:b.size+16,"class":"hit","data-id":b.id},g);wireHit(g,b.id);
+      var t=el("text",{x:0,y:-b.size-10,"text-anchor":"middle","class":"slabel",fill:sc},g);t.textContent=b.label;
+      el("circle",{cx:0,cy:0,r:b.size+16,"class":"hit"},g);
+      wireHit(g,"miranda",(function(bid){return function(){var bb=MIRANDA_BLURBS[bid];showBodyBlurb("miranda",bb[0],bb[1]);};})(b.id));
     }
   });
-  var sh=el("text",{x:CX+232,y:CY-8,"class":"slabel-sm"},svg);sh.textContent="THE SHATTER";
-  var shh=el("circle",{cx:CX+220,cy:CY,r:26,"class":"hit","data-id":"shatter"},svg);wireHit(shh,"shatter");
-}
-
-/* ================= JUMP CHART ================= */
-function hexPoints(cx,cy,r){var p=[];for(var i=0;i<6;i++){var a=Math.PI/3*i-Math.PI/6;p.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1));}return p.join(" ");}
-function routeLine(svg,x1,y1,x2,y2,color,tag){
-  el("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:color,"stroke-width":1.6,opacity:0.85},svg);
-  if(tag){var t=el("text",{x:((x1+x2)/2).toFixed(1),y:((y1+y2)/2-9).toFixed(1),"text-anchor":"middle","class":"slabel-sm",fill:color},svg);t.textContent=tag;}
-}
-function jumpCircle(svg,x,y,r,id,label,color){
-  var g=el("g",{"class":"node"},svg);
-  el("circle",{cx:x,cy:y,r:r+9,fill:color,opacity:0.10,"class":"halo"},g);
-  el("circle",{cx:x,cy:y,r:r,fill:"#0d1a08",stroke:color,"stroke-width":2},g);
-  var t=el("text",{x:x,y:y+4,"text-anchor":"middle","font-size":(label.length>9?10:11),fill:color},g);t.textContent=label;
-  el("circle",{cx:x,cy:y,r:r+13,"class":"hit","data-id":id},g);wireHit(g,id);
-}
-function darkDot(svg,x,y,id,label){
-  var g=el("g",{"class":"node"},svg);
-  el("circle",{cx:x,cy:y,r:7,fill:"#3a0f0c",stroke:"#ff5544","stroke-width":1.2},g);
-  var t=el("text",{x:x,y:y+25,"text-anchor":"middle","class":"slabel-sm",fill:"#ff5544"},g);t.textContent=label;
-  el("circle",{cx:x,cy:y,r:19,"class":"hit","data-id":id},g);wireHit(g,id);
-}
-function buildJump(){
-  var svg=$("jumpSvg"),cx=110,cy=320;
-  // title block, after the Alexandrian's map
-  var title=el("text",{x:36,y:76,"class":"jtitle",fill:"#33ff66"},svg);title.textContent="MIRANDA REACH";
-  var sub=el("text",{x:38,y:100,"class":"slabel-sm"},svg);sub.textContent="RAC NAVCOM SURVEY 2186 // JUMP ROUTES";
-  // home node
-  var hg=el("g",{"class":"node"},svg);
-  el("polygon",{points:hexPoints(cx,cy,34),fill:"#0d1a08",stroke:"#ffb000","stroke-width":2},hg);
-  var ht=el("text",{x:cx,y:cy+4,"text-anchor":"middle","class":"slabel",fill:"#ffb000"},hg);ht.textContent="MIRANDA";
-  var hs=el("text",{x:cx,y:cy+54,"text-anchor":"middle","class":"slabel-sm",fill:"#ffb000"},hg);hs.textContent="HOME";
-  el("circle",{cx:cx,cy:cy,r:42,"class":"hit","data-id":"transit"},hg);wireHit(hg,"transit");
-  // J1 systems, middle column
-  var jx=400;
-  var J1N=[["tausigma","TAU SIGMA",120],["tybalt","TYBALT",210],["ersa","ERSA",300],["argent","ARGENT",390],["carmentis","CARMENTIS",480],["utpala","UTPALA",570]];
-  J1N.forEach(function(n){
-    routeLine(svg,cx,cy,jx,n[2],"#8a6a00",null);
-    jumpCircle(svg,jx,n[2],26,n[0],n[1],"#ffb000");
-  });
-  var j1tag=el("text",{x:255,y:150,"text-anchor":"middle","class":"slabel-sm",fill:"#8a6a00"},svg);j1tag.textContent="J1";
-  // deep routes via dark systems
-  routeLine(svg,jx,120,640,120,"#7a2a22",null);
-  darkDot(svg,640,120,"ku17","KU-17");
-  routeLine(svg,640,120,860,120,"#7a2a22","J2");
-  jumpCircle(svg,860,120,34,"bell","THE BELL","#ff5544");
-  routeLine(svg,jx,210,640,210,"#7a2a22",null);
-  darkDot(svg,640,210,"ku9","KU-9");
-  routeLine(svg,640,210,860,210,"#7a2a22","J2");
-  jumpCircle(svg,860,210,34,"vanaheim","VANAHEIM","#ff5544");
-  routeLine(svg,jx,390,640,390,"#7a2a22",null);
-  darkDot(svg,640,390,"ku2b","KU-2B");
-  routeLine(svg,640,390,860,390,"#7a2a22","J2");
-  jumpCircle(svg,860,390,34,"brilotis","BRILOTIS X-1","#ff5544");
-  routeLine(svg,jx,570,860,570,"#7a2a22","J2");
-  jumpCircle(svg,860,570,34,"longfall","LONG FALL","#ff5544");
-}
-
-/* ================= DOSSIER ================= */
-function wireHit(node,id){
-  node.addEventListener("mouseenter",function(){blipHover();});
-  node.addEventListener("click",function(e){e.stopPropagation();showDossier(id);});
-}
-function showDossier(id){
-  var d=DOSSIER[id];if(!d)return;
-  blipSelect();
-  var toneCls=d.tone==="amb"?"amb":(d.tone==="red"?"red":"glow");
-  var hooks=d.hooks.map(function(h){return "<li>"+h+"</li>";}).join("");
-  $("dossierBody").innerHTML=
-   '<div class="dname '+toneCls+'">'+d.name+'</div>'+
-   '<div class="row"><span class="k">CLASS:</span> '+d.cls+'</div>'+
-   '<div class="row"><span class="k">TRANSIT:</span> <span class="'+toneCls+'">'+d.transit+'</span></div>'+
-   '<div class="row" style="margin-top:8px">'+d.desc+'</div>'+
-   '<ul>'+hooks+'</ul>'+
-   '<div class="row"><span class="cursorblink"></span></div>';
 }
 
 /* ================= ANIMATION LOOP ================= */
 var motionOn=true,lastT=0;
+var view={mode:"cluster",key:null};
 function frame(t){
   if(motionOn){
     var dt=Math.min(0.05,(t-lastT)/1000||0);
-    sysBodies.forEach(function(b){
-      b.angle+=dt*(Math.PI*2)/b.period;
-      var x=CX+b.orbit*Math.cos(b.angle),y=CY+b.orbit*Math.sin(b.angle);
-      b.g.setAttribute("transform","translate("+x.toFixed(1)+","+y.toFixed(1)+")");
-      if(b.id==="janus"){
-        moonState.karth.angle+=dt*(Math.PI*2)/moonState.karth.period;
-        var kx=44*Math.cos(moonState.karth.angle),ky=44*Math.sin(moonState.karth.angle);
-        b.karthG.setAttribute("transform","translate("+kx.toFixed(1)+","+ky.toFixed(1)+")");
-        var da=b.angle+Math.PI/3;
-        b.dreamG.setAttribute("transform","translate("+(CX+295*Math.cos(da)).toFixed(1)+","+(CY+295*Math.sin(da)).toFixed(1)+")");
-      }
-      if(b.id==="cocytus"){
-        moonState.offit.angle+=dt*(Math.PI*2)/moonState.offit.period;
-        var ox=34*Math.cos(moonState.offit.angle),oy=34*Math.sin(moonState.offit.angle);
-        b.offitG.setAttribute("transform","translate("+ox.toFixed(1)+","+oy.toFixed(1)+")");
-      }
-    });
+    if(view.mode==="region"&&view.key==="miranda"){
+      mirBodies.forEach(function(b){
+        b.angle+=dt*(Math.PI*2)/b.period;
+        var x=MCX+b.orbit*Math.cos(b.angle),y=MCY+b.orbit*Math.sin(b.angle);
+        b.g.setAttribute("transform","translate("+x.toFixed(1)+","+y.toFixed(1)+")");
+        if(b.id==="janus"){
+          mirMoons.karth.angle+=dt*(Math.PI*2)/mirMoons.karth.period;
+          b.karthG.setAttribute("transform","translate("+(44*Math.cos(mirMoons.karth.angle)).toFixed(1)+","+(44*Math.sin(mirMoons.karth.angle)).toFixed(1)+")");
+          var da=b.angle+Math.PI/3;
+          b.dreamG.setAttribute("transform","translate("+(MCX+295*Math.cos(da)).toFixed(1)+","+(MCY+295*Math.sin(da)).toFixed(1)+")");
+        }
+        if(b.id==="cocytus"){
+          mirMoons.offit.angle+=dt*(Math.PI*2)/mirMoons.offit.period;
+          b.offitG.setAttribute("transform","translate("+(34*Math.cos(mirMoons.offit.angle)).toFixed(1)+","+(34*Math.sin(mirMoons.offit.angle)).toFixed(1)+")");
+        }
+      });
+    }else if(view.mode==="region"){
+      // pass 1: star-orbit bodies
+      genBodies.forEach(function(b){
+        if(b.parent)return;
+        b.angle+=dt*(Math.PI*2)/b.period;
+        var x=OCX+b.soloOrbit*Math.cos(b.angle),y=OCY+b.soloOrbit*Math.sin(b.angle);
+        b.g.setAttribute("transform","translate("+x.toFixed(1)+","+y.toFixed(1)+")");
+        b.px=x;b.py=y;
+      });
+      // pass 2: moons / attached stations
+      genBodies.forEach(function(b){
+        if(!b.parent)return;
+        b.angle+=dt*(Math.PI*2)/b.period;
+        var px=b.parent.px!==undefined?b.parent.px:OCX, py=b.parent.py!==undefined?b.parent.py:OCY;
+        var x=px+b.orbitR*Math.cos(b.angle),y=py+b.orbitR*Math.sin(b.angle);
+        b.g.setAttribute("transform","translate("+x.toFixed(1)+","+y.toFixed(1)+")");
+      });
+    }
   }
   lastT=t;
   requestAnimationFrame(frame);
@@ -475,16 +683,28 @@ if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches){
   flickerOn=false;motionOn=false;
   document.getElementById("crt").classList.remove("flicker-on");
 }
-function setView(which){
+function setCluster(){
   blipView();
-  var sys=which==="sys";
-  $("sysSvg").classList.toggle("hidden",!sys);
-  $("jumpSvg").classList.toggle("hidden",sys);
-  $("legendSys").classList.toggle("hidden",!sys);
-  $("legendJump").classList.toggle("hidden",sys);
-  $("btnSys").classList.toggle("active",sys);
-  $("btnJump").classList.toggle("active",!sys);
-  $("chartTitle").innerHTML=sys?"&gt; MIRANDA SYSTEM — CUTTER RANGE":"&gt; JUMP CHART — CHARTER &amp; BUS";
+  view={mode:"cluster",key:null};
+  buildCluster();
+  $("chartTitle").innerHTML="&gt; MIRANDA REACH — CLUSTER JUMP MAP";
+  $("legendCluster").classList.remove("hidden");
+  $("legendRegion").classList.add("hidden");
+  $("btnCluster").classList.add("active");
+  $("btnBack").classList.add("hidden");
+}
+function setRegion(key){
+  if(!ORBITALS[key]&&key!=="miranda")return;
+  blipView();
+  view={mode:"region",key:key};
+  if(key==="miranda")buildMiranda();else buildOrbital(key);
+  var d=SYS[key];
+  $("chartTitle").innerHTML="&gt; "+(d?d.name:key.toUpperCase())+" — ORBITAL CHART";
+  $("legendCluster").classList.add("hidden");
+  $("legendRegion").classList.remove("hidden");
+  $("btnCluster").classList.remove("active");
+  $("btnBack").classList.remove("hidden");
+  showSysPanel(key);
 }
 function setMotion(on){
   motionOn=on;
@@ -503,15 +723,16 @@ function setSound(on){
   $("btnSound").classList.toggle("active",!on);
   if(on)blipSelect();
 }
-$("btnSys").addEventListener("click",function(){setView("sys");});
-$("btnJump").addEventListener("click",function(){setView("jump");});
+$("btnCluster").addEventListener("click",setCluster);
+$("btnBack").addEventListener("click",setCluster);
+$("btnTransit").addEventListener("click",function(){showSysPanel("transit");});
 $("btnMotion").addEventListener("click",function(){setMotion(!motionOn);});
 $("btnFlicker").addEventListener("click",function(){setFlicker(!flickerOn);});
 $("btnSound").addEventListener("click",function(){setSound(!soundOn);});
 document.addEventListener("keydown",function(e){
   var k=e.key.toLowerCase();
-  if(k==="1")setView("sys");
-  else if(k==="2")setView("jump");
+  if(k==="1")setCluster();
+  else if(k==="t")showSysPanel("transit");
   else if(k==="m")setMotion(!motionOn);
   else if(k==="f")setFlicker(!flickerOn);
   else if(k==="s")setSound(!soundOn);
@@ -527,14 +748,14 @@ setInterval(function(){
 },3800);
 
 /* ================= BOOT ================= */
-buildSystem();
-buildJump();
+setRegion("miranda");
 setMotion(motionOn);setFlicker(flickerOn);setSound(soundOn);
 requestAnimationFrame(frame);
 var bootLines=[
- "RAC NAVCOM v2.1 — CHART TERMINAL",
+ "RAC NAVCOM v3.0 — CLUSTER CHART TERMINAL",
  "> LOADING EPHEMERIS ............ OK",
  "> LOADING JUMP TAPES ........... OK",
+ "> LOADING SYSTEM FILES ......... OK",
  "> RENDER PHOSPHOR .............. OK",
  "> _"
 ];
