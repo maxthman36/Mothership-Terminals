@@ -69,12 +69,16 @@ bounties: [
               local: "Charter to the 46B coast + shuttle to Split Log",
               localKcr: 2 } },
 
+  // B-0233 sleeve trade (2026-10-16, Max's session-2 plan): the proof-of-death
+  // bonus is posted in kind by the Ice Box proprietor — one reclamation sleeve
+  // (house price 100kcr per the Ice Box terminal). This is the mechanism for
+  // saving Grimm's backed-up consciousness after the Change.
   { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
-    reward: "10 Kcr (+100 Kcr bonus for proof of death)", status: "OPEN",
+    reward: "10 Kcr (+1 reclamation sleeve for proof of death — posted by the Ice Box proprietor)", status: "OPEN",
     client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",
-    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, 100 Kcr bonus for proof of death. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
+    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings. Supplemental offer from the proprietor of the Ice Box: one reclamation sleeve (house price 100kcr) to the licensed team that brings verified proof of death. Inquire at the Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
     travel: { jumps: 0,
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },

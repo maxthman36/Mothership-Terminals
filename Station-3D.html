@@ -67,6 +67,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const PINK = 0xff2d78;
 const DECK_TOP = 0.75;   // deck plane modules sit on
@@ -181,6 +182,28 @@ function beamBetween(x1, z1, x2, z2, y, h) {
   b.rotation.y = Math.atan2(-dz, dx);
   return b;
 }
+/* Globular organic hull: displaced icosahedron, roughly the bounding volume
+   of the old box module. Displacement is a pure function of position, so it
+   is identical for duplicated vertices and welds cleanly. Seeded per district
+   so the layout is deterministic. */
+function globHull(sx, sy, sz, seed) {
+  let g = new THREE.IcosahedronGeometry(1, 3);
+  const pos = g.attributes.position;
+  const v = new THREE.Vector3();
+  const p1 = (seed % 89) * 0.61, p2 = (seed % 53) * 0.83;
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i).normalize();
+    const lump = 1
+      + 0.075 * Math.sin(3.1 * v.x + p1) * Math.sin(2.6 * v.y + p2)
+      + 0.055 * Math.sin(4.2 * v.z + p2) * Math.sin(3.4 * v.x + p1)
+      + 0.030 * Math.sin(6.3 * v.y + p1 * 1.7);
+    pos.setXYZ(i, v.x * lump, v.y * lump, v.z * lump);
+  }
+  g = mergeVertices(g);
+  g.computeVertexNormals();
+  g.scale(sx * 0.58, sy * 0.58, sz * 0.58);
+  return g;
+}
 
 /* ---------- central hub disc (The Court platform) ---------- */
 const courtGroup = new THREE.Group();
@@ -192,10 +215,10 @@ courtGroup.userData.district = COURT;
   rim.rotation.x = Math.PI / 2; rim.position.y = 1.5; courtGroup.add(rim);
   const hubRing = new THREE.Mesh(new THREE.TorusGeometry(7, 0.22, 8, 40), trackMat);
   hubRing.rotation.x = Math.PI / 2; hubRing.position.y = 1.55; courtGroup.add(hubRing);
-  const hall = edged(new THREE.BoxGeometry(8.5, 4.5, 8.5), hullMat);
-  hall.position.y = 3.75; courtGroup.add(hall);
-  const tier = edged(new THREE.BoxGeometry(5.5, 3, 5.5), darkMat);
-  tier.position.y = 7.5; courtGroup.add(tier);
+  const hall = edged(new THREE.BoxGeometry(9.6, 5.2, 9.6), hullMat);
+  hall.position.y = 3.2; courtGroup.add(hall);
+  const tier = edged(new THREE.BoxGeometry(5.8, 3.6, 5.8), darkMat);
+  tier.position.y = 5.9; courtGroup.add(tier);
   courtGroup.traverse(o => { if (o.isMesh) pickables.push(o); });
   station.add(courtGroup);
   COURT._group = courtGroup;
@@ -287,20 +310,122 @@ DISTRICTS.forEach(d => {
   grp.rotation.y = rad;   // local +X points radially outward
 
   const deckY = d.col ? d.y : DECK_TOP + d.s[1] / 2;
+  const rx = d.s[0] * 0.58, ry = d.s[1] * 0.58, rz = d.s[2] * 0.58;
+  // Only CANYONHEAVY (06) keeps the globular book look;
+  // every other district uses the original pink-edged box hull.
+  // THE FARM (05) is a dome cluster, built below from the Blender layout.
+  const GLOB = d.n === "06";
+  const FARM = d.n === "05";
+  let topY = 0, farmTop = 0;
 
-  const main = edged(new THREE.BoxGeometry(d.s[0], d.s[1], d.s[2]), hullMat);
-  grp.add(main); pickables.push(main.children[0]);
+  if (FARM) {
+    // Dome cluster: outer wireframe dome + inner chamber per section.
+    // Blender coords are z-up; Three.js is y-up, so (x, y, z) -> (x, z, y).
+    const farmOakTrunk = new THREE.MeshStandardMaterial({ color: 0x2e2318, roughness: 0.95, metalness: 0.0 });
+    const farmOakLeaf = new THREE.MeshStandardMaterial({ color: 0x2a4a33, roughness: 0.85, metalness: 0.05, flatShading: true });
+    const farmDomeGlass = new THREE.MeshStandardMaterial({ color: 0x14141b, roughness: 0.4, metalness: 0.6, transparent: true, opacity: 0.62 });
+    const SECTIONS = [
+      ["Sanctuary", 1.5, 2.2, -4.0, -2.0, 0.0, "Quiet chapel domes of the Solarian Church."],
+      ["Sun Market", 2.5, 3.5, 0.0, 0.0, 0.0, "The Farm's trading floor. Produce sells before it cools."],
+      ["Gardens", 1.2, 1.8, 1.0, 3.5, 0.5, "Ornamental and medicinal beds under glass."],
+      ["Monastery", 1.5, 2.3, -1.5, 4.5, 1.0, "The Church's resident order keeps the hours."],
+      ["Drug Lab", 1.3, 1.9, -4.0, 2.0, 0.5, "Church-licensed pharmaceuticals and remedies."],
+      ["Seed Vault", 1.4, 2.0, -4.5, 0.5, 0.5, "Genetic stock of every crop grown on the Dream."],
+      ["Solarium", 1.3, 1.8, -4.5, 3.5, 1.0, "Sun rooms for light therapy and worship."],
+      ["Farm One", 2.2, 3.0, -1.0, -4.0, -0.5, "Hydroponic production dome."],
+      ["The Tree", 4.0, 5.5, 4.0, -1.0, 0.0, "The Farm's heart: a great tree under the main dome."],
+      ["Farm Two", 1.8, 2.6, 2.5, 2.5, 1.0, "Hydroponic production dome."],
+    ];
+    SECTIONS.forEach(([sname, ri, ro, bx, by, bz, sdesc]) => {
+      const sec = new THREE.Group();
+      sec.userData.district = { n: "05", name: "THE FARM — " + sname.toUpperCase(), desc: sdesc };
+      const cx = bx, cy = bz, cz = by; // Blender z-up -> Three y-up
+      if (sname === "The Tree") {
+        // dark translucent main dome with the hint of a live oak inside
+        const dome = new THREE.Mesh(new THREE.SphereGeometry(ro, 32, 24), farmDomeGlass);
+        dome.position.set(cx, cy, cz);
+        sec.add(dome); pickables.push(dome);
+        const oak = new THREE.Group();
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.6, 3.0, 8), farmOakTrunk);
+        trunk.position.y = 1.0;
+        oak.add(trunk);
+        // broad spreading canopy, flattened live-oak silhouette, base halfway up the dome
+        [[3.0, 3.0, 0], [2.4, 4.0, 1.2], [2.2, 4.0, -1.2]].forEach(([fr, fy, fx]) => {
+          const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(fr, 1), farmOakLeaf);
+          blob.scale.y = 0.55;
+          blob.position.set(fx, fy, 0);
+          oak.add(blob);
+        });
+        oak.position.set(cx, cy, cz);
+        oak.scale.set(0.8, 0.8, 0.8); // keep the canopy clear of the dome crown
+        sec.add(oak);
+        oak.traverse(o => { if (o.isMesh) pickables.push(o); });
+      } else {
+        const dome = new THREE.Mesh(new THREE.SphereGeometry(ro, 24, 16), hullMat);
+        dome.position.set(cx, cy, cz);
+        sec.add(dome); pickables.push(dome);
+      }
+      grp.add(sec);
+      farmTop = Math.max(farmTop, bz + ro);
+    });
+    topY = farmTop;
+  }
 
-  // roof greebles
-  const n = 4 + Math.floor(rnd() * 3);
-  for (let i = 0; i < n; i++) {
-    const w = 1 + rnd() * d.s[0] * 0.35, h = 1 + rnd() * 3, dep = 1 + rnd() * d.s[2] * 0.35;
+  let hull;
+  if (GLOB) {
+    // globular main hull (grown, organic — the book look)
+    hull = new THREE.Mesh(globHull(d.s[0], d.s[1], d.s[2], d.seed), hullMat);
+    grp.add(hull); pickables.push(hull);
+
+    // pink structural ribs hugging the hull (keeps the neon outline identity;
+    // EdgesGeometry would turn to triangle soup on organic geometry)
+    [[0, 1.0], [ry * 0.45, 0.9], [-ry * 0.45, 0.9]].forEach(([yy, f]) => {
+      const rib = new THREE.Mesh(new THREE.TorusGeometry(1, 0.05, 8, 48), trackMat);
+      rib.rotation.x = Math.PI / 2;
+      rib.scale.set(rx * f, rz * f, 1);
+      rib.position.y = yy;
+      grp.add(rib); pickables.push(rib);
+    });
+
+    // organic blister domes, seeded per district
+    const nBl = 2 + (d.seed % 3);
+    for (let i = 0; i < nBl; i++) {
+      const th = rnd() * Math.PI * 2;
+      const ph = (rnd() * 0.95 - 0.2) * Math.PI / 2;
+      const br = Math.min(rx, rz) * (0.26 + rnd() * 0.24);
+      const bl = new THREE.Mesh(new THREE.SphereGeometry(1, 18, 12), rnd() < 0.5 ? darkMat : hullMat);
+      bl.scale.set(br, br * (0.55 + rnd() * 0.3), br);
+      bl.position.set(Math.cos(th) * Math.cos(ph) * rx * 0.8,
+                      Math.sin(ph) * ry * 0.8,
+                      Math.sin(th) * Math.cos(ph) * rz * 0.8);
+      grp.add(bl); pickables.push(bl);
+    }
+  } else if (!FARM) {
+    // original pink-edged box hull
+    hull = edged(new THREE.BoxGeometry(d.s[0], d.s[1], d.s[2]), hullMat);
+    grp.add(hull); pickables.push(hull.children[0]);
+  }
+
+  // roof/side greebles: tech contrast on the hull (the Farm's domes are the detail)
+  if (!FARM) topY = GLOB ? ry * 1.02 : d.s[1] / 2;
+  const n = 3 + Math.floor(rnd() * 3);
+  for (let i = 0; i < n && !FARM; i++) {
+    const w = 0.8 + rnd() * (GLOB ? rx * 0.5 : d.s[0] * 0.25);
+    const h = 0.8 + rnd() * 2.4;
+    const dep = 0.8 + rnd() * (GLOB ? rz * 0.5 : d.s[2] * 0.25);
     const g = edged(new THREE.BoxGeometry(w, h, dep), darkMat);
     if (rnd() < 0.35) {
       const side = rnd() < 0.5 ? 1 : -1;
-      g.position.set(side * (d.s[0]/2 + w/2 - 0.5), (rnd()-0.5) * d.s[1] * 0.5, (rnd()-0.5) * d.s[2] * 0.8);
+      if (GLOB)
+        g.position.set(side * (rx * 0.92 + w / 2 - 0.4), (rnd() - 0.5) * ry * 0.9, (rnd() - 0.5) * rz * 1.2);
+      else
+        g.position.set(side * (d.s[0] / 2 + w / 2 - 0.4), (rnd() - 0.5) * d.s[1] * 0.45, (rnd() - 0.5) * d.s[2] * 0.6);
+    } else if (GLOB) {
+      const gx = (rnd() - 0.5) * rx * 1.1, gz = (rnd() - 0.5) * rz * 1.1;
+      const gy = ry * Math.sqrt(Math.max(0.05, 1 - (gx / rx) * (gx / rx) - (gz / rz) * (gz / rz)));
+      g.position.set(gx, gy + h / 2 - 0.4, gz);
     } else {
-      g.position.set((rnd()-0.5) * d.s[0] * 0.9, d.s[1]/2 + h/2 - 0.5, (rnd()-0.5) * d.s[2] * 0.9);
+      g.position.set((rnd() - 0.5) * d.s[0] * 0.55, d.s[1] / 2 + h / 2 - 0.4, (rnd() - 0.5) * d.s[2] * 0.55);
     }
     grp.add(g); pickables.push(g.children[0]);
   }
@@ -314,16 +439,36 @@ DISTRICTS.forEach(d => {
     });
   }
 
-  // tower rising from the module (Farm, Tempest HQ)
-  let topY = d.s[1] / 2;
-  if (d.tower) {
-    const tw = edged(new THREE.BoxGeometry(d.tower[0], d.tower[1], d.tower[2]), hullMat);
-    tw.position.set(0, d.s[1]/2 + d.tower[1]/2 - 0.5, 0);
-    grp.add(tw); pickables.push(tw.children[0]);
-    const cap = edged(new THREE.BoxGeometry(d.tower[0]*0.6, 2, d.tower[2]*0.6), darkMat);
-    cap.position.set(0, d.s[1]/2 + d.tower[1] - 0.5 + 1, 0);
-    grp.add(cap); pickables.push(cap.children[0]);
-    topY = d.s[1]/2 + d.tower[1] + 1.5;
+  // towers: CANYONHEAVY keeps its grown organic blob stack; the Farm's Tree
+  // dome is its landmark now, so it skips the tower; every other tower
+  // (Tempest HQ) reverts to the original stacked boxes.
+  if (d.tower && !FARM) {
+    const nSeg = 4;
+    const segH = d.tower[1] / nSeg;
+    if (GLOB) {
+      // grown spire: stacked organic blobs
+      let yCur = topY + segH * 0.3;
+      for (let k = 0; k < nSeg; k++) {
+        const sr = d.tower[0] * 0.52 * (1 - 0.16 * k);
+        const blob = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), k % 2 ? darkMat : hullMat);
+        blob.scale.set(sr, segH * 0.62, sr);
+        blob.position.y = yCur;
+        yCur += segH * 0.8;
+        grp.add(blob); pickables.push(blob);
+      }
+      topY = yCur - segH * 0.8 + segH * 0.62;
+    } else {
+      // original stacked box tower
+      let yCur = topY;
+      for (let k = 0; k < nSeg; k++) {
+        const w = d.tower[0] * (1 - 0.16 * k);
+        const seg = edged(new THREE.BoxGeometry(w, segH, w), k % 2 ? darkMat : hullMat);
+        seg.position.y = yCur + segH / 2;
+        yCur += segH;
+        grp.add(seg); pickables.push(seg.children[0]);
+      }
+      topY = yCur;
+    }
   }
 
   // open docking boxes (Dry Dock): hollow cradles, mouths facing outward
@@ -356,10 +501,11 @@ DISTRICTS.forEach(d => {
     arm.position.set(mid * Math.cos(rad), d.y, -mid * Math.sin(rad));
     arm.rotation.y = rad;
   }
-  // keel below the deck (Tempest HQ extends below the ring plane)
+  // keel below the deck (Tempest HQ extends below the ring plane):
+  // original box keel
   if (d.keel) {
     const kl = edged(new THREE.BoxGeometry(d.keel[0], d.keel[1], d.keel[2]), hullMat);
-    kl.position.set(0, -(d.s[1]/2 + d.keel[1]/2 - 0.5), 0);
+    kl.position.set(0, -(d.s[1] / 2 + d.keel[1] / 2), 0);
     grp.add(kl); pickables.push(kl.children[0]);
   }
 
