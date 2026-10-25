@@ -80,7 +80,7 @@ bounties: [
     client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",
-    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, plus a bonus — the team's choice: 100 Kcr, or one reclamation sleeve (house price 100kcr) from the proprietor of the Ice Box. Inquire at the Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
+    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, plus a bonus — the team's choice: 100 Kcr, or one reclamation sleeve (house price 100kcr) held by the proprietor of the Ice Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
     travel: { jumps: 0,
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
