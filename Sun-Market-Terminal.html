@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>SUN MARKET // FARM CO-OP EXCHANGE</title>
+<!--
+  Player-facing diegetic terminal. Sources (kept out of the visible page):
+  - Drug table: A Pound of Flesh drug table as photographed from Max's print copy.
+    RULED 2026-10-31 (Max): that photo is the 1E version and its prices and effects
+    are the campaign standard. The PDF printing on file differs on several rows
+    (Stimspice most of all: 30kcr there, 500cr in 1E) and is NOT to be used for
+    drug prices or effects.
+  - Sycorax sidebar: APoF, Sycorax sidebar (500 doses per 3 fruits; +20 Body Saves
+    for cybermod installation; healing by installed slots; mutation marks; addictive)
+    and the Ecstacy menu line ("Neon pink pill. Strong sense of euphoria for
+    cybermod users. 750cr/pill").
+  - Sun Market, Sanctuary, Solarium, morning prayer: APoF, The Farm.
+  - Farm fruit buy price (10kcr / 3 fruits, sealed): APoF, Sycorax sidebar.
+  - "Take two packets" line: campaign play, Ukko/Ukka alms beat, session 2 prep.
+  Warden-only material (Farm Two, the Drug Lab guard roster, the Tree's secret)
+  is deliberately absent.
+-->
+<style>
+:root{
+  --sun:#ffb52e; --dawn:#ff7a1a; --leaf:#8fe388; --cream:#ffedbe;
+  --dim:#c98f3d; --soil:#170d03; --panel:#120a04; --rax:#ff4fd8;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{background:var(--soil); color:var(--cream);
+  font-family:"Courier New",Courier,monospace;
+  text-shadow:0 0 8px rgba(255,181,46,.45);
+  overflow-x:hidden; padding:12px;}
+/* Rotating sun rays */
+#rays{position:fixed; inset:-60vmax; pointer-events:none; z-index:0; opacity:.10;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,
+    rgba(255,181,46,.9) 0deg 4deg, transparent 4deg 12deg);
+  animation:spin 240s linear infinite;}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+#glow{position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255,122,26,.35), transparent 65%);}
+#crt{position:fixed; inset:0; pointer-events:none; z-index:90;}
+#crt::before{content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 3px);}
+#crt::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(10,4,0,.75) 100%);}
+#sweep{position:fixed; left:0; right:0; height:120px; z-index:91; pointer-events:none; opacity:.10;
+  background:linear-gradient(to bottom, transparent, var(--sun), transparent);
+  animation:sweep 11s linear infinite;}
+@keyframes sweep{from{top:-140px}to{top:110%}}
+#term{position:relative; z-index:2; max-width:900px; margin:0 auto; border:1px solid var(--sun);
+  background:rgba(18,10,4,.93);
+  box-shadow:0 0 30px rgba(255,181,46,.22), inset 0 0 80px rgba(60,30,0,.5);
+  clip-path:polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px);}
+.growstrip{height:8px;
+  background:repeating-linear-gradient(90deg, var(--leaf) 0 26px, var(--sun) 26px 52px, var(--dawn) 52px 78px);
+  opacity:.55;}
+header.bar{border-bottom:1px solid var(--sun); padding:14px 20px;
+  display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+header.bar .ttl{font-size:clamp(17px,3.6vw,26px); letter-spacing:.28em; color:#fff;
+  text-shadow:0 0 16px var(--sun);}
+header.bar .sub{font-size:clamp(10px,2vw,13px); color:var(--sun); letter-spacing:.16em; margin-top:4px;}
+header.bar .sub2{font-size:clamp(9px,1.8vw,11px); color:var(--leaf); letter-spacing:.14em; margin-top:3px;
+  text-shadow:0 0 8px rgba(143,227,136,.5);}
+#glyph{cursor:pointer; font-size:34px; line-height:1; color:var(--sun); user-select:none;
+  filter:drop-shadow(0 0 10px var(--dawn));}
+#blessing{padding:10px 20px 0; font-size:clamp(11px,2.2vw,13px); color:var(--cream);
+  letter-spacing:.12em; min-height:1.4em;}
+#blessing .who{color:var(--dim);}
+nav.tabs{display:flex; gap:10px; padding:14px 20px 0; flex-wrap:wrap;}
+button.hex{font-family:inherit; font-weight:bold; letter-spacing:.2em; text-transform:uppercase;
+  font-size:clamp(11px,2.2vw,14px); color:var(--sun); background:rgba(255,181,46,.06);
+  border:1px solid var(--sun); padding:12px 18px; cursor:pointer; min-height:48px;
+  clip-path:polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);}
+button.hex.on{background:rgba(255,181,46,.22); color:#fff; text-shadow:0 0 10px var(--sun);}
+button.hex.rax{color:var(--rax); border-color:var(--rax); background:rgba(255,79,216,.05);
+  text-shadow:0 0 8px rgba(255,79,216,.55);}
+button.hex.rax.on{background:rgba(255,79,216,.20); color:#fff; text-shadow:0 0 10px var(--rax);}
+section.page{display:none; padding:18px 20px 22px;}
+section.page.on{display:block;}
+.intro{font-size:clamp(11px,2.2vw,13px); line-height:1.65; color:var(--cream);
+  border-left:3px solid var(--leaf); padding:2px 0 2px 12px; margin-bottom:16px;}
+.intro b{color:var(--leaf);}
+.row{display:flex; gap:12px; align-items:baseline; padding:11px 2px;
+  border-bottom:1px dashed rgba(201,143,61,.4);}
+.row .code{color:var(--dim); font-size:clamp(10px,2vw,12px); min-width:2.2em;}
+.row .main{flex:1 1 auto;}
+.row .name{font-weight:bold; letter-spacing:.14em; color:#fff; font-size:clamp(13px,2.6vw,16px);
+  text-shadow:0 0 10px rgba(255,181,46,.6);}
+.row .fx{font-size:clamp(11px,2.2vw,13px); line-height:1.55; color:var(--cream); margin-top:3px;}
+.row .fx .down{color:var(--dawn);}
+.row .price{font-weight:bold; color:var(--sun); font-size:clamp(13px,2.6vw,16px);
+  white-space:nowrap; text-shadow:0 0 10px rgba(255,181,46,.6);}
+.row.pink .name{color:#fff; text-shadow:0 0 12px var(--rax);}
+.row.pink .price{color:var(--rax); text-shadow:0 0 10px rgba(255,79,216,.7);}
+.row.pink{border-bottom:1px dashed rgba(255,79,216,.5); cursor:pointer;}
+h2.sec{font-size:clamp(15px,3vw,20px); letter-spacing:.22em; color:#fff; margin:2px 0 6px;
+  text-shadow:0 0 14px var(--rax);}
+h2.sec.gold{text-shadow:0 0 14px var(--sun);}
+.tagline{color:var(--rax); letter-spacing:.14em; font-size:clamp(11px,2.2vw,13px); margin-bottom:14px;}
+.fxblock{font-size:clamp(12px,2.4vw,14px); line-height:1.7; margin:0 0 12px;}
+.fxblock b{color:var(--sun);}
+.fxblock .pk{color:var(--rax); font-weight:bold;}
+ul.rules{margin:0 0 6px; padding-left:18px; font-size:clamp(12px,2.4vw,14px); line-height:1.75;}
+ul.rules li{margin-bottom:6px;}
+ul.rules b{color:#fff;}
+.notice{border:1px solid rgba(143,227,136,.5); background:rgba(143,227,136,.05);
+  padding:12px 14px; margin-bottom:12px;}
+.notice .nh{color:var(--leaf); font-weight:bold; letter-spacing:.16em;
+  font-size:clamp(11px,2.2vw,13px); margin-bottom:5px; text-shadow:0 0 8px rgba(143,227,136,.5);}
+.notice .nb{font-size:clamp(11px,2.2vw,13px); line-height:1.6;}
+.notice .nb b{color:var(--sun);}
+footer{border-top:1px solid var(--sun); padding:14px 20px 16px; text-align:center;}
+footer .prayer{font-size:clamp(10px,2vw,12px); letter-spacing:.18em; color:var(--dim); line-height:1.9;}
+footer .resp{font-size:clamp(11px,2.2vw,13px); letter-spacing:.22em; color:var(--sun); margin-top:6px;}
+</style>
+</head>
+<body>
+<div id="rays"></div>
+<div id="glow"></div>
+<div id="crt"></div>
+<div id="sweep"></div>
+
+<div id="term">
+  <div class="growstrip"></div>
+  <header class="bar">
+    <div>
+      <div class="ttl">SUN MARKET</div>
+      <div class="sub">FARM CO-OP EXCHANGE // EVANGELICAL SOLARIAN CHURCH</div>
+      <div class="sub2">PROSPERO'S DREAM · THE FARM · STALL RATES POSTED AT DAWN</div>
+    </div>
+    <div id="glyph" title="Receive the blessing">☉</div>
+  </header>
+  <div id="blessing"><span class="who">THE SUN:</span> <span id="blessingText">I SEE YOUR LIGHT.</span></div>
+
+  <nav class="tabs">
+    <button class="hex on" data-tab="offerings">The Offerings</button>
+    <button class="hex rax" data-tab="sycorax">Sycorax</button>
+    <button class="hex" data-tab="board">Market Board</button>
+  </nav>
+
+  <section class="page on" id="page-offerings">
+    <p class="intro">Grown, gathered, and blessed under the sun. The Church keeps no books on
+      mercy; the market keeps exact books on everything else. <b>All sales final. All prices
+      in credits. Take a seed packet on your way out; they are free, they are always free.</b></p>
+
+    <div class="row"><div class="code">01</div><div class="main">
+      <div class="name">METHOD</div>
+      <div class="fx">Complete and total eidetic memory for 2d10min.</div></div>
+      <div class="price">80cr</div></div>
+
+    <div class="row"><div class="code">02</div><div class="main">
+      <div class="name">LIQUID SWORD</div>
+      <div class="fx">[+] on Combat Checks for 1d5 turns. <span class="down">Take 2d10 DMG after.</span></div></div>
+      <div class="price">200cr</div></div>
+
+    <div class="row"><div class="code">03</div><div class="main">
+      <div class="name">DAYTONA</div>
+      <div class="fx">Gain an extra action for 1d10 turns. <span class="down">Reduce Speed by 1d10 after.</span></div></div>
+      <div class="price">150cr</div></div>
+
+    <div class="row"><div class="code">04</div><div class="main">
+      <div class="name">TRIUMPH</div>
+      <div class="fx">Grants [+] on the next 1d10 rolls. <span class="down">1d5 Stress. Permanently reduce Max Health by 1d5.</span></div></div>
+      <div class="price">300cr</div></div>
+
+    <div class="row"><div class="code">05</div><div class="main">
+      <div class="name">SOMA</div>
+      <div class="fx">Don't gain Stress for 1d10 hours. <span class="down">[-] on Speed Checks for the next 1d10 days. +1 Minimum Stress.</span></div></div>
+      <div class="price">125cr</div></div>
+
+    <div class="row"><div class="code">06</div><div class="main">
+      <div class="name">RUCKUS</div>
+      <div class="fx">+1d10 Strength. <span class="down">-1d10 Sanity.</span></div></div>
+      <div class="price">100cr</div></div>
+
+    <div class="row"><div class="code">07</div><div class="main">
+      <div class="name">SEED</div>
+      <div class="fx">Gain a new Skill for 1d10 days. <span class="down">Lower a random Skill's bonus by 5
+        [1d10: (1-5) Trained, (6-9) Expert, (10) Master]. A Skill reduced below 0 is forgotten completely.</span></div></div>
+      <div class="price">350cr</div></div>
+
+    <div class="row"><div class="code">08</div><div class="main">
+      <div class="name">STIMSPICE</div>
+      <div class="fx">Grants the ability to read target's mind for 1d10 minutes. <span class="down">Gain 1d5 Stress.</span></div></div>
+      <div class="price">500cr</div></div>
+
+    <div class="row"><div class="code">09</div><div class="main">
+      <div class="name">SLUG</div>
+      <div class="fx">Mentally visit a virtual world shared by everyone taking Slug at that exact moment.
+        <span class="down">Last 1d10 hours. Sanity Save.</span></div></div>
+      <div class="price">25cr</div></div>
+
+    <div class="row pink" id="rowSycorax"><div class="code">10</div><div class="main">
+      <div class="name">SYCORAX</div>
+      <div class="fx">See the pink page. The Sun provides; the Sun also keeps count.</div></div>
+      <div class="price">750cr</div></div>
+  </section>
+
+  <section class="page" id="page-sycorax">
+    <h2 class="sec">SYCORAX</h2>
+    <div class="tagline">NEON PINK PILL · 750cr A DOSE · GROWN NOWHERE ELSE</div>
+    <p class="fxblock">A powerful drug made only from fruit that grows in one place in all
+      the Dream. Three fruits yield a batch of five hundred pure doses. Strong sense of
+      <span class="pk">euphoria</span> for cybermod users.</p>
+    <ul class="rules">
+      <li><b>Installation:</b> +20 to Body Saves made when installing cybermods.</li>
+      <li><b>Mending:</b> Heals Xd10 damage, where X is the number of slots of cybermods
+        and Slickware you have installed.</li>
+      <li><b>The Count:</b> Every time you take Sycorax, make a mark and roll 1d10. If you
+        roll equal to or lower than the number of marks you have made, you gain a random
+        Mutation, and the count resets to zero.</li>
+      <li><b>Addictive.</b> The Sun does not invoice the field. Sycorax is not the Sun.</li>
+    </ul>
+    <p class="fxblock">Sold at this market by the Church's own stalls. If anyone offers it
+      cheaper elsewhere on the station, ask them where their fruit grows.</p>
+  </section>
+
+  <section class="page" id="page-board">
+    <h2 class="sec gold">MARKET BOARD</h2>
+    <div class="notice">
+      <div class="nh">SEED PACKETS &amp; TRACT LITERATURE</div>
+      <div class="nb"><b>FREE.</b> Take two packets: one to eat, one to grow. No forms. No debt.
+        The sun does not invoice the field.</div>
+    </div>
+    <div class="notice">
+      <div class="nh">THE FARM BUYS</div>
+      <div class="nb">Burrows fruit, <b>sealed container only</b>: <b>10kcr for every 3 fruits.</b>
+        Present at the Farm intake. Do not open the container. Do not carry it through the
+        Choke unsealed.</div>
+    </div>
+    <div class="notice">
+      <div class="nh">THE SOLARIUM</div>
+      <div class="nb">Massive artificial sun room. Access on a <b>100cr donation</b>. Kneel in
+        the shallow waters, bask in the glorious light, <b>reduce Stress by 1</b>.</div>
+    </div>
+    <div class="notice">
+      <div class="nh">PRAYER AT THE SANCTUARY</div>
+      <div class="nb"><b>Dawn 0600 · High Sun 1200 · Sundown 1800.</b> Guided meditation from
+        the Altar of Dawn. All are welcome. All labor ceases when you rest in the west.</div>
+    </div>
+    <div class="notice">
+      <div class="nh">MUSHROOM COFFEE</div>
+      <div class="nb">The Farm stand pours mushroom coffee all market day, dark and earthy.
+        Sit a while. The market is in no hurry, and neither is the sun.</div>
+    </div>
+    <div class="notice">
+      <div class="nh">BECOME INVICTUS SOL</div>
+      <div class="nb">Anyone may join the Dawn of the Unconquered Sun. Accept a <b>Sun Spot</b>,
+        burned into the skull, and grow and maintain a small garden of your own, aboard ship
+        or otherwise. Speak to any Gardener Monk.</div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="prayer">ALL EYES ARE ON YOUR BEAUTY UNTIL YOU SET.<br>
+      ALL LABOR CEASES WHEN YOU REST IN THE WEST.</div>
+    <div class="resp">I SEE YOUR LIGHT. — AND I YOURS.</div>
+  </footer>
+  <div class="growstrip"></div>
+</div>
+
+<script>
+var tabs = document.querySelectorAll("button.hex");
+function showTab(name){
+  tabs.forEach(function(b){ b.classList.toggle("on", b.getAttribute("data-tab")===name); });
+  document.querySelectorAll("section.page").forEach(function(p){
+    p.classList.toggle("on", p.id==="page-"+name);
+  });
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+tabs.forEach(function(b){ b.addEventListener("click", function(){ showTab(b.getAttribute("data-tab")); }); });
+document.getElementById("rowSycorax").addEventListener("click", function(){ showTab("sycorax"); });
+
+var prayer = [
+  "I SEE YOUR LIGHT.",
+  "LET LIGHT SHINE ON THE AFFLICTED.",
+  "CAST MERCY UPON THE DEEP.",
+  "FEED THE HUNGRY.",
+  "RANSOM OUR PRISONERS.",
+  "RAISE UP THE SICK.",
+  "BANISH THE DARK PLACES."
+];
+var pi = 0;
+document.getElementById("glyph").addEventListener("click", function(){
+  pi = (pi + 1) % prayer.length;
+  document.getElementById("blessingText").textContent = prayer[pi];
+});
+</script>
+</body>
+</html>

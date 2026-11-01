@@ -73,6 +73,46 @@ main{padding:18px 20px;}
   color:var(--cy); letter-spacing:.14em; display:none;}
 .panel.open .cold{display:block;}
 .panel .req{font-size:11px; color:var(--dim); margin-top:6px; letter-spacing:.08em;}
+/* ============ SLICKWARE TECH TREE ============ */
+.tierLbl{font-size:11px; letter-spacing:.3em; color:var(--dim); margin:20px 0 10px; text-shadow:none;}
+.tierLbl:first-of-type{margin-top:2px;}
+.tier{display:flex; flex-wrap:wrap; gap:10px;}
+.node{flex:1 1 160px; max-width:250px; border:1px solid var(--dim); background:rgba(0,229,255,.04);
+  padding:10px 12px; position:relative;
+  clip-path:polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);}
+.node:hover{border-color:var(--cy);}
+.node .tag{font-size:9px; letter-spacing:.16em; color:var(--dim); text-shadow:none; text-align:right; min-height:11px;}
+.node.inst .tag{color:#fff;}
+.node.hw.owned .tag{color:var(--cy);}
+.node .nn{font-size:13px; letter-spacing:.08em; color:#fff; text-shadow:0 0 10px var(--cy); line-height:1.35; cursor:pointer;}
+.node .np{color:var(--cy); font-weight:bold; font-size:12px; margin-top:4px; letter-spacing:.06em;}
+.node .ns{color:var(--dim); font-size:11px; margin-top:2px; text-shadow:none;}
+.node .nd{font-size:11px; line-height:1.55; margin-top:7px; color:var(--ice); display:none;}
+.node.open .nd{display:block;}
+.node .ncold{font-size:10px; margin-top:7px; letter-spacing:.12em; color:var(--cy); display:none;}
+.node.open .ncold{display:block;}
+.node .chips{margin-top:7px; display:flex; flex-wrap:wrap; gap:4px;}
+.chip{font-size:9px; letter-spacing:.1em; padding:2px 6px; border:1px solid var(--dim); color:var(--dim); text-shadow:none;}
+.chip.ok{border-color:var(--cy); color:var(--cy);}
+.chip.miss{border-color:var(--mag); color:var(--mag);}
+.node .ibtn{margin-top:9px; width:100%; font-family:inherit; font-weight:bold; letter-spacing:.18em;
+  font-size:11px; padding:8px 6px; cursor:pointer; color:var(--cy); background:rgba(0,229,255,.07);
+  border:1px solid var(--cy); min-height:36px;}
+.node .ibtn:active{transform:scale(.97);}
+.node.inst{border-color:#fff; background:rgba(0,229,255,.16); box-shadow:0 0 16px rgba(0,229,255,.45);}
+.node.warn{border-color:var(--mag); box-shadow:0 0 14px rgba(255,61,240,.35);}
+.node.hw{border-style:dashed;}
+.node.hw.owned{border-color:var(--cy); background:rgba(0,229,255,.10);}
+.chain{display:flex; align-items:stretch; gap:0; flex-wrap:wrap;}
+.chain .arrow{align-self:center; padding:0 5px; color:var(--dim); font-size:16px; text-shadow:none;}
+#loadout{border:1px solid var(--cy); background:rgba(0,229,255,.06); padding:13px 16px; margin-bottom:4px;
+  clip-path:polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);}
+#loadout .lh{letter-spacing:.28em; color:#fff; font-size:13px; text-shadow:0 0 12px var(--cy);}
+#loadout .lrow{font-size:12px; margin-top:7px; line-height:1.7;}
+#loadout .tot{color:var(--cy); font-weight:bold;}
+#loadout .miss{color:var(--mag);}
+#loadout .clr{margin-top:9px; font-family:inherit; font-weight:bold; letter-spacing:.18em; font-size:11px;
+  padding:8px 14px; cursor:pointer; color:var(--mag); background:rgba(255,61,240,.06); border:1px solid var(--mag); min-height:36px;}
 h2.sttl{font-size:clamp(13px,2.8vw,17px); letter-spacing:.3em; color:#fff;
   text-shadow:0 0 12px var(--cy); border-bottom:1px solid var(--dim); padding-bottom:10px; margin:4px 0 16px;}
 .dim{color:var(--dim); text-shadow:none;}
@@ -141,28 +181,46 @@ const sOpen=()=>{ping(660,.25,.05); setTimeout(()=>ping(990,.25,.05),110); setTi
 const sErr=()=>ping(180,.4,.06);
 function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="AUDIO: "+(muted?"OFF":"ON"); if(!muted) sClick(); }
 
-/* ================= DATA (APoF p.21, verified) ================= */
+/* ================= DATA (Sleeves & Services: APoF Ice Box pages, verified.
+   Slickware: separate SLICKS table below, 1E print standard.) ================= */
 const CATS=["SLEEVES","SLICKWARE","SERVICES"];
 const ITEMS=[
 {c:0,n:"Reclamation Sleeve",p:"100kcr",d:"Sleeves built by memory-wiping prisoners. Reroll stats. 10% chance you learn a random skill. 10% chance of gaining someone else's memories.",cold:"A PAST, INCLUDED AT NO EXTRA CHARGE."},
 {c:0,n:"Model-A Series Sleeve",p:"500kcr",d:"Bulk issue. Ten physical models (A1-A10). Reduce all Stats and Saves by 5. Heavily discriminated against.",cold:"YOU WILL BE JUDGED. EVERYONE IS."},
 {c:0,n:"Atlas X Premium Sleeve",p:"2.2mcr",d:"Custom designed sleeve. +5 Strength, Speed and Body. Recovery only takes 48hrs.",cold:"THE BODY YOU WERE PROMISED."},
 {c:0,n:"Narcissus-1 Sleeve",p:"50mcr",d:"Luxury designer sleeve. All new stats: 240 points across Strength, Intellect, Combat and Speed. Recovery: 12hrs.",cold:"PERFECTION HAS A PRICE. THIS IS IT."},
-{c:1,n:"God Mode",p:"85kcr",s:"2 slots",d:"[+] on Hacking Checks when jacked into a terminal. Gain 1d5 Stress per use.",r:"Requires: Slicksocket, Terminal Jack",cold:"OMNISCIENCE, RENTED."},
-{c:1,n:"Espernetic Feedback Loop",p:"3mcr",s:"5 slots",d:"Psionic attack overloading targeted electronics (incl. androids, cybernetics). Sanity Save [+]: damage = amount rolled; fail = half damage + 1d5 Stress.",r:"Requires: Slicksocket",cold:"THINK LOUDLY."},
-{c:1,n:"Holopet",p:"75kcr",s:"2 slots",d:"Medium holographic AI pet, 30m radius. Heal 1 Stress whenever you rest. Panic Check [-] if destroyed.",r:"Requires: Slicksocket, Holoprojector",cold:"LOVE, PROJECTED."},
-{c:1,n:"Looky-loo",p:"550cr",s:"1 slot",d:"Picks up transmissions on all non-encrypted bands. Audio recording with a Black Box.",r:"Requires: Slicksocket, Loudmouth",cold:"EVERYONE IS BROADCASTING."},
-{c:1,n:"Machine Code",p:"350kcr",s:"4 slots",d:"Converse with powerful AI at a level it finds comfortable. Sanity Save: 1 Stress/hour; fail = 1/minute.",r:"Requires: Slicksocket, Black Box, Terminal Jack",cold:"SPEAK WITH GODS. BRING SANITY."},
-{c:1,n:"Sentinel System",p:"8,500cr",s:"3 slots",d:"Doubles Stimpak, rest and healing effectiveness. Addiction Body Saves at [-].",r:"Requires: Slicksocket",cold:"YOUR BODY, OPTIMIZED."},
-{c:1,n:"Skillslick (Trained)",p:"50kcr",s:"1 slot",d:"Gain the purchased Skill while installed. Selection very limited, closely guarded.",r:"Requires: Slicksocket, OGRE",cold:"KNOWLEDGE, TEMPORARY."},
-{c:1,n:"Skillslick (Expert)",p:"550kcr",s:"2 slots",d:"Gain the purchased Skill while installed. Selection very limited, closely guarded.",r:"Requires: Slicksocket, OGRE",cold:"KNOWLEDGE, TEMPORARY."},
-{c:1,n:"Skillslick (Master)",p:"4mcr",s:"3 slots",d:"Gain the purchased Skill while installed. Selection very limited, closely guarded.",r:"Requires: Slicksocket, OGRE",cold:"KNOWLEDGE, TEMPORARY."},
-{c:1,n:"Twitch Booster",p:"125kcr",s:"3 slots",d:"[+] on Speed Checks for 3 rounds. 2d10 damage to user as nerve endings burn.",r:"Requires: Slicksocket",cold:"SPEED HAS A COST."},
-{c:1,n:"Vox Box",p:"25kcr",s:"1 slot",d:"Perfectly mimic any voice after 10min of exposure. Stores up to 3 voices.",r:"Requires: Loudmouth",cold:"BE ANYONE."},
 {c:2,n:"Sleeve Backup (NeMo Machine)",p:"10kcr",d:"Download your memories. 24 hours. Sanity Save or forget 1d10 days. Critical failure: Panic Check + total amnesia.",cold:"FORGETTING IS A FEATURE."},
 {c:2,n:"Sleeve Storage",p:"500cr/mo",d:"Monthly storage fees. Climate controlled. Judgment free.",cold:"WE KEEP YOUR OLD SELF SAFE."},
 {c:2,n:"Slickbay (1hr)",p:"50cr",d:"Enough time to install a Slick.",cold:"ONE HOUR TO BECOME SOMEONE ELSE."},
 {c:2,n:"Slickworld (1mo)",p:"100cr",d:"DIY or join a Clan Server.",cold:"WORLDS, RENTED MONTHLY."}
+];
+
+/* ================= SLICKWARE — TECH TREE DATA =================
+   Prices, slots, effects and requirements: A Pound of Flesh 1E print
+   Slickware table (Max's copy, photographed 2026-10-31; ruled the campaign
+   standard the same day). The PDF printing on file differs sharply
+   (God Mode 85kcr/2 slots there; 10kcr/1 here) and is NOT used.
+   Hardware nodes carry no price: they are cybermods, sold at the Chop Shop,
+   and their 1E page has not been photographed yet. */
+const HARDWARE=[
+{id:"socket",n:"SLICKSOCKET",d:"Cranial input jack which allows Slickware to be installed. The door every Slick walks through."},
+{id:"jack",n:"TERMINAL JACK",d:"Port allowing interface with terminals, smartlink weapons and information systems."},
+{id:"blackbox",n:"BLACK BOX",d:"Eidetic memory backup. Your past, kept current: watchable, copyable, ownable."},
+{id:"loudmouth",n:"LOUDMOUTH",d:"Allows for recording and playback of audio. Maximum volume is a lifestyle choice."}
+];
+const HWNAME={}; HARDWARE.forEach(h=>HWNAME[h.id]=h.n);
+const SLICKS=[
+{id:"esper",grp:"core",n:"Espernetic Feedback Loop",p:"36kcr",cr:36000,slots:1,req:["socket"],d:"Psionic attack that overloads targeted electronics (including androids, cybernetics, etc.). Make a Sanity Save [+]. If successful deal damage equal to the amount rolled. On failure take 1 DMG and gain 1 Stress.",cold:"THINK LOUDLY."},
+{id:"holopet",grp:"core",n:"Holopet",p:"24kcr",cr:24000,slots:0,req:["socket"],d:"Projects a medium sized holographic AI pet which can run around within Close Range. When Resting, relieve +1 Stress. Panic Check at [-] if the Holopet slickware is ever destroyed.",cold:"LOVE, PROJECTED."},
+{id:"looky",grp:"core",n:"Looky-loo",p:"550cr",cr:550,slots:0,req:["socket"],d:"Picks up transmissions on all non-encrypted bands.",cold:"EVERYONE IS BROADCASTING."},
+{id:"sentinel",grp:"core",n:"Sentinel System",p:"120kcr",cr:120000,slots:2,req:["socket"],d:"Doubles effectiveness of stimpaks, Rest and Medical Treatment.",cold:"YOUR BODY, OPTIMIZED."},
+{id:"twitch",grp:"core",n:"Twitch Booster",p:"4kcr",cr:4000,slots:1,req:["socket"],d:"When activated, the user gains [+] on Speed Checks for 3 rounds and takes 1 DMG as their nerve endings burn.",cold:"SPEED HAS A COST."},
+{id:"godmode",grp:"adv",n:"God Mode",p:"10kcr",cr:10000,slots:1,req:["socket","jack"],d:"Gives [+] on Hacking Checks when jacked into a terminal. On failure: Gain 2 Stress.",cold:"OMNISCIENCE, RENTED."},
+{id:"machinecode",grp:"adv",n:"Machine Code",p:"350kcr",cr:350000,slots:4,req:["socket","blackbox","jack"],d:"Can converse with powerful AI at a level the AI finds comfortable. Requires Sanity Save: if successful gain 1 Stress per hour spent conversing. If failed gain 1 per minute.",cold:"SPEAK WITH GODS. BRING SANITY."},
+{id:"skillT",grp:"chain",n:"Skillslick (Trained)",p:"50kcr",cr:50000,slots:1,req:["socket"],d:"The user gains the purchased Skill for as long as the Skillslick remains installed. The selection and supply of Skillslicks is very limited and closely guarded.",cold:"KNOWLEDGE, TEMPORARY."},
+{id:"skillE",grp:"chain",n:"Skillslick (Expert)",p:"500kcr",cr:500000,slots:2,req:["socket"],d:"The user gains the purchased Skill for as long as the Skillslick remains installed. The selection and supply of Skillslicks is very limited and closely guarded.",cold:"KNOWLEDGE, TEMPORARY."},
+{id:"skillM",grp:"chain",n:"Skillslick (Master)",p:"1mcr",cr:1000000,slots:3,req:["socket"],d:"The user gains the purchased Skill for as long as the Skillslick remains installed. The selection and supply of Skillslicks is very limited and closely guarded.",cold:"KNOWLEDGE, TEMPORARY."},
+{id:"voxbox",grp:"loud",n:"Vox Box",p:"24kcr",cr:24000,slots:1,req:["loudmouth"],d:"Can perfectly mimic any voice after 10 minutes of speaking to the target. Stores up to 3 voices.",cold:"BE ANYONE."}
 ];
 
 /* ================= BOOT ================= */
@@ -182,7 +240,7 @@ function bootStep(){
 }
 
 /* ================= TABS + LIST ================= */
-let curCat=0;
+let curCat=1; /* SLICKWARE tech tree is the landing view (Max, 2026-10-31) */
 function buildTabs(){
   const t=document.getElementById("tabs"); t.innerHTML="";
   CATS.forEach((c,i)=>{ const b=document.createElement("button");
@@ -198,13 +256,80 @@ function card(m){
     ${m.r?`<div class="req">${m.r}</div>`:""}
     <div class="cold">DR. COLD: ${m.cold}</div></div>`;
 }
+function slickCard(s){
+  return {n:s.n,p:s.p,s:s.slots+(s.slots===1?" slot":" slots"),d:s.d,
+    r:"Requires: "+s.req.map(r=>HWNAME[r]).join(", "),cold:s.cold};
+}
 function renderList(filter){
   const L=document.getElementById("list");
-  const items=ITEMS.map((m,i)=>({m,i})).filter(x=>filter?(x.m.n+x.m.d).toLowerCase().includes(filter):x.m.c===curCat);
+  if(!filter && curCat===1){ renderTree(L); return; }
+  const pool=ITEMS.concat(SLICKS.map(slickCard));
+  const items=pool.filter(m=>filter?(m.n+m.d).toLowerCase().includes(filter):m.c===curCat);
   let h=`<h2 class="sttl">${filter?"SCAN RESULTS":CATS[curCat]} <span class="dim">[${items.length}]</span></h2>`;
-  h+=items.length?items.map(x=>card(x.m)).join(""):`<p class="dim">// NO MATCH. THE COLD PROVIDES WHAT IT PROVIDES.</p>`;
+  h+=items.length?items.map(card).join(""):`<p class="dim">// NO MATCH. THE COLD PROVIDES WHAT IT PROVIDES.</p>`;
   L.innerHTML=h;
 }
+
+/* ================= TECH TREE ================= */
+const ownedHW=new Set(), installed=new Set(), openNodes=new Set();
+function fmtCr(n){
+  if(n>=1000000){ const v=n/1000000; return (Number.isInteger(v)?v:v.toFixed(2).replace(/0+$/,"").replace(/\.$/,""))+"mcr"; }
+  if(n>=1000){ const v=n/1000; return (Number.isInteger(v)?v:v.toFixed(1).replace(/\.0$/,""))+"kcr"; }
+  return n+"cr";
+}
+function missingFor(s){ return s.req.filter(r=>!ownedHW.has(r)); }
+function hwNode(h){
+  const owned=ownedHW.has(h.id);
+  return `<div class="node hw${owned?" owned":""}">
+    <div class="tag">${owned?"OWNED":"NOT OWNED"}</div>
+    <div class="nn" onclick="toggleOpen('hw-${h.id}')">${h.n}</div>
+    <div class="ns">REQUIRED HARDWARE — CHOP SHOP CATALOG</div>
+    <div class="nd" ${openNodes.has("hw-"+h.id)?'style="display:block"':""}>${h.d}</div>
+    <button class="ibtn" onclick="toggleHW('${h.id}')">${owned?"MARK NOT OWNED":"MARK OWNED"}</button></div>`;
+}
+function slickNode(s){
+  const inst=installed.has(s.id), miss=missingFor(s), warn=inst&&miss.length>0;
+  const chips=s.req.map(r=>`<span class="chip ${ownedHW.has(r)?"ok":"miss"}">${HWNAME[r]}</span>`).join("");
+  return `<div class="node${inst?" inst":""}${warn?" warn":""}">
+    <div class="tag">${inst?(warn?"UNPOWERED":"INSTALLED"):""}</div>
+    <div class="nn" onclick="toggleOpen('${s.id}')">${s.n}</div>
+    <div class="np">${s.p}</div>
+    <div class="ns">${s.slots} ${s.slots===1?"SLOT":"SLOTS"}</div>
+    <div class="chips">${chips}</div>
+    <div class="nd" ${openNodes.has(s.id)?'style="display:block"':""}>${s.d}</div>
+    <div class="ncold" ${openNodes.has(s.id)?'style="display:block"':""}>DR. COLD: ${s.cold}</div>
+    <button class="ibtn" onclick="toggleSlick('${s.id}')">${inst?"REMOVE":"INSTALL"}</button></div>`;
+}
+function renderTree(L){
+  L=L||document.getElementById("list");
+  const chosen=SLICKS.filter(s=>installed.has(s.id));
+  const totCr=chosen.reduce((a,s)=>a+s.cr,0), totSl=chosen.reduce((a,s)=>a+s.slots,0);
+  const need=new Set(); chosen.forEach(s=>s.req.forEach(r=>need.add(r)));
+  const miss=[...need].filter(r=>!ownedHW.has(r));
+  let h=`<h2 class="sttl">SLICKWARE <span class="dim">[TECH TREE]</span></h2>`;
+  h+=`<div id="loadout"><div class="lh">CURRENT LOADOUT</div>
+    <div class="lrow">${chosen.length?chosen.map(s=>s.n).join(" · "):"<span class='dim'>NOTHING INSTALLED. A BLANK, BEAUTIFUL BRAIN.</span>"}</div>
+    <div class="lrow">TOTAL: <span class="tot">${fmtCr(totCr)}</span> · SLOTS USED: <span class="tot">${totSl}</span></div>
+    <div class="lrow">HARDWARE REQUIRED: ${need.size?[...need].map(r=>ownedHW.has(r)?HWNAME[r]:`<span class="miss">${HWNAME[r]} — MISSING</span>`).join(" · "):"<span class='dim'>NONE</span>"}</div>
+    ${miss.length?`<div class="lrow miss">// WARNING: INSTALLED SLICKWARE WITHOUT ITS HARDWARE IS AN EXPENSIVE PAPERWEIGHT.</div>`:""}
+    ${chosen.length?`<button class="clr" onclick="clearLoadout()">CLEAR LOADOUT</button>`:""}</div>`;
+  h+=`<div class="tierLbl">TIER 0 // REQUIRED HARDWARE — TAP TO MARK WHAT YOU OWN</div><div class="tier">`;
+  h+=HARDWARE.map(hwNode).join("");
+  h+=`</div><div class="tierLbl">TIER 1 // CORE SLICKWARE — RUNS ON A SLICKSOCKET</div><div class="tier">`;
+  h+=SLICKS.filter(s=>s.grp==="core").map(slickNode).join("");
+  h+=`</div><div class="tierLbl">TIER 2 // ADVANCED — MULTI-HARDWARE BUILDS</div><div class="tier">`;
+  h+=SLICKS.filter(s=>s.grp==="adv").map(slickNode).join("");
+  h+=`</div><div class="tierLbl">THE SKILLSLICK CHAIN — ONE SLOT OF BORROWED GENIUS, THREE DEPTHS</div><div class="chain">`;
+  h+=SLICKS.filter(s=>s.grp==="chain").map((s,i)=> (i?`<div class="arrow">▸</div>`:"") + slickNode(s)).join("");
+  h+=`</div><div class="tierLbl">THE LOUDMOUTH BRANCH — NO SOCKET REQUIRED</div><div class="tier">`;
+  h+=SLICKS.filter(s=>s.grp==="loud").map(slickNode).join("");
+  h+=`</div><p class="dim" style="font-size:11px;margin-top:16px">// INSTALLATION AT ANY SLICKBAY, 50cr AN HOUR. HARDWARE SOLD SEPARATELY AT THE CHOP SHOP. THE ICE BOX IS NOT RESPONSIBLE FOR WHO YOU BECOME.</p>`;
+  L.innerHTML=h;
+}
+function toggleHW(id){ ownedHW.has(id)?ownedHW.delete(id):ownedHW.add(id); sTab(); renderTree(); }
+function toggleSlick(id){ installed.has(id)?installed.delete(id):installed.add(id); openNodes.add(id); sClick(); renderTree(); }
+function toggleOpen(id){ openNodes.has(id)?openNodes.delete(id):openNodes.add(id); sClick(); renderTree(); }
+function clearLoadout(){ installed.clear(); sErr(); renderTree(); }
 
 /* ================= SEARCH ================= */
 function doSearch(){
