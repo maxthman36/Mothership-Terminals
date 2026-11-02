@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!-- TEAMSTER STRIKE LEAFLET — player-facing diegetic handout.
+     Styled as a retro-future teletype printout on fanfold paper (Max, 2026-11-01).
+     Copy grounded in A Pound of Flesh pp. 6-8: Local 32819L distributes Sycorax for
+     Yandee; the Stratemeyer Syndicate holds Reidmar's freighter fleet for ransom and
+     (the book leaves the Syndicate undefined; campaign fill per Max 2026-11-01:
+     the Syndicate is Sharpe Co., the campaign's extraction-and-labor megacorp) and
+     has sent footage of Teamster executions; Yandee won't pay; the Local can't afford
+     Tempest Co.; Reidmar threatens a general strike (Phase 1). Engineering facilities
+     that keep the Dream running are run by Local 32819L (APoF station key).
+     Warden-only material deliberately excluded: no Yandee secret, no strike endgame. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LOCAL 32819L — STRIKE LEAFLET (TTY PRINT)</title>
+<style>
+  :root{
+    --ink:#22201b; --ink-soft:rgba(34,32,27,.82); --ink-faint:rgba(34,32,27,.55);
+    --red:#9c1a12; --paper:#e9e4d2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{background:#211f1c;}
+  body{font-family:'Courier New',Courier,monospace;color:var(--ink);
+       display:flex;justify-content:center;padding:30px 10px;}
+  .sheet{
+    position:relative;width:740px;max-width:100%;
+    padding:30px 64px 40px;
+    background:
+      /* grime and handling stains */
+      radial-gradient(ellipse 300px 120px at 82% 6%, rgba(110,80,30,.16), transparent 70%),
+      radial-gradient(ellipse 220px 200px at 6% 68%, rgba(110,80,30,.13), transparent 70%),
+      radial-gradient(ellipse 160px 90px at 55% 97%, rgba(60,50,30,.15), transparent 70%),
+      /* fanfold greenbar bands */
+      repeating-linear-gradient(180deg, rgba(96,128,84,.10) 0 46px, rgba(0,0,0,0) 46px 92px),
+      var(--paper);
+    box-shadow:0 16px 50px rgba(0,0,0,.6);
+  }
+  /* tractor-feed sprocket strips */
+  .sheet::before,.sheet::after{
+    content:"";position:absolute;top:0;bottom:0;width:34px;
+    background-image:radial-gradient(circle 6.5px at 50% 50%, #211f1c 6px, rgba(0,0,0,.35) 7px, rgba(255,255,255,.25) 8px, transparent 9px);
+    background-size:34px 46px;background-repeat:repeat-y;background-position:center 8px;
+  }
+  .sheet::before{left:0;border-right:2px dashed rgba(34,32,27,.35);}
+  .sheet::after{right:0;border-left:2px dashed rgba(34,32,27,.35);}
+  /* fold shadow across the middle */
+  .fold{position:absolute;left:0;right:0;top:52%;height:26px;
+    background:linear-gradient(180deg, transparent, rgba(70,58,30,.13), transparent);
+    pointer-events:none;}
+  .tty-head{font-size:12.5px;letter-spacing:.06em;color:var(--ink-soft);line-height:1.65;}
+  .tty-head .r{color:var(--red);}
+  .rule{border:0;border-top:2px solid var(--ink);margin:10px 0 4px;}
+  .rule.thin{border-top:1px solid var(--ink-soft);margin:4px 0 10px;}
+  .masthead{text-align:center;margin:8px 0 2px;}
+  .masthead .local{
+    font-weight:bold;font-size:40px;letter-spacing:.04em;line-height:1.05;
+    text-shadow:1px 0 0 currentColor; /* ribbon double-strike */
+    text-transform:uppercase;
+  }
+  .masthead .local .red{color:var(--red);text-shadow:1px 0 0 var(--red);}
+  .masthead .sub{font-size:13px;letter-spacing:.3em;text-transform:uppercase;margin-top:7px;color:var(--ink-soft);}
+  .masthead .motto{font-size:14.5px;margin-top:6px;color:var(--ink-soft);}
+  .headline{
+    text-align:center;text-transform:uppercase;font-weight:bold;
+    font-size:31px;line-height:1.28;letter-spacing:.02em;margin:18px 0 10px;
+    text-shadow:.8px 0 0 currentColor;
+  }
+  .headline .red{color:var(--red);text-shadow:.8px 0 0 var(--red);}
+  .deck{text-align:center;font-size:15px;line-height:1.55;margin:0 8px 14px;color:var(--ink);}
+  .body p{font-size:14.8px;line-height:1.62;margin-bottom:11px;text-align:left;}
+  .body b{font-weight:bold;text-shadow:.55px 0 0 currentColor;}
+  .fade{color:var(--ink-soft);}           /* ribbon running dry */
+  .ghost{color:var(--ink-faint);}          /* faintest pass of the ribbon */
+  .over{color:var(--red);font-weight:bold;} /* typist's X-out correction sits red in this build */
+  .demands{
+    border:2px solid var(--ink);padding:14px 18px 10px;margin:14px 0;
+    background:rgba(156,26,18,.045);
+  }
+  .demands h2{font-size:20px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;
+    text-shadow:.7px 0 0 currentColor;}
+  .demands ol{margin-left:24px;}
+  .demands li{font-size:14.8px;line-height:1.55;margin-bottom:6px;}
+  .demands li b{text-shadow:.55px 0 0 currentColor;}
+  .vote{text-align:center;margin-top:16px;position:relative;padding:4px 40px;}
+  .vote .big{font-weight:bold;font-size:25px;letter-spacing:.05em;text-transform:uppercase;
+    line-height:1.25;text-shadow:.8px 0 0 currentColor;}
+  .vote .small{font-size:14.5px;line-height:1.6;margin-top:6px;}
+  .stamp{
+    position:absolute;right:2px;top:50%;transform:translateY(-50%) rotate(-10deg);
+    border:3.5px solid var(--red);color:var(--red);border-radius:3px;
+    font-weight:bold;font-size:19px;letter-spacing:.1em;padding:3px 9px 1px;opacity:.8;
+  }
+  .sign{margin-top:20px;font-size:14px;line-height:1.6;}
+  .sign .name{font-size:17px;font-weight:bold;letter-spacing:.06em;}
+  .sign .role{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);}
+  .tty-foot{margin-top:16px;font-size:12.5px;letter-spacing:.05em;color:var(--ink-soft);line-height:1.7;}
+  .tear{margin-top:14px;border-top:2px dashed rgba(34,32,27,.5);}
+  @media print{
+    html,body{background:#fff;padding:0;}
+    .sheet{box-shadow:none;width:100%;}
+    @page{margin:10mm;}
+  }
+  @media (max-width:640px){
+    .sheet{padding:24px 48px 32px;}
+    .masthead .local{font-size:28px;}
+    .headline{font-size:23px;}
+    .stamp{display:none;}
+    .vote{padding:4px 6px;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="fold"></div>
+
+  <div class="tty-head">
+    ZCZC&nbsp;&nbsp;DCK-32819L&nbsp;&nbsp;//&nbsp;&nbsp;HALL PRESS UNIT 3&nbsp;&nbsp;//&nbsp;&nbsp;FEED OK<br>
+    ROUTE: ALL MEMBERS — HAND TO HAND&nbsp;&nbsp;//&nbsp;&nbsp;PRIORITY: <span class="r">URGENT</span><br>
+    DO NOT POST. DO NOT FILE. <span class="ghost">RIBBON LOW — PRINT ANYWAY.</span>
+  </div>
+  <hr class="rule"><hr class="rule thin">
+
+  <div class="masthead">
+    <div class="local">Teamsters <span class="red">Local 32819L</span></div>
+    <div class="sub">Prospero's Dream · Dockside · Engineering · Haulage</div>
+    <div class="motto">"Everything on this station got here on a Teamster's back."</div>
+  </div>
+  <hr class="rule thin">
+
+  <div class="headline">They took our ships.<br>They are killing our people.<br><span class="red">The boss won't pay.</span></div>
+
+  <p class="deck">SHARPE CO. HOLDS A FLEET OF LOCAL FREIGHTERS AND EVERY SOUL ABOARD THEM. THIS WEEK THEY SENT US THE FOOTAGE TO PROVE WHAT THEY DO TO HOSTAGES. YANDEE HAS SEEN IT TOO. YANDEE'S ANSWER WAS NO.</p>
+
+  <div class="body">
+    <p>Our members are being held for ransom by Sharpe Co. Not cargo. Not hulls. <b>People.</b> Drivers, loaders, engineers, with families in Dockside and Doptown who are waiting on a knock at the door.</p>
+    <p>Sharpe has begun sending recordings of executions. They want the whole station to understand the price of waiting. We understand it fine. <span class="fade">We are done waiting.</span></p>
+    <p>This Local moves the freight, runs the engineering decks that keep the Dream breathing, and hauls for every outfit on this station, including the Golyanovo. <b>There is no cargo on Prospero's Dream that a Teamster did not touch.</b> That is not a boast. It is a reminder of what stops when we stop.</p>
+    <p>Yandee refuses to pay the rans<span class="over">XXXX</span> <b>rescue money</b>. Yandee refuses to send Tempest Company. The Local cannot raise a rescue fleet out of dues, and everyone at that table knows it. So the crews on those ships are to be written off, because the arithmetic is easier that way.</p>
+    <p>We do arithmetic too. Here is ours: <b>a union that lets its people be murdered on camera, one at a time, while the boss counts the savings, is not a union anymore.</b> It is a mailing list.</p>
+    <p>Reidmar has carried our demand to Yandee in person. It is the same demand printed below. There will not be a second, softer version of it.</p>
+  </div>
+
+  <div class="demands">
+    <h2>++ Our Demands ++</h2>
+    <ol>
+      <li><b>Pay the ransom, or send Tempest Company.</b> One or the other, and now. Bring our fleet and our people home.</li>
+      <li><b>No more hostage arithmetic.</b> No member of this Local is a line item to be written off in a back room.</li>
+      <li><b>Until our people are home, nothing is normal.</b> Members will be kept informed by hall notice and handbill only. Trust what you are handed. Do not trust what you are told.</li>
+    </ol>
+  </div>
+
+  <div class="vote">
+    <div class="big">Strike Authorization Vote</div>
+    <div class="small">ALL MEMBERS IN GOOD STANDING. UNION HALL, DOCKSIDE.<br>
+    BRING YOUR O2 CREDSTICK. BRING A COWORKER.<br>
+    IF YANDEE WILL NOT MOVE, WE WILL. <b>ALL OF US, OR NONE OF US.</b></div>
+    <div class="stamp">32819L</div>
+  </div>
+
+  <div class="sign">
+    <span class="name">REIDMAR</span><br>
+    <span class="role">Union Representative, Local 32819L</span><br>
+    <span class="fade">Pass this sheet on when you have read it. Do not leave it where you found it.</span>
+  </div>
+
+  <div class="tty-foot">
+    PRINTED BY LOCAL 32819L ON HALL PRESS 3 — NOT AUTHORIZED BY TEMPEST CO., THE GOLYANOVO II, OR ANYONE'S BOSS.<br>
+    SOLIDARITY IS NOT CONTRABAND.<br>
+    NNNN&nbsp;&nbsp;//&nbsp;&nbsp;END OF SHEET&nbsp;&nbsp;//&nbsp;&nbsp;TEAR HERE AND PASS ON
+  </div>
+  <div class="tear"></div>
+
+</div>
+</body>
+</html>
