@@ -181,27 +181,27 @@ const sOpen=()=>{ping(660,.25,.05); setTimeout(()=>ping(990,.25,.05),110); setTi
 const sErr=()=>ping(180,.4,.06);
 function toggleMute(){ muted=!muted; document.getElementById("muteBtn").textContent="AUDIO: "+(muted?"OFF":"ON"); if(!muted) sClick(); }
 
-/* ================= DATA (Sleeves & Services: APoF Ice Box pages, verified.
-   Slickware: separate SLICKS table below, 1E print standard.) ================= */
+/* ================= DATA (Sleeves, Services & Slickware: A Pound of Flesh
+   1e v1.2, verified against the owned 1e PDF 2026-11-09.) ================= */
 const CATS=["SLEEVES","SLICKWARE","SERVICES"];
 const ITEMS=[
-{c:0,n:"Reclamation Sleeve",p:"100kcr",d:"Sleeves built by memory-wiping prisoners. Reroll stats. 10% chance you learn a random skill. 10% chance of gaining someone else's memories.",cold:"A PAST, INCLUDED AT NO EXTRA CHARGE."},
+{c:0,n:"Reclamation Sleeve",p:"300kcr",d:"Sleeves built by memory-wiping prisoners. Reroll stats. 10% chance you learn a random skill. 10% chance of gaining someone else's memories.",cold:"A PAST, INCLUDED AT NO EXTRA CHARGE."},
 {c:0,n:"Model-A Series Sleeve",p:"500kcr",d:"Bulk issue. Ten physical models (A1-A10). Reduce all Stats and Saves by 5. Heavily discriminated against.",cold:"YOU WILL BE JUDGED. EVERYONE IS."},
-{c:0,n:"Atlas X Premium Sleeve",p:"2.2mcr",d:"Custom designed sleeve. +5 Strength, Speed and Body. Recovery only takes 48hrs.",cold:"THE BODY YOU WERE PROMISED."},
+{c:0,n:"Atlas X Premium Sleeve",p:"3mcr",d:"Custom designed sleeve. +5 Strength, Speed and Body. Recovery only takes 48hrs.",cold:"THE BODY YOU WERE PROMISED."},
 {c:0,n:"Narcissus-1 Sleeve",p:"50mcr",d:"Luxury designer sleeve. All new stats: 240 points across Strength, Intellect, Combat and Speed. Recovery: 12hrs.",cold:"PERFECTION HAS A PRICE. THIS IS IT."},
-{c:2,n:"Sleeve Backup (NeMo Machine)",p:"10kcr",d:"Download your memories. 24 hours. Sanity Save or forget 1d10 days. Critical failure: Panic Check + total amnesia.",cold:"FORGETTING IS A FEATURE."},
+{c:2,n:"Sleeve Backup (NeMo Machine)",p:"50kcr",d:"Download your memories. 24 hours. Sanity Save or forget 1d10 days. Critical failure: Panic Check + total amnesia.",cold:"FORGETTING IS A FEATURE."},
 {c:2,n:"Sleeve Storage",p:"500cr/mo",d:"Monthly storage fees. Climate controlled. Judgment free.",cold:"WE KEEP YOUR OLD SELF SAFE."},
-{c:2,n:"Slickbay (1hr)",p:"50cr",d:"Enough time to install a Slick.",cold:"ONE HOUR TO BECOME SOMEONE ELSE."},
+{c:2,n:"Slickbay (1hr)",p:"5cr",d:"Enough time to install a Slick.",cold:"ONE HOUR TO BECOME SOMEONE ELSE."},
 {c:2,n:"Slickworld (1mo)",p:"100cr",d:"DIY or join a Clan Server.",cold:"WORLDS, RENTED MONTHLY."}
 ];
 
 /* ================= SLICKWARE — TECH TREE DATA =================
-   Prices, slots, effects and requirements: A Pound of Flesh 1E print
-   Slickware table (Max's copy, photographed 2026-10-31; ruled the campaign
-   standard the same day). The PDF printing on file differs sharply
-   (God Mode 85kcr/2 slots there; 10kcr/1 here) and is NOT used.
-   Hardware nodes carry no price: they are cybermods, sold at the Chop Shop,
-   and their 1E page has not been photographed yet. */
+   Prices, slots, effects and requirements: A Pound of Flesh 1e v1.2
+   Slickware table, verified against the owned 1e PDF 2026-11-09 (matches
+   the photographed print table ruled standard 2026-10-31).
+   Hardware nodes carry no price here: they are cybermods, priced at the
+   Chop Shop per the same book (Slicksocket 500cr, Terminal Jack 750cr,
+   Black Box 200kcr, Loudmouth 500cr). */
 const HARDWARE=[
 {id:"socket",n:"SLICKSOCKET",d:"Cranial input jack which allows Slickware to be installed. The door every Slick walks through."},
 {id:"jack",n:"TERMINAL JACK",d:"Port allowing interface with terminals, smartlink weapons and information systems."},

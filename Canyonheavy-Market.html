@@ -108,7 +108,7 @@ footer.bar{border-top:1px solid var(--lm); padding:12px 20px; display:flex; gap:
     </div>
     <div id="tipbox">
       <div class="th">SELL A TIP TO ANGUS</div>
-      <div class="dim">Always buying. Pays 3d10 x 10kcr. No questions. Some questions. Okay, a few questions.</div>
+      <div class="dim">Always buying. Pays 3d10kcr. No questions. Some questions. Okay, a few questions.</div>
       <input id="tipInput" placeholder="Type what you know..." onkeydown="if(event.key==='Enter')sellTip()">
       <div style="margin-top:8px"><button class="ghost" onclick="sellTip()">TRANSMIT TIP</button></div>
       <div id="tipResp"></div>
@@ -231,7 +231,7 @@ function checkout(){
   <button class="hx" onclick="closeOvl()">VANISH</button>`);
 }
 /* ================= SELL A TIP ================= */
-const ANGUS_OK=["YES!! TALK TO ME! 3d10 times ten kay, CASH, no questions — okay, a few questions — SOLD!",
+const ANGUS_OK=["YES!! TALK TO ME! 3d10 kay, CASH, no questions — okay, a few questions — SOLD!",
 "OH that's GOOD. That's very good. Sending credits NOW. Tell no one. Tell everyone. Tell me MORE.",
 "Manic typing intensifies. Credits sent. You are my favorite anonymous user. Don't tell the others.",
 "WAIT. Say that again slower. ... Got it. GOT IT. Credits sent! This changes EVERYTHING. Or nothing. Either way: paid!"];
@@ -239,11 +239,11 @@ function sellTip(){
   const inp=document.getElementById("tipInput");
   const q=inp.value.trim(); if(!q){ sErr(); return; }
   let r=0; for(let i=0;i<3;i++) r+=1+Math.floor(Math.random()*10);
-  const pay=(r*10000).toLocaleString();
+  const pay=(r*1000).toLocaleString();
   document.getElementById("tipResp").innerHTML=
     `<span style="color:#ff2d78">TIP RECEIVED. EVALUATING...</span><br>`+
     `<span class="dim">Angus, chatty and manic:</span> "${ANGUS_OK[Math.floor(Math.random()*ANGUS_OK.length)]}"<br>`+
-    `<span style="color:#b6ff00">PAYOUT: ${pay}cr (rolled ${r} on 3d10 × 10kcr)</span>`;
+    `<span style="color:#b6ff00">PAYOUT: ${pay}cr (rolled ${r} on 3d10kcr)</span>`;
   blip(500,.1,.04); setTimeout(()=>blip(1500,.12,.04),130);
   inp.value="";
 }
@@ -262,7 +262,7 @@ function angusSpeaks(){
   ovl(`<div style="color:#b6ff00; letter-spacing:.2em">ANGUS</div>
   <div class="dim">sysadmin of canyonheavy.market // chatty, manic voice</div><br>
   YOU'RE LOOKING AT HIM! Well, at his terminal. He's three rooms away. Or fourteen proxies away. BOTH!<br><br>
-  Tips! I buy tips! 3d10 × 10kcr, CASH! Finder's fee 2d10cr just for showing up with work!<br>
+  Tips! I buy tips! 3d10kcr, CASH! Finder's fee 1d10kcr just for showing up with work!<br>
   Loyal to Yandee, loyal to the market, loyal to YOU, anonymous user #44821!<br><br>
   <span class="dim">He has already opened seventeen tabs about you. All of them say "friend".</span><br><br>
   <button class="hx" onclick="closeOvl()">BACK TO THE MARKET</button>`);

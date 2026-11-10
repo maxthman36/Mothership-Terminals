@@ -73,14 +73,14 @@ bounties: [
 
   // B-0233 bonus (2026-10-19, Max): the Quick family leaves the proof-of-death
   // bonus as the hunter's choice — 100 Kcr OR one reclamation sleeve
-  // (house price 100kcr) from the proprietor of the Ice Box. This is the
+  // (1e price 300kcr) from the proprietor of the Ice Box. This is the
   // mechanism for saving Grimm's backed-up consciousness after the Change.
   { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
     reward: "10 Kcr + bonus (hunter's choice): 100 Kcr OR one reclamation sleeve", status: "ASSIGNED",
     client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",
-    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, plus a bonus — the team's choice: 100 Kcr, or one reclamation sleeve (house price 100kcr) held by the proprietor of the Ice Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
+    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, plus a bonus — the team's choice: 100 Kcr, or one reclamation sleeve (1e price 300kcr) held by the proprietor of the Ice Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
     travel: { jumps: 0,
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
