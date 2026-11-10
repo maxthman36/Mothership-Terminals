@@ -247,10 +247,15 @@ brilotis:{tone:"red",name:"BRILOTIS X-1",cls:"J2 // BLACK HOLE",transit:"~40KCR 
  exports:"None public.",
  gov:"Science charter."},
 vanaheim:{tone:"red",name:"VANAHEIM",cls:"J2 // EXPEDITION SITE",transit:"~40KCR CHARTER — NO BUS SERVICE",orbital:true,
- locs:[["Vanir expedition camp","Company terraforming survey. Staged via Tybalt Blue. Details restricted to contract holders."]],
+ locs:[["Vanir expedition camp","Element-cracking operation, staged via Tybalt Blue. The expedition is mining a deep-orbit ice body for the elements of life. Details restricted to contract holders."],["Yillesham-Tau","Orbital hab over Yillesham, a declining dustbowl colony of 182 residents. InsightLabs keeps a research presence."],["Samsa","Failed colony world. The settlement is dark; recovery survey pending."]],
  imports:"Expedition supplies.",
  exports:"Survey data (contract holders only).",
  gov:"Company expedition charter."},
+maat:{tone:"red",name:"MA'AT",cls:"J2 // SURVEY WORLD",transit:"~40KCR CHARTER — NO BUS SERVICE",orbital:true,
+ locs:[["The reported ruins","Structures on a world long written off as uninhabited. A joint university and corporate survey is on site; findings are embargoed."]],
+ imports:"Expedition supplies.",
+ exports:"Survey data (embargoed).",
+ gov:"Expedition charter (Landis University / Sunray Interstellar)."},
 dautamica:{tone:"dim",name:"DAUTAMICA STATION",cls:"OFF-CHART // RESEARCH STATION",transit:"CHARTER BY QUOTE",orbital:false,
  locs:[["Dautamica domes","Grey-research domes. Appointment only; need-to-know access."]],
  imports:"None public.",
@@ -323,8 +328,14 @@ hadal:{title:"HADAL SYSTEM — ORBITAL CHART",star:"HADAL",starCls:"DEEP-RANGE D
   {name:"THE BELL",kind:"station",orbit:320,size:8,blurb:"The Bell is a deep-range relay and survey station, access restricted to contract crews. It handles deep-space relay traffic and stages survey rotations into the dark. File approach vectors early; unfiled traffic is refused. Old hands treat deep rotations with respect, and decompression protocols are strictly enforced."}]},
 vanaheim:{title:"VANAHEIM — ORBITAL CHART",star:"VANAHEIM",starCls:"ICE-GIANT PRIMARY",
  bodies:[
-  {name:"VANAHEIM",kind:"planet",orbit:220,size:14,color:"#9adfff",blurb:"Vanaheim is a Company terraforming survey site, staged out of Tybalt Blue. The survey is long-term and close-held; details are restricted to contract holders. Supply ships run the Tybalt leg on a fixed schedule. The public feed lists it as an active expedition, nothing more."},
-  {name:"VANIR CAMP",kind:"station",orbit:300,size:6,blurb:"The Vanir expedition camp is the surface footprint of the Vanaheim survey. Company personnel only; the camp is closed to visitors. Resupply is by scheduled lander. What the survey has found so far is under contract seal."}]}
+  {name:"YILLESHAM",kind:"planet",orbit:170,size:11,color:"#d8a86a",blurb:"Yillesham is a dustbowl colony world in long decline. Its orbital hab, Yillesham-Tau, houses the remaining 182 residents, and InsightLabs maintains a research presence. Charter traffic only; supply runs are infrequent, and the colony feels every delay."},
+  {name:"YILLESHAM-TAU",kind:"station",orbit:208,size:5,blurb:"Yillesham-Tau is the orbital hab above Yillesham: docks, habitation, and the colony's only reliable link off-world. What happens on the surface is managed from here."},
+  {name:"SAMSA",kind:"planet",orbit:262,size:11,color:"#a8906a",blurb:"Samsa is a failed colony world. The terraforming settlement went dark and has not answered since; the site is closed pending a recovery survey. Charter traffic only."},
+  {name:"VANAHEIM IV",kind:"planet",orbit:336,size:12,color:"#9adfff",blurb:"A deep-orbit ice body, charted as the Vanir expedition's element source: nitrogen, carbon and phosphorus locked in ice, slated for cracking. The system is poor in the elements of life, and this body is the exception. Closed to all traffic under contract seal."},
+  {name:"VANIR CAMP",kind:"station",orbit:372,size:6,blurb:"The Vanir expedition camp supports the element-cracking operation on the deep ice body. Company personnel only; the camp is closed to visitors. Resupply is by scheduled lander. Progress reports are under contract seal."}]},
+maat:{title:"MA'AT — ORBITAL CHART",star:"MA'AT",starCls:"ERRATIC ORBIT",
+ bodies:[
+  {name:"MA'AT",kind:"planet",orbit:220,size:13,color:"#e0b070",blurb:"Ma'at is a desert world on an eccentric orbit, with violent seasons: deep cold for much of its year, then killing heat. Written off as a terraforming candidate generations ago and long listed as uninhabited, it made the feeds two years ago when passing traders reported structures on the surface. A joint survey expedition (Landis University, with Sunray Interstellar) is now on site. Charter traffic only; the expedition controls the landing zones."}]}
 };
 /* Miranda bodies keep their bespoke renderer below; blurbs for clicks: */
 var MIRANDA_BLURBS={
@@ -350,6 +361,7 @@ var NODES=[
  {id:"hadal",x:154,y:560,r:26,color:"#00e5ff",label:"HADAL"},
  {id:"brilotis",x:846,y:560,r:30,color:"#ff5544",label:"BRILOTIS X-1"},
  {id:"vanaheim",x:846,y:160,r:30,color:"#ff5544",label:"VANAHEIM"},
+ {id:"maat",x:940,y:64,r:26,color:"#ff5544",label:"MA'AT"},
  {id:"dautamica",x:665,y:646,r:12,color:"#5a5348",label:"DAUTAMICA",faint:true},
  {id:"uyema",x:335,y:646,r:12,color:"#5a5348",label:"UYEMA",faint:true},
  {id:"mania",x:335,y:74,r:12,color:"#5a5348",label:"MANIA",faint:true},
@@ -363,7 +375,8 @@ var ROUTES=[
  {from:"miranda",to:"tausigma",color:"#8a6a00",tag:"J1"},
  {from:"tausigma",to:"hadal",color:"#7a2a22",tag:"J2"},
  {from:"argent",to:"brilotis",color:"#7a2a22",tag:"J2"},
- {from:"tybalt",to:"vanaheim",color:"#7a2a22",tag:"J2"}
+ {from:"tybalt",to:"vanaheim",color:"#7a2a22",tag:"J2"},
+ {from:"tybalt",to:"maat",color:"#7a2a22",tag:"J2"}
 ];
 function nodeById(id){for(var i=0;i<NODES.length;i++)if(NODES[i].id===id)return NODES[i];return null;}
 
