@@ -38,11 +38,11 @@ travelConfig: {
 /* ---------- the board ---------- */
 bounties: [
   { id: "B-0101", target: "GRIMM, IANERIA", type: "DEBTOR — SKIP-TRACE", bl: 1,
-    rewardDice: "1d10", rewardUnit: "Kcr", rewardNote: "(×2 IF ALIVE)", status: "ASSIGNED",
+    rewardDice: "1d10", rewardUnit: "Kcr", rewardNote: "(×2 IF ALIVE)", status: "CLOSED",
     client: "Brandr Mulder (via RAC)",
     fee: "1 Kcr — STAMPED PAID (PROBATIONARY)",
     lastKnown: "Doptown, Prospero's Dream",
-    terms: "Subject is non-violent but evasive. Apprehend and deliver to Brandr Mulder's office in TopRing within 48 standard hours, then debrief Brunhildh at the RAC Annex. Minimal collateral damage. The client pays DOUBLE for alive and coherent delivery. This warrant is ASSIGNED to your crew — the board opens when it closes.",
+    terms: "COMPLETE — delivered alive and coherent. 18 Kcr paid. Client deceased at delivery. Warrant closed.",
     travel: { jumps: 0,
               local: "Station transit — the target is in Doptown, on the Dream.",
               localKcr: 0 } },
@@ -76,7 +76,7 @@ bounties: [
   // (house price 100kcr) from the proprietor of the Ice Box. This is the
   // mechanism for saving Grimm's backed-up consciousness after the Change.
   { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
-    reward: "10 Kcr + bonus (hunter's choice): 100 Kcr OR one reclamation sleeve", status: "OPEN",
+    reward: "10 Kcr + bonus (hunter's choice): 100 Kcr OR one reclamation sleeve", status: "ASSIGNED",
     client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
     lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",

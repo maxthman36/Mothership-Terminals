@@ -260,7 +260,7 @@ function rewardText(b){
    pick the next job at the table or in the group channel during the week. */
 let activeWarrantId=null;
 try{ activeWarrantId=localStorage.getItem("rac_active_warrant"); }catch(e){}
-let activeWarrant=BOUNTIES.find(b=>b.id===activeWarrantId)||BOUNTIES.find(b=>b.id==="B-0101")||BOUNTIES[0];
+let activeWarrant=BOUNTIES.find(b=>b.id===activeWarrantId)||BOUNTIES.find(b=>b.id==="B-0233")||BOUNTIES[0];
 const tbody=document.querySelector("#boardTable tbody"),
       detail=document.getElementById("detail");
 function statusTag(b){
