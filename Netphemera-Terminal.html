@@ -207,8 +207,11 @@ body{
 #tillPrompt{font-size:clamp(16px,3.6vw,20px); line-height:1.5; font-weight:bold; text-align:center;
   background:#fff7bf; border:2.5px solid #14101f; padding:14px 14px; margin:12px 0;}
 #tillPrompt .sayIt{display:block; font-size:11px; letter-spacing:.26em; color:#c2007a; margin-bottom:8px;}
-#tillText{width:100%; font-family:inherit; font-size:16px; line-height:1.5; padding:10px 12px;
-  border:2.5px solid #14101f; background:#fff; color:var(--ink); resize:vertical;}
+.tillHow{font-size:13.5px; line-height:1.65; color:var(--ink); margin:12px 0 4px;}
+.tillHow p{margin:0 0 8px;}
+.tillHow .warn{font-weight:bold; color:#a1005c;}
+.tillFormWrap{border:2.5px solid #14101f; background:#fff; padding:6px; margin:10px 0 4px;}
+#tillForm{display:block; width:100%; max-width:640px; height:406px; border:0; margin:0 auto; background:#fff;}
 #tillReact{display:none; width:96px; height:92px; object-fit:contain; margin:12px auto 0;}
 .tillLabel{font-size:12px; letter-spacing:.14em; font-weight:bold; color:#3b0066; margin:12px 0 6px;}
 
@@ -382,10 +385,18 @@ body{
       </ul>
       <span class="disc">NE&#8224;PHEMERA is not responsible for post-transaction regret, phantom nostalgia, or bursts of unexplainable grief.</span>
     </div>
-    <div class="tillLabel">SAY IT ALOUD, WHERE OTHERS CAN HEAR. THEN TYPE IT HERE:</div>
-    <textarea id="tillText" rows="6" placeholder="say it first. out loud. then type it here."></textarea>
+    <div class="tillLabel">HOW PAYING WORKS HERE:</div>
+    <div class="tillHow">
+      <p>read the price first, little mouse. rly read it.</p>
+      <p>if u will pay it: say it ALOUD, where the others can hear. then write the memory in the box below and press the box's own Submit button.</p>
+      <p class="warn">pressing Submit IS answering. once u press it, it is said, and there is no taking it back after that.</p>
+      <p>then press my button below, I HAVE SAID IT, and u will receive what u bought. i take u at your word. i always keep mine. meow.</p>
+      <p>if the box does not appear, the shop cannot hear you.</p>
+    </div>
+    <!-- This Google Form is the campaign owner's own collection endpoint, embedded at his instruction; it is the page's only external element. -->
+    <div class="tillFormWrap"><iframe id="tillForm" src="https://docs.google.com/forms/d/e/1FAIpQLSefq_1ilZRVXt3T705pSAsgFyLd0OaODybuimMJu54YMmMf_A/viewform?embedded=true" width="640" height="406" frameborder="0" marginheight="0" marginwidth="0" title="NE&#8224;PHEMERA payment">Loading&#8230;</iframe></div>
     <img id="tillReact" data-np="yes" alt="">
-    <button class="bigBtn green" id="tillAnswer" type="button" disabled>ANSWER (PAY THE MEMORY)</button>
+    <button class="bigBtn green" id="tillAnswer" type="button">I HAVE SAID IT</button>
     <button class="bigBtn grey" id="tillBack" type="button">BACK OUT</button>
   </div>
 </div>
@@ -679,22 +690,20 @@ function showPayment(){
   tag.textContent = "THE PRICE. SAY IT ALOUD:";
   promptBox.appendChild(tag);
   promptBox.appendChild(document.createTextNode(PRICE_TABLE[roll].prompt));
-  var text = el("tillText");
-  text.value = "";
-  el("tillAnswer").disabled = true;
+  var form = el("tillForm");
+  form.src = form.src;   /* reload: a fresh, blank form for this payment */
+  el("tillAnswer").disabled = false;
   var react = el("tillReact");
   react.style.display = "none";
   el("tillBack").disabled = false;
-  text.focus();
 }
 
 function answerPayment(){
-  var text = el("tillText");
-  var val = text.value.replace(/^\s+|\s+$/g, "");
-  if (!val) return;
-  archive.push(text.value);
+  /* The visitor states they have answered in the form. The page cannot read
+     inside the form, so only payment metadata is archived, never content. */
+  var roll = purchase.payments[purchase.idx];
+  archive.push({roll: roll, prompt: PRICE_TABLE[roll].prompt, at: new Date().toISOString()});
   saveArchive();
-  text.value = "";
   el("tillAnswer").disabled = true;
   el("tillBack").disabled = true;
   var react = el("tillReact");
@@ -716,7 +725,6 @@ function backOut(){
   react.style.display = "block";
   el("tillAnswer").disabled = true;
   el("tillBack").disabled = true;
-  el("tillText").value = "";
   setTimeout(function(){
     el("tillModal").classList.remove("open");
     purchase = null;
@@ -920,10 +928,6 @@ el("enterBtn").addEventListener("click", function(){
   window.scrollTo(0, 0);
 });
 el("checkoutBtn").addEventListener("click", openCheckout);
-el("tillText").addEventListener("input", function(){
-  var v = el("tillText").value.replace(/^\s+|\s+$/g, "");
-  el("tillAnswer").disabled = v.length === 0;
-});
 el("tillAnswer").addEventListener("click", answerPayment);
 el("tillBack").addEventListener("click", backOut);
 el("receiptClose").addEventListener("click", closeReceipt);
