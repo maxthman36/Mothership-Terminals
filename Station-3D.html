@@ -56,6 +56,9 @@
   <div class="num" id="pNum"></div>
   <h2 id="pName"></h2>
   <p id="pDesc"></p>
+  <p id="pLinkRow" style="display:none; margin-top:10px;">
+    <a href="Netphemera-Terminal.html" style="color:var(--pink); letter-spacing:.1em; font-size:12px;">VISIT THE STOREFRONT &rarr;</a>
+  </p>
 </div>
 <div id="bar">
   <button id="btnLabels">LABELS: ON</button>
@@ -554,9 +557,10 @@ function select(d) {
   selected = d;
   if (!d) { panel.classList.remove('on'); return; }
   setHighlight(d, true);
-  document.getElementById('pNum').textContent = 'DISTRICT ' + d.n;
+  document.getElementById('pNum').textContent = d.np ? 'UNSCHEDULED CONTACT' : 'DISTRICT ' + d.n;
   document.getElementById('pName').textContent = d.name;
   document.getElementById('pDesc').textContent = d.desc;
+  document.getElementById('pLinkRow').style.display = d.np ? 'block' : 'none';
   panel.classList.add('on');
 }
 document.getElementById('closePanel').onclick = () => select(null);
@@ -574,6 +578,44 @@ renderer.domElement.addEventListener('pointerup', e => {
   if (hit) { let o = hit.object; while (o && !o.userData.district) o = o.parent; target = o ? o.userData.district : null; }
   select(target);
 });
+
+/* ---------- unlisted contact ---------- */
+/*NP:START*/
+const NP_SHOP = { n:'—', name:'NE†PHEMERA', np:true,
+  desc:'Unscheduled transient contact, docked in the ring gap without filing a flight plan. The harbormaster has no record of the vessel, its registry, or its arrival. Its manifest lists a single storefront. It was not there yesterday.' };
+let npTurns = 0;
+let npDocked = false;
+try { npDocked = localStorage.getItem('np_door_station3d') === '1'; } catch(e) {}
+let npBlip = null, npBlipCore = null;
+function npShowBlip() {
+  if (npBlip) { npBlip.visible = true; return; }
+  const grp = new THREE.Group();
+  grp.userData.district = NP_SHOP;
+  const core = new THREE.Mesh(
+    new THREE.OctahedronGeometry(1.5),
+    new THREE.MeshStandardMaterial({ color:0x1a0a12, roughness:0.4, metalness:0.6,
+      emissive:new THREE.Color(PINK), emissiveIntensity:0.55 }));
+  grp.add(core); pickables.push(core);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.14, 8, 40), trackMat);
+  ring.rotation.x = Math.PI / 2;
+  grp.add(ring); pickables.push(ring);
+  const a = 345 * Math.PI / 180;
+  grp.position.set(28 * Math.cos(a), 0.9, -28 * Math.sin(a));
+  station.add(grp);
+  NP_SHOP._group = grp;
+  npBlip = grp; npBlipCore = core;
+}
+if (npDocked) npShowBlip();
+function npAddTurns(delta) {
+  if (npDocked) return;
+  npTurns += delta;
+  if (npTurns >= Math.PI * 6) {
+    npDocked = true;
+    try { localStorage.setItem('np_door_station3d', '1'); } catch(e) {}
+    npShowBlip();
+  }
+}
+/*NP:END*/
 
 /* ---------- ui buttons ---------- */
 const btnL = document.getElementById('btnLabels');
@@ -593,6 +635,7 @@ btnR.onclick = () => {
 document.getElementById('btnReset').onclick = () => {
   camera.position.copy(CAM_HOME);
   controls.target.set(0, 0, 0);
+  npTurns = 0;
   select(null);
 };
 
@@ -614,10 +657,15 @@ const clock = new THREE.Clock();
   });
   if (rotateOn && !userOrbiting) {
     station.rotation.y += 0.0004;
+    npAddTurns(CAM_ORBIT_STEP + 0.0004);
     // manual camera orbit: stops the instant rotateOn flips, no damping glide
     const off = camera.position.clone().sub(controls.target);
     off.applyAxisAngle(UP, CAM_ORBIT_STEP);
     camera.position.copy(controls.target).add(off);
+  }
+  if (npBlipCore) {
+    const bs = 1 + 0.25 * Math.sin(t * 2.4);
+    npBlipCore.scale.set(bs, bs, bs);
   }
   controls.update();
   renderer.render(scene, camera);

@@ -499,6 +499,7 @@ function buildCluster(){
   });
   var oc=el("text",{x:500,y:700,"text-anchor":"middle","class":"slabel-sm",fill:"#5a5348"},svg);
   oc.textContent="O U T E R   N O D E S — O F F - C H A R T";
+  paintDagger();
 }
 
 /* ================= GENERIC ORBITAL RENDERER ================= */
@@ -514,6 +515,7 @@ function buildOrbital(key){
   genBodies=[];
   // star
   var sg=el("g",{},svg);
+  sg.addEventListener("click",function(e){e.stopPropagation();});
   el("circle",{cx:OCX,cy:OCY,r:52,fill:"#ffb000",opacity:0.10},sg);
   el("circle",{cx:OCX,cy:OCY,r:40,fill:"none",stroke:"#ffb000","stroke-width":1,"stroke-dasharray":"4 6",opacity:0.7},sg);
   el("circle",{cx:OCX,cy:OCY,r:28,fill:"#0d1a08",stroke:"#ffb000","stroke-width":2},sg);
@@ -563,6 +565,7 @@ function buildOrbital(key){
     (function(bd){wireHit(g,key,function(){showBodyBlurb(key,bd.name,bd.blurb);});})(b);
     genBodies.push(entry);
   });
+  paintDagger();
 }
 
 /* ================= MIRANDA BESPOKE ORBITAL ================= */
@@ -643,6 +646,7 @@ function buildMiranda(){
       wireHit(g,"miranda",(function(bid){return function(){var bb=MIRANDA_BLURBS[bid];showBodyBlurb("miranda",bb[0],bb[1]);};})(b.id));
     }
   });
+  paintDagger();
 }
 
 /* ================= ANIMATION LOOP ================= */
@@ -759,6 +763,62 @@ setInterval(function(){
     blip(90+Math.random()*60,0.12,"sawtooth",0.012);
   }
 },3800);
+
+/* ================= UNLISTED CONTACT ================= */
+/*NP:START*/
+var npVoid=0, npMapOpen=false, npPos=null, npFresh=false, npDagger=null;
+try{
+  npVoid=parseInt(localStorage.getItem("np_map_void")||"0",10)||0;
+  npMapOpen=localStorage.getItem("np_door_map")==="1";
+  var npStoredPos=localStorage.getItem("np_map_pos");
+  if(npStoredPos){var npPp=npStoredPos.split(",");npPos={x:parseFloat(npPp[0]),y:parseFloat(npPp[1])};}
+}catch(e){}
+function showNpPanel(){
+  blipSelect();
+  $("dossierBody").innerHTML=
+   '<div class="dname amb">NE†PHEMERA</div>'+
+   '<div class="row"><span class="k">CLASS:</span> UNLISTED STOREFRONT</div>'+
+   '<div class="row"><span class="k">SYSTEM:</span> —</div>'+
+   '<div class="row"><span class="k">ORBIT:</span> —</div>'+
+   '<div class="row"><span class="k">PARENT BODY:</span> —</div>'+
+   '<div class="row" style="margin-top:8px">A shop with no fixed address. It keeps no berth and files no route. The chart has no symbol for it, so the chart uses this one.</div>'+
+   '<div class="row" style="margin-top:8px"><a href="Netphemera-Terminal.html">[ VISIT THE STOREFRONT ]</a></div>'+
+   '<div class="row"><span class="cursorblink"></span></div>';
+}
+function paintDagger(){
+  var svg=$("chartSvg");if(!svg)return;
+  if(npDagger&&npDagger.parentNode)npDagger.parentNode.removeChild(npDagger);
+  npDagger=null;
+  if(!npMapOpen||!npPos)return;
+  var g=el("g",{"class":"node"},svg);
+  var t=el("text",{x:0,y:9,"text-anchor":"middle","font-size":27,fill:"#ffb000",opacity:npFresh?0.95:0.45},g);
+  t.textContent="†";
+  el("circle",{cx:0,cy:0,r:19,"class":"hit"},g);
+  g.setAttribute("transform","translate("+npPos.x+","+npPos.y+")");
+  g.addEventListener("mouseenter",function(){blipHover();});
+  g.addEventListener("click",function(e){e.stopPropagation();showNpPanel();});
+  npDagger=g;
+}
+$("chartSvg").addEventListener("click",function(e){
+  if(npMapOpen)return;
+  var svg=$("chartSvg");
+  var r=svg.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  var x=(e.clientX-r.left)/r.width*1000;
+  var y=(e.clientY-r.top)/r.height*720;
+  npVoid++;
+  try{localStorage.setItem("np_map_void",String(npVoid));}catch(err){}
+  blip(240,0.08,"sawtooth",0.02);
+  if(npVoid>=3){
+    npMapOpen=true;npFresh=true;npPos={x:x,y:y};
+    try{
+      localStorage.setItem("np_door_map","1");
+      localStorage.setItem("np_map_pos",x.toFixed(1)+","+y.toFixed(1));
+    }catch(err){}
+    paintDagger();
+  }
+});
+/*NP:END*/
 
 /* ================= BOOT ================= */
 setRegion("miranda");

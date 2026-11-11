@@ -109,6 +109,7 @@ footer.bar{border-top:2px solid var(--pk); padding:12px 20px; display:flex; gap:
         <button class="neon" onclick="soberUp()">SOBER UP (1d10 HRS)</button>
       </div>
     </div>
+    <div id="semTrace" style="display:none; margin:0 20px 6px; font-size:12px; letter-spacing:.14em; color:#8a5a72; cursor:pointer" onclick="semCardAgain()">▸ <a href="Netphemera-Terminal.html" style="color:var(--pk)" onclick="event.stopPropagation()">ONE CARD, UNMARKED</a></div>
     <footer class="bar">
       <span>LET YOUR INDULGENCE SET ME FREE. NO REFUNDS ON MEMORIES.</span>
     </footer>
@@ -196,6 +197,9 @@ function renderList(filter){
 
 /* ================= TAB + DRUNKENNESS ================= */
 let tab=[], drinks=0;
+let cardFromSem=false;
+try{ const bsv=JSON.parse(localStorage.getItem("stellarburn_note")||"null"); if(bsv) cardFromSem=!!bsv.f; }catch(e){}
+function semSave(){ try{ localStorage.setItem("stellarburn_note", JSON.stringify({f:cardFromSem})); }catch(e){} }
 function addToTab(n,p,isDrink){
   tab.push({n,p}); sAdd();
   if(isDrink){ drinks++; updateDrunk(); }
@@ -212,6 +216,7 @@ function updateDrunk(){
   else if(drinks<=2) el.innerHTML=`DRINKS: ${drinks} — BUZZED. <span class="dim">Body Save [+] after a few. You're fine. Probably.</span>`;
   else if(drinks<=4) el.innerHTML=`DRINKS: ${drinks} — <span style="color:#ff2d95">DRUNK. [-] TO ALL ROLLS. Lasts 1d10 hours.</span>`;
   else el.innerHTML=`DRINKS: ${drinks} — <span style="color:#ff3b3b">WASTED. Body Save [-]. The floor is dancing without you.</span>`;
+  if(drinks>=5 && !cardFromSem){ cardFromSem=true; semSave(); semTraceShow(); semCutoff(); }
 }
 function soberUp(){ drinks=0; tab=[]; renderTab(); updateDrunk(); sClick();
   ovl(`<div style="color:var(--pk)">1d10 HOURS LATER.</div><br>You feel like a Slickbay accident.<br>The Burn never noticed you left.<br><br><button class="neon" onclick="closeOvl()">BACK TO THE FLOOR</button>`); }
@@ -220,6 +225,20 @@ function closeTab(){
   const total=tab.reduce((s,t)=>s+priceCr(t.p),0).toLocaleString();
   tab=[]; renderTab(); sClick();
   ovl(`<div style="color:var(--pk)">TAB CLOSED: ${total}cr</div><br>Sem nods. Somewhere, a rumor changes hands.<br><span class="dim">You don't remember paying. You paid.</span><br><br><button class="neon" onclick="closeOvl()">STUMBLE ON</button>`);
+}
+
+function semTraceShow(){ const t=document.getElementById("semTrace"); if(t) t.style.display="block"; }
+function semCardAgain(){ semCutoff(); }
+function semCutoff(){
+  tone(220,.3,.06,"triangle");
+  ovl(`<div style="color:var(--pk); letter-spacing:.2em">SEM — CUT OFF</div><br>
+  That is enough. I am cutting you off. Five drinks and you have spent more time reading the menu than drinking.<br><br>
+  Whatever you are actually thirsty for, we do not pour it here. A regular left this with me a while back and told me to pass it to the next person who came in wanting the wrong thing. So here. Take it.<br><br>
+  <div style="border:1px solid var(--pu); border-radius:8px; padding:14px; margin:0 auto 6px; max-width:340px; background:rgba(181,55,242,.08)">
+    <a href="Netphemera-Terminal.html" style="color:#fff; letter-spacing:.24em; text-decoration:none; font-weight:bold">NE†PHEMERA</a>
+    <div class="dim" style="margin-top:6px; font-size:12px">No address on it. The place takes memories, not money.</div>
+  </div><br>
+  <button class="neon" onclick="closeOvl()">STUMBLE ON</button>`);
 }
 
 /* ================= SEARCH ================= */
@@ -260,6 +279,7 @@ function wake(){ sClick(); idleReset(); }
 ["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
 idleReset();
 
+if(cardFromSem) semTraceShow();
 bootStep();
 </script>
 </body>

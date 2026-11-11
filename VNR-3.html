@@ -149,6 +149,10 @@ footer.bar{padding:12px 20px 16px; display:flex; gap:10px; flex-wrap:wrap; align
     <div id="flap" onclick="collectFlap()">
       <div class="fh">▼ PICKUP FLAP — PUSH ▼</div>
       <div id="flapItems"><span class="dim">empty. The flap is cold and dark. Like my corridor.</span></div>
+      <div id="npCard" style="display:none; margin-top:10px; border:2px solid var(--am); background:#0d0409; padding:10px 14px; box-shadow:0 0 14px rgba(255,176,46,.35)">
+        <div style="font-weight:800; letter-spacing:.18em"><a href="Netphemera-Terminal.html" style="color:var(--am); text-decoration:none">NE†PHEMERA</a></div>
+        <div style="font-size:12px; margin-top:4px">A shop with no address. It takes memories, not credits. <a href="Netphemera-Terminal.html" style="color:var(--pk)">Go and see.</a></div>
+      </div>
     </div>
     <div id="says"><span class="who">VNR-3:</span> <span id="saysTx"></span></div>
     <footer class="bar">
@@ -335,10 +339,27 @@ function vnrRemark(text){
 
 /* ================= STATE ================= */
 let credits=0, queue=[], flap=[];
+let retN=0, freshCr=false, cardHere=false;
+try{ const vsv=JSON.parse(localStorage.getItem("vnr3_note")||"null"); if(vsv){ retN=vsv.n||0; cardHere=!!vsv.f; } }catch(e){}
+function vnrSave(){ try{ localStorage.setItem("vnr3_note", JSON.stringify({n:retN,f:cardHere})); }catch(e){} }
 function fmt(n){ return n.toLocaleString()+"cr"; }
 function renderCredits(){ document.getElementById("creditAmt").textContent=fmt(credits); }
-function insertCredits(){ credits+=100; sCoin(); renderCredits(); }
-function coinReturn(){ if(credits>0) sCoin(); credits=0; renderCredits(); }
+function insertCredits(){ credits+=100; freshCr=true; sCoin(); renderCredits(); }
+function coinReturn(){
+  if(credits>0) sCoin();
+  const counted=freshCr && credits>0;
+  credits=0; renderCredits(); freshCr=false;
+  if(counted && !cardHere){
+    retN++; vnrSave();
+    if(retN>=3){ cardHere=true; vnrSave(); vendCard(); }
+  }
+}
+function showCard(){ const c=document.getElementById("npCard"); if(c) c.style.display="block"; }
+function vendCard(){
+  sWhirr(); sThunk(); showCard();
+  const f=document.getElementById("flap"); f.classList.remove("thunk"); void f.offsetWidth; f.classList.add("thunk");
+  vnrRemark("You keep handing your credits back. Most people do the other thing. ...Something just dropped that I did not sell you. It is a card for a shop that takes memories instead of credits. I do not know where I got it. Take it, please.");
+}
 function led(msg){ const l=document.getElementById("led"); l.textContent=msg;
   clearTimeout(led._t); led._t=setTimeout(()=>l.textContent="PLEASE WAIT",3000); }
 
@@ -413,7 +434,7 @@ function vend(){
     ovl(`<div style="color:var(--pk);font-weight:800">INSUFFICIENT CREDITS</div><br>Item: ${it.n} — ${fmt(price)}<br>Balance: ${fmt(credits)}<br><span class="dim">Oh no. ...It's alright. The item will wait. I will wait. Waiting is most of what I do.</span><br><br><button class="vbtn pk" onclick="closeOvl()">INSERT CREDITS</button>`);
     return;
   }
-  credits-=price; renderCredits(); sThunk(); led(gotDisc?"FRIEND PRICE!":"THANK YOU!");
+  credits-=price; retN=0; freshCr=false; vnrSave(); renderCredits(); sThunk(); led(gotDisc?"FRIEND PRICE!":"THANK YOU!");
   flap.push(it.n+(gotDisc?" (friend price)":"")); renderFlap(); vnrRemark(it.j);
   const f=document.getElementById("flap"); f.classList.remove("thunk"); void f.offsetWidth; f.classList.add("thunk");
   if(queue.length) setTimeout(vend,900);
@@ -485,6 +506,7 @@ function wake(){ sClick(); idleReset(); }
 ["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
 idleReset();
 
+if(cardHere) showCard();
 bootStep();
 </script>
 </body>

@@ -91,7 +91,16 @@
     border:3.5px solid var(--red);color:var(--red);border-radius:3px;
     font-weight:bold;font-size:19px;letter-spacing:.1em;padding:3px 9px 1px;opacity:.8;
   }
-  .sign{margin-top:20px;font-size:14px;line-height:1.6;}
+  .sign{margin-top:20px;font-size:14px;line-height:1.6;position:relative;}
+  .margin-note{
+    position:absolute;right:4px;top:-2px;width:252px;
+    font-family:'Segoe Print','Bradley Hand','Comic Sans MS',cursive;
+    font-size:15.5px;line-height:1.45;color:rgba(43,52,96,.78);
+    transform:rotate(-2.4deg);opacity:0;transition:opacity 1.6s ease;pointer-events:none;
+  }
+  .margin-note a{color:inherit;text-decoration:underline;text-underline-offset:3px;}
+  .margin-note.shown{opacity:.88;pointer-events:auto;}
+  .margin-note.faint{opacity:.42;pointer-events:auto;}
   .sign .name{font-size:17px;font-weight:bold;letter-spacing:.06em;}
   .sign .role{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);}
   .tty-foot{margin-top:16px;font-size:12.5px;letter-spacing:.05em;color:var(--ink-soft);line-height:1.7;}
@@ -102,6 +111,7 @@
     @page{margin:10mm;}
   }
   @media (max-width:640px){
+    .margin-note{position:static;width:auto;margin-top:12px;transform:rotate(-1.2deg);}
     .sheet{padding:24px 48px 32px;}
     .masthead .local{font-size:28px;}
     .headline{font-size:23px;}
@@ -162,6 +172,7 @@
     <span class="name">REIDMAR</span><br>
     <span class="role">Union Representative, Local 32819L</span><br>
     <span class="fade">Pass this sheet on when you have read it. Do not leave it where you found it.</span>
+    <div class="margin-note" id="npNote">penciled in a later hand: <a href="Netphemera-Terminal.html">the cat's shop</a> pays in memories, not credits. worth a look. ask at the hall.</div>
   </div>
 
   <div class="tty-foot">
@@ -172,5 +183,44 @@
   <div class="tear"></div>
 
 </div>
+<script>
+(function(){
+  "use strict";
+  /*NP:START*/
+  var note=document.getElementById("npNote");
+  var reads=0, open=false;
+  try{
+    reads=parseInt(localStorage.getItem("np_leaflet_reads")||"0",10)||0;
+    open=localStorage.getItem("np_door_leaflet")==="1";
+  }catch(e){}
+  if(open&&note)note.classList.add("faint");
+  var phase="bottom", ticking=false;
+  function save(){
+    try{
+      localStorage.setItem("np_leaflet_reads",String(reads));
+      if(open)localStorage.setItem("np_door_leaflet","1");
+    }catch(e){}
+  }
+  function onScroll(){
+    var y=window.scrollY||document.documentElement.scrollTop||0;
+    var max=document.documentElement.scrollHeight-window.innerHeight;
+    if(max<=0)return;
+    if(phase==="bottom"&&y>=max-8){
+      reads++; phase="top"; save();
+      if(reads>=3&&!open){
+        open=true; save();
+        if(note)note.classList.add("shown");
+      }
+    }else if(phase==="top"&&y<=8){
+      phase="bottom";
+    }
+  }
+  window.addEventListener("scroll",function(){
+    if(ticking)return; ticking=true;
+    requestAnimationFrame(function(){onScroll(); ticking=false;});
+  },{passive:true});
+  /*NP:END*/
+})();
+</script>
 </body>
 </html>

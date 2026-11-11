@@ -496,10 +496,11 @@ function renderList(filter){
   let items=SHOPS.map((s,i)=>({s,i})).filter(x=>x.s.c===curCat);
   let h=`<h2 class="sttl">${CATS[curCat]} <span class="dim">(${items.length})</span> <span class="dim" style="font-size:11px">— FEATURED, fully fleshed out</span></h2>`;
   h+=items.map(x=>shopCard(x.s,x.i)).join("");
+  if(npDoorOn()) h+=npCardHTML();
   L.innerHTML=h;
 }
 function showDetail(idx){
-  sCash(); const s=SHOPS[idx]; const D=document.getElementById("detail");
+  sCash(); npViewShop(idx); const s=SHOPS[idx]; const D=document.getElementById("detail");
   D.classList.remove("add");
   D.innerHTML=`<h2 class="sttl">${s.n}</h2>
     <div class="drow"><span class="dlab">PROPRIETOR</span><br>${s.o}</div>
@@ -589,7 +590,7 @@ let warrN=0;
 function warranty(){
   warrN++; sClick();
   if(warrN<3){ ovl(`<b>EXTENDED WARRANTY</b><br><br>Protect your purchases, big spender! For a small fee, KIOSK-7 will worry about your belongings <i>so you don't have to</i>.<br><br><span class="dim">(${3-warrN} more click${3-warrN>1?"s":""} to hear the full pitch...)</span>`); return; }
-  sCash();
+  sCash(); npPurchase();
   ovl(`<b class="hot">CONGRATULATIONS, BIG SPENDER!</b><br><br>You now have an EXTENDED WARRANTY on <b>everything you have ever bought or will buy</b>.<br><br>
   Coverage includes: wear, tear, wear-and-tear, spontaneous disassembly, buyer's remorse, and one (1) Act of Station.<br>
   Coverage excludes: everything else.<br><br>
@@ -618,7 +619,7 @@ function employeeMode(){
   <button class="chunky small" onclick="closeOvl()">CLOCK OUT</button>`);
 }
 function bribeRumor(){
-  setRumors(true); sCash();
+  npPurchase(); setRumors(true); sCash();
   document.getElementById("ovlBox").innerHTML=`<b class="hot">BRIBE ACCEPTED.</b><br><br>
   <span class="grn">STREET RUMORS UNLOCKED.</span> KIOSK-7 saw nothing. KIOSK-7 sees nothing. KIOSK-7 is a kiosk.<br><br>
   <span class="dim">The 50cr has been donated to the KIOSK-7 Retirement Fund (a coffee can behind the screen).</span><br><br>
@@ -655,6 +656,45 @@ function saverLoop(){
 }
 ["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
 idleReset();
+
+/* ================= THE UNLISTED STOREFRONT ================= */
+function npDoorOn(){ try{ return localStorage.getItem("np_door_dreamshops")==="1"; }catch(e){ return false; } }
+function npViewed(){ try{ return JSON.parse(localStorage.getItem("np_door_dreamshops_viewed")||"[]"); }catch(e){ return []; } }
+function npViewShop(idx){
+  if(npDoorOn()) return;
+  const v=npViewed(); if(v.indexOf(idx)>=0) return;
+  v.push(idx);
+  try{ localStorage.setItem("np_door_dreamshops_viewed",JSON.stringify(v)); }catch(e){}
+  if(v.length>=SHOPS.length){
+    try{ localStorage.setItem("np_door_dreamshops","1"); }catch(e){}
+    const L=document.getElementById("list");
+    if(L && L.innerHTML.indexOf("npDoorCard")<0) L.insertAdjacentHTML("beforeend",npCardHTML());
+  }
+}
+function npPurchase(){
+  if(npDoorOn()) return;
+  try{ localStorage.setItem("np_door_dreamshops_viewed","[]"); }catch(e){}
+}
+function npCardHTML(){
+  return `<div class="shop" id="npDoorCard" style="border-style:dashed" onclick="showNpDetail()">
+    <div class="nm">UNLISTED STOREFRONT</div>
+    <div class="meta">Proprietor: a cat &middot; No fixed address</div>
+    <div class="blurb">This listing was not here before. KIOSK-7 has no record of adding it, and KIOSK-7 keeps very good records.</div></div>`;
+}
+function showNpDetail(){
+  sCash(); const D=document.getElementById("detail");
+  D.classList.remove("add");
+  D.innerHTML=`<h2 class="sttl">NE†PHEMERA</h2>
+    <div class="drow"><span class="dlab">PROPRIETOR</span><br>The Bakeneko. A cat. The cat does the talking.</div>
+    <div class="drow"><span class="dlab">LOCATION</span><br>No fixed address. It finds you.</div>
+    <div class="drow"><span class="dlab">WHAT</span><br>A small, quiet shop. It sells things the other shops on this list do not carry, to people the other shops did not notice.</div>
+    <div class="drow"><span class="dlab">PRICES</span><br><span class="hot">Named at checkout. The shop takes one personal memory, spoken aloud, in place of credits.</span></div>
+    <div class="drow"><span class="dlab">HOURS</span><br>Once. It opens for a person once.</div>
+    <div class="drow"><span class="dlab">KIOSK-7 SAYS</span><br><span class="dim">KIOSK-7 did not add this listing. KIOSK-7 has checked three times. KIOSK-7 is checking a fourth time.</span></div>
+    <div style="margin-top:12px"><a href="Netphemera-Terminal.html"><button class="chunky small">STEP INSIDE</button></a>
+    <button class="chunky small" onclick="hideDetail();sClick()">BACK TO LISTINGS</button></div>`;
+  D.classList.add("on"); D.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
 
 /* ================= GO ================= */
 let rumorsUnlocked = false;

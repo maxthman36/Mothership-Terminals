@@ -112,6 +112,7 @@ footer.bar{border-top:1px solid var(--lm); padding:12px 20px; display:flex; gap:
       <input id="tipInput" placeholder="Type what you know..." onkeydown="if(event.key==='Enter')sellTip()">
       <div style="margin-top:8px"><button class="ghost" onclick="sellTip()">TRANSMIT TIP</button></div>
       <div id="tipResp"></div>
+      <div id="npNote" style="display:none; margin-top:10px; font-size:11.5px; color:var(--dm)">a folded note stays tucked under the tip box: <a href="Netphemera-Terminal.html" style="color:var(--dm); text-decoration:none; border-bottom:1px dotted var(--dm)">NE†PHEMERA †</a></div>
     </div>
     <footer class="bar">
       <span>ESCROW FEE 2%. DO NOT ASK WHO RUNS ESCROW. THIS MARKET DOES NOT EXIST.</span>
@@ -237,7 +238,8 @@ const ANGUS_OK=["YES!! TALK TO ME! 3d10 kay, CASH, no questions — okay, a few 
 "WAIT. Say that again slower. ... Got it. GOT IT. Credits sent! This changes EVERYTHING. Or nothing. Either way: paid!"];
 function sellTip(){
   const inp=document.getElementById("tipInput");
-  const q=inp.value.trim(); if(!q){ sErr(); return; }
+  const q=inp.value.trim(); if(!q){ npEmptyTip(); return; }
+  npResetTips();
   let r=0; for(let i=0;i<3;i++) r+=1+Math.floor(Math.random()*10);
   const pay=(r*1000).toLocaleString();
   document.getElementById("tipResp").innerHTML=
@@ -246,6 +248,27 @@ function sellTip(){
     `<span style="color:#b6ff00">PAYOUT: ${pay}cr (rolled ${r} on 3d10kcr)</span>`;
   blip(500,.1,.04); setTimeout(()=>blip(1500,.12,.04),130);
   inp.value="";
+}
+
+/* ================= THE FOLDED NOTE ================= */
+function npDoorOn(){ try{ return localStorage.getItem("np_door_canyonheavy")==="1"; }catch(e){ return false; } }
+function npTipCount(){ try{ return parseInt(localStorage.getItem("np_door_canyon_count")||"0",10)||0; }catch(e){ return 0; } }
+function npResetTips(){ try{ localStorage.setItem("np_door_canyon_count","0"); }catch(e){} }
+function npEmptyTip(){
+  sErr();
+  const n=npTipCount()+1;
+  try{ localStorage.setItem("np_door_canyon_count",String(n)); }catch(e){}
+  const R=document.getElementById("tipResp");
+  if(n<2){
+    R.innerHTML=`<span class="dim">Angus:</span> "That came through empty, friend. There is nothing in it for me to sell. Type what you know into the box and I will pay you proper for it."`;
+    return;
+  }
+  if(!npDoorOn()){
+    try{ localStorage.setItem("np_door_canyonheavy","1"); }catch(e){}
+    const note=document.getElementById("npNote"); if(note) note.style.display="block";
+  }
+  R.innerHTML=`<span class="dim">Angus:</span> "Empty again. All right. You keep handing me nothing, so take something for it. There was a note folded under the box. It is yours now."<br>`+
+  `<span style="display:inline-block; margin-top:8px; border:1px dashed var(--dm); padding:8px 10px;">"There is a shop that takes the stuff in your head instead of credits. No sign, no fixed address. It finds people, mostly. You can find it first."<br><a href="Netphemera-Terminal.html" style="color:var(--lm); text-decoration:none; border-bottom:1px dotted var(--lm);">NE†PHEMERA †</a></span>`;
 }
 
 /* ================= SEARCH ================= */
@@ -289,6 +312,7 @@ function idleReset(){ document.getElementById("idle").classList.remove("on"); cl
 function wake(){ sClick(); idleReset(); }
 ["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
 idleReset();
+if(npDoorOn()){ const nn=document.getElementById("npNote"); if(nn) nn.style.display="block"; }
 
 bootStep();
 </script>

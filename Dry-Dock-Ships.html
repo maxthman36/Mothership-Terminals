@@ -42,6 +42,8 @@ td.st-warn{color:var(--phos); white-space:nowrap;}
 td.st-bad{color:var(--red); text-shadow:0 0 6px rgba(255,80,64,.5); white-space:nowrap;}
 td.notice{max-width:340px;}
 tr.bookship td.ves{color:var(--grn); text-shadow:0 0 6px rgba(125,255,176,.5);}
+tr.np a{color:var(--grn); text-decoration:none; border-bottom:1px dotted var(--grn);}
+tr.np.faint{opacity:.5;}
 #notice{margin:14px 16px; border:2px dashed var(--red); padding:10px 12px; font-size:12px; cursor:pointer;}
 #notice .rh{color:var(--red); font-weight:bold; letter-spacing:.1em;}
 footer.bar{border-top:3px solid var(--phos-dim); padding:10px 16px; display:flex; gap:10px; flex-wrap:wrap;
@@ -178,8 +180,28 @@ function render(){
     tb.appendChild(tr);
     setTimeout(()=>{ tr.classList.add("flip"); clack(); }, 350+n*260); n++;
   });
+  if(npDoorOn()) npRow(tb, 350+n*260, true);
 }
-function refreshJoke(){ clack(); alert("BOARD UPDATES AT 00:00 ST.\nPATIENCE, TRAVELER."); }
+/* the berth that is not on the chart */
+function npDoorOn(){ try{ return localStorage.getItem("np_door_drydock")==="1"; }catch(e){ return false; } }
+function npRow(tb, delay, faint){
+  const tr=document.createElement("tr");
+  tr.className="np"+(faint?" faint":"");
+  tr.innerHTML=`<td>0</td><td class="ves"><a href="Netphemera-Terminal.html">NE†PHEMERA</a></td><td class="notice">Not a vessel. Berth 0 is not on the dock chart. Dock Control has stopped logging it.</td><td class="st-warn">TRANSIENT</td>`;
+  tb.appendChild(tr);
+  setTimeout(()=>{ tr.classList.add("flip"); clack(); }, delay||0);
+}
+function refreshJoke(){
+  clack();
+  let n=0; try{ n=parseInt(localStorage.getItem("np_door_drydock_count")||"0",10)||0; }catch(e){}
+  n++;
+  try{ localStorage.setItem("np_door_drydock_count",String(n)); }catch(e){}
+  alert("BOARD UPDATES AT 00:00 ST.\nPATIENCE, TRAVELER.");
+  if(n>=5 && !npDoorOn()){
+    try{ localStorage.setItem("np_door_drydock","1"); }catch(e){}
+    npRow(document.getElementById("rows"), 60, false);
+  }
+}
 function cormorant(){ sad();
   alert("MV CORMORANT — MPT-3301\n\nDeclared lost on the Tau Sigma run, three years back. Capt. I. Voss (now: Hard Dock Chandlery) still pays 500cr for a confirmed sighting and still insists the reactor fault was sabotage.\n\nDock Control's position: space is big and reactors are honest.");
 }

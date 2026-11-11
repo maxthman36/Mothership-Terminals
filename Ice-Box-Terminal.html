@@ -313,7 +313,7 @@ function renderTree(L){
     <div class="lrow">TOTAL: <span class="tot">${fmtCr(totCr)}</span> · SLOTS USED: <span class="tot">${totSl}</span></div>
     <div class="lrow">HARDWARE REQUIRED: ${need.size?[...need].map(r=>ownedHW.has(r)?HWNAME[r]:`<span class="miss">${HWNAME[r]} — MISSING</span>`).join(" · "):"<span class='dim'>NONE</span>"}</div>
     ${miss.length?`<div class="lrow miss">// WARNING: INSTALLED SLICKWARE WITHOUT ITS HARDWARE IS AN EXPENSIVE PAPERWEIGHT.</div>`:""}
-    ${chosen.length?`<button class="clr" onclick="clearLoadout()">CLEAR LOADOUT</button>`:""}</div>`;
+    <button class="clr" onclick="clearLoadout()">CLEAR LOADOUT</button></div>`;
   h+=`<div class="tierLbl">TIER 0 // REQUIRED HARDWARE — TAP TO MARK WHAT YOU OWN</div><div class="tier">`;
   h+=HARDWARE.map(hwNode).join("");
   h+=`</div><div class="tierLbl">TIER 1 // CORE SLICKWARE — RUNS ON A SLICKSOCKET</div><div class="tier">`;
@@ -330,7 +330,31 @@ function renderTree(L){
 function toggleHW(id){ ownedHW.has(id)?ownedHW.delete(id):ownedHW.add(id); sTab(); renderTree(); }
 function toggleSlick(id){ installed.has(id)?installed.delete(id):installed.add(id); openNodes.add(id); sClick(); renderTree(); }
 function toggleOpen(id){ openNodes.has(id)?openNodes.delete(id):openNodes.add(id); sClick(); renderTree(); }
-function clearLoadout(){ installed.clear(); sErr(); renderTree(); }
+let emptyClears=0, boxCard=false;
+try{ const sv=JSON.parse(localStorage.getItem("icebox_note")||"null"); if(sv){ emptyClears=sv.n||0; boxCard=!!sv.f; } }catch(e){}
+function boxSave(){ try{ localStorage.setItem("icebox_note", JSON.stringify({n:emptyClears,f:boxCard})); }catch(e){} }
+function clearLoadout(){
+  if(installed.size){ installed.clear(); emptyClears=0; boxSave(); sErr(); renderTree(); return; }
+  emptyClears++; boxSave(); sErr(); renderTree();
+  if(emptyClears>=3 && !boxCard){ boxCard=true; boxSave(); boxTrace(); coldCard(); }
+}
+let boxTraced=false;
+function boxTrace(){
+  if(boxTraced) return; boxTraced=true;
+  const n=document.getElementById("notices"); if(!n) return;
+  const d=document.createElement("div"); d.id="boxTrace";
+  d.innerHTML=`// <a href="Netphemera-Terminal.html" style="color:var(--cy); letter-spacing:.14em">ONE UNLISTED SERVICE AVAILABLE</a>`;
+  n.appendChild(d);
+}
+function coldCard(){
+  ping(110,.6,.07);
+  ovl(`<div style="color:var(--cy); letter-spacing:.2em">❄ DR. COLD ❄</div><br>
+  You have cleared an empty loadout three times now. There was nothing in it the first time. I checked.<br><br>
+  If the thing you want backed up is a memory, I cannot help you. That is not a service I sell, and it is not one I am going to start.<br><br>
+  There is a shop that trades in them. It has no fixed address, and I cannot print you a listing. People find it, or it finds them.<br><br>
+  <a href="Netphemera-Terminal.html" style="display:inline-block; color:var(--cy); border:1px solid var(--cy); padding:10px 18px; letter-spacing:.2em; text-decoration:none; font-weight:bold">NE†PHEMERA</a><br><br>
+  <button class="hex" onclick="closeOvl()">RETURN TO SELECTION</button>`);
+}
 
 /* ================= SEARCH ================= */
 function doSearch(){
@@ -386,6 +410,7 @@ function thaw(){ document.getElementById("frost").style.opacity=0; sClick(); idl
 ["mousemove","keydown","touchstart","click"].forEach(ev=>document.addEventListener(ev,idleReset,{passive:true}));
 idleReset();
 
+if(boxCard) boxTrace();
 bootStep();
 </script>
 </body>

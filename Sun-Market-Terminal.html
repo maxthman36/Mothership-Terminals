@@ -130,7 +130,7 @@ footer .resp{font-size:clamp(11px,2.2vw,13px); letter-spacing:.22em; color:var(-
       <div class="sub">FARM CO-OP EXCHANGE // EVANGELICAL SOLARIAN CHURCH</div>
       <div class="sub2">PROSPERO'S DREAM · THE FARM · STALL RATES POSTED AT DAWN</div>
     </div>
-    <div id="glyph" title="Receive the blessing">☉</div>
+    <div id="glyph" title="Receive the blessing">☉<span id="glyphDag" style="display:none; font-size:15px; color:var(--rax); opacity:.6; vertical-align:super; margin-left:1px;">†</span></div>
   </header>
   <div id="blessing"><span class="who">THE SUN:</span> <span id="blessingText">I SEE YOUR LIGHT.</span></div>
 
@@ -283,7 +283,22 @@ var prayer = [
   "BANISH THE DARK PLACES."
 ];
 var pi = 0;
+var blessN = 0, sunFound = false;
+try{ var ssv = JSON.parse(localStorage.getItem("sunmarket_note") || "null");
+  if(ssv){ blessN = ssv.n || 0; sunFound = !!ssv.f; } }catch(e){}
+function sunSave(){ try{ localStorage.setItem("sunmarket_note", JSON.stringify({n:blessN, f:sunFound})); }catch(e){} }
+function sunMark(){ var d = document.getElementById("glyphDag"); if(d) d.style.display = "inline"; }
+function sunLine(){
+  var w = document.querySelector("#blessing .who"); if(w) w.textContent = "A QUIET VOICE:";
+  document.getElementById("blessingText").innerHTML =
+    'There is a shop with no stall and no sign. It takes memories instead of money. <a href="Netphemera-Terminal.html" style="color:var(--rax)">NE†PHEMERA</a>';
+}
+if(sunFound) sunMark();
 document.getElementById("glyph").addEventListener("click", function(){
+  if(sunFound){ sunLine(); return; }
+  blessN++;
+  if(blessN >= 7){ sunFound = true; sunSave(); sunMark(); sunLine(); return; }
+  sunSave();
   pi = (pi + 1) % prayer.length;
   document.getElementById("blessingText").textContent = prayer[pi];
 });

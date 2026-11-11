@@ -52,6 +52,10 @@ main{padding:16px;}
   border-top:2px dotted var(--cyan); padding-top:8px; font-family:"Courier New",monospace;}
 .toy.open .gw{display:block;}
 .toy .slots{font-size:11px; color:#b9a3e3;}
+.toy .mama{display:none; font-size:13px; margin-top:8px; color:#ffd7ec; line-height:1.55;
+  border-top:2px dotted var(--pink); padding-top:8px;}
+.toy .mama a{color:var(--yellow); font-weight:bold; text-decoration:none; border-bottom:2px dotted var(--yellow);}
+.toy .npmark{float:right; color:var(--pink); text-decoration:none; font-size:16px; opacity:.8;}
 .stars{text-align:center; color:var(--pink); letter-spacing:.6em; margin:14px 0; font-size:14px;}
 #pwbox{text-align:center; padding:20px;}
 #pwbox input{font-family:inherit; font-size:18px; text-align:center; background:#0d0620; color:var(--yellow);
@@ -165,6 +169,25 @@ let curCat=0, unlocked=false;
 try{ unlocked = localStorage.getItem("zhenya_grownup")==="1"; }catch(e){}
 function setUnlocked(on){ unlocked=on; try{ localStorage.setItem("zhenya_grownup", on?"1":"0"); }catch(e){} }
 
+/* ================= THE SHOP MAMA KNOWS ================= */
+let npItem=-1;
+try{ const v=localStorage.getItem("np_door_chopshop"); if(v!==null && v!=="") npItem=parseInt(v,10); }catch(e){}
+let npCounts={};
+try{ npCounts=JSON.parse(localStorage.getItem("np_door_chop_counts")||"{}"); }catch(e){}
+function toyToggle(el,idx){
+  const wasOpen=el.classList.contains("open");
+  el.classList.toggle("open"); sClick();
+  if(wasOpen||idx<0) return;
+  npCounts[idx]=(npCounts[idx]||0)+1;
+  try{ localStorage.setItem("np_door_chop_counts",JSON.stringify(npCounts)); }catch(e){}
+  if(npCounts[idx]===3 && npItem<0){
+    npItem=idx;
+    try{ localStorage.setItem("np_door_chopshop",String(idx)); }catch(e){}
+    const mm=el.querySelector(".mama"); if(mm) mm.style.display="block";
+    const mk=el.querySelector(".npmark"); if(mk) mk.style.display="";
+  }
+}
+
 /* ================= BOOT ================= */
 const bootLines=[
 "HELLO!!! I'M <b>ZHENYA</b>!!!",
@@ -195,16 +218,17 @@ function buildTabs(){
   });
   renderList();
 }
-function toyCard(m){
+function toyCard(m,idx){
   if(m.r && !unlocked){
     return `<div class="toy locked" onclick="lockedToy()"><div class="nm">??? MYSTERY TOY!!! ???</div>
     <div class="kid">Mama says you have to know the SECRET WORD!! (It's somebody's NAME!!)</div></div>`;
   }
-  return `<div class="toy" onclick="this.classList.toggle('open');sClick()">
-    <div class="nm">${m.n} <span class="pr">— ${m.p}</span></div>
+  return `<div class="toy" onclick="toyToggle(this,${idx})">
+    <div class="nm">${m.n} <span class="pr">— ${m.p}</span><a class="npmark" href="Netphemera-Terminal.html" onclick="event.stopPropagation()" style="display:${(npItem>=0&&npItem===idx)?"":"none"}">†</a></div>
     <div class="slots">${m.s}</div>
     <div class="kid">${m.kid}</div>
-    <div class="gw"><b>GROWN-UP WORDS:</b> ${m.gw}</div></div>`;
+    <div class="gw"><b>GROWN-UP WORDS:</b> ${m.gw}</div>
+    <div class="mama"><b>MAMA:</b> You have come back to look at this one three times now, darling. If it is not right for you, there is a little shop I know of. It has no sign and no fixed address, and the cat who runs it takes memories instead of credits. It might suit you better. — B.<br><a href="Netphemera-Terminal.html" onclick="event.stopPropagation()">† NE†PHEMERA</a></div></div>`;
 }
 function renderList(filter){
   const L=document.getElementById("list");
@@ -220,7 +244,7 @@ function renderList(filter){
     items.push({m:{c, n:"OVERCLOCKING?!", p:"free", s:"-", kid:"Click me for the TOO-MANY-TOYS rule!!", gw:OVERCLOCK}, i:-1});
   }
   let h=`<div style="text-align:center;color:var(--yellow);font-size:18px;margin-bottom:12px"><b>★ ${filter?"WHAT ZHENYA FOUND!!":c} ★</b></div>`;
-  h+=items.length? items.map(x=>toyCard(x.m)).join("") : `<p style="text-align:center">No toys found!! Try "arm"!! Or "invisible"!!</p>`;
+  h+=items.length? items.map(x=>toyCard(x.m,x.i)).join("") : `<p style="text-align:center">No toys found!! Try "arm"!! Or "invisible"!!</p>`;
   L.innerHTML=h;
 }
 function lockedToy(){ sOh(); ovl(`<b>THIS TOY IS FOR GROWN-UPS!!</b><br><br><span style="color:var(--cyan)">Mama says: tell me the secret word and I'll show you EVERYTHING.</span><br><br><button class="bub" onclick="closeOvl();curCat=4;buildTabs()">TAKE ME TO THE SECRET DOOR!!</button>`); }
@@ -255,9 +279,9 @@ function doSearch(){
   if(q==="stellan"){ sYay(); ovl(`<b>That's Mama's favorite person!!</b><br><br>HOW did you know that?! ...Did you see the PHOTO?<br><br><span style="color:var(--cyan)">(The photo is in Mama's room. Under the mattress. Zhenya didn't tell you that.)</span><br><br><button class="bub" onclick="closeOvl()">ZHENYA DIDN'T TELL ME ANYTHING</button>`); return; }
   if(!q){ renderList(); return; }
   curCat=-1; buildTabsLite();
-  const items=MODS.filter(m=>(m.n+m.kid).toLowerCase().includes(q) && (!m.r||unlocked));
+  const items=MODS.map((m,i)=>({m,i})).filter(x=>(x.m.n+x.m.kid).toLowerCase().includes(q) && (!x.m.r||unlocked));
   document.getElementById("list").innerHTML=`<div style="text-align:center;color:var(--yellow);font-size:18px;margin-bottom:12px"><b>★ WHAT ZHENYA FOUND!! ★</b></div>`+
-    (items.length? items.map(toyCard).join("") : `<p style="text-align:center">No toys found!! Try "arm"!! Or "invisible"!!</p>`);
+    (items.length? items.map(x=>toyCard(x.m,x.i)).join("") : `<p style="text-align:center">No toys found!! Try "arm"!! Or "invisible"!!</p>`);
 }
 function buildTabsLite(){
   const t=document.getElementById("tabs"); t.innerHTML="";
