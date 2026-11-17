@@ -264,10 +264,18 @@ function rewardText(b){
   return `${v} ${b.rewardUnit || "Kcr"}${b.rewardNote ? " " + b.rewardNote : ""}`;
 }
 /* Active warrant persists between sessions (localStorage) so the crew can
-   pick the next job at the table or in the group channel during the week. */
+   pick the next job at the table or in the group channel during the week.
+   A stored warrant that has since CLOSED (e.g. B-0101) no longer counts:
+   the terminal falls back to the current assigned warrant, B-0233, so the
+   Quick job is what the first page shows. */
 let activeWarrantId=null;
 try{ activeWarrantId=localStorage.getItem("rac_active_warrant"); }catch(e){}
-let activeWarrant=BOUNTIES.find(b=>b.id===activeWarrantId)||BOUNTIES.find(b=>b.id==="B-0233")||BOUNTIES[0];
+let storedWarrant=BOUNTIES.find(b=>b.id===activeWarrantId);
+if(storedWarrant&&storedWarrant.status==="CLOSED") storedWarrant=null;
+let activeWarrant=storedWarrant||BOUNTIES.find(b=>b.id==="B-0233")||BOUNTIES[0];
+if(activeWarrant&&activeWarrant.id!==activeWarrantId){
+  try{ localStorage.setItem("rac_active_warrant",activeWarrant.id); }catch(e){}
+}
 const tbody=document.querySelector("#boardTable tbody"),
       detail=document.getElementById("detail");
 function statusTag(b){

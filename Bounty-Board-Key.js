@@ -78,11 +78,11 @@ bounties: [
   // the proprietor of the Ice Box. This is the mechanism for saving
   // Grimm's backed-up consciousness after the Change.
   { id: "B-0233", target: "QUICK, ELIAS", type: "MISSING PERSON — PROOF OF DEATH", bl: 2,
-    reward: "10 Kcr + bonus (hunter's choice): 100 Kcr OR one reclamation sleeve", status: "ASSIGNED",
+    reward: "10 Kcr + bonus (hunter's choice): 100 Kcr OR one low-grade reclamation sleeve", status: "ASSIGNED",
     client: "The Quick family (via RAC annex)",
     fee: "1 Kcr license fee applies",
-    lastKnown: "Prospero's Dream — Lycaon's arcade (disused)",
-    terms: "Media mogul missing three years after bad business deals. The family needs his death confirmed to release company funds: 10 Kcr for verified findings, plus a bonus — the team's choice: 100 Kcr, or one low-grade reclamation sleeve (100kcr) held by the proprietor of the Ice Box. Last trace: Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger.",
+    lastKnown: "Prospero's Dream — Lycaon's arcade (closed)",
+    terms: "Elias Quick, media mogul, vanished three years ago after a run of bad business deals. His family needs his death confirmed to take control of the company funds: 10 Kcr for verified findings. Proof of death pays a bonus, at the hunters' choice: 100 Kcr, or one low-grade reclamation sleeve (100 Kcr) held by the proprietor of the Ice Box. Proof must satisfy the family and the RAC annex. Start at Lycaon's, a closed-down Slickworld arcade on the Dream, still paying utilities on the company ledger. Annex advisory: slickworld entry runs through the Ice Box. A hunter with no Slicksocket installed goes in read-only by pod: safe, and unable to act inside.",
     travel: { jumps: 0,
               local: "Station transit — the target is on the Dream.",
               localKcr: 0 } },
